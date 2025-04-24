@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { useAuth } from '@/hooks/use-auth-context';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, ClipboardCheck, Hospital, UserCheck, Users } from 'lucide-react';
+import SecretaryDashboard from './secretary/SecretaryDashboard';
 
 const Dashboard = () => {
   const { user } = useAuth();
