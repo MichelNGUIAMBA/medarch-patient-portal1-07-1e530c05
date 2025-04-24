@@ -1,6 +1,8 @@
 import React from 'react';
 import { useAuth } from '@/hooks/use-auth-context';
 import SecretaryDashboard from './secretary/SecretaryDashboard';
+import { Calendar, ClipboardCheck, Hospital, Users, UserCheck } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -27,124 +29,6 @@ const Dashboard = () => {
     <div>
       <h1 className="text-2xl font-bold mb-6">Bienvenue, {user?.name}</h1>
       {renderRoleDashboard()}
-    </div>
-  );
-};
-
-const SecretaryDashboard = () => {
-  // Mock data
-  const waitingListData = {
-    vm: 5,
-    cons: 8,
-    urg: 2,
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Patients en attente de VM
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <Calendar className="h-5 w-5 text-blue-600 mr-2" />
-              <span className="text-2xl font-bold">{waitingListData.vm}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Patients en attente de consultation
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <ClipboardCheck className="h-5 w-5 text-green-600 mr-2" />
-              <span className="text-2xl font-bold">{waitingListData.cons}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Urgences en cours
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <Hospital className="h-5 w-5 text-red-600 mr-2" />
-              <span className="text-2xl font-bold">{waitingListData.urg}</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold mb-4">Actions rapides</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="flex flex-col items-center justify-center p-6 hover:bg-gray-50 cursor-pointer transition-colors">
-            <UserCheck className="h-8 w-8 text-blue-600 mb-2" />
-            <span className="font-medium">Nouveau patient</span>
-          </Card>
-
-          <Card className="flex flex-col items-center justify-center p-6 hover:bg-gray-50 cursor-pointer transition-colors">
-            <Users className="h-8 w-8 text-green-600 mb-2" />
-            <span className="font-medium">Rechercher un patient</span>
-          </Card>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-4 border-b">
-          <h2 className="text-lg font-semibold">Derniers patients enregistrés</h2>
-        </div>
-        <div className="p-0">
-          <table className="w-full">
-            <thead>
-              <tr className="text-xs font-medium text-gray-500 bg-gray-50 border-b">
-                <th className="px-6 py-3 text-left">ID</th>
-                <th className="px-6 py-3 text-left">Nom</th>
-                <th className="px-6 py-3 text-left">Entreprise</th>
-                <th className="px-6 py-3 text-left">Service</th>
-                <th className="px-6 py-3 text-left">Statut</th>
-                <th className="px-6 py-3 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { id: "P-1234", name: "Jean Dupont", company: "PERENCO", service: "VM", status: "En attente" },
-                { id: "P-1235", name: "Marie Lambert", company: "Total SA", service: "Ug", status: "En cours" },
-                { id: "P-1236", name: "Philippe Martin", company: "Dixstone", service: "Cons", status: "En attente" }
-              ].map((patient) => (
-                <tr key={patient.id} className="border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">{patient.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{patient.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{patient.company}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{patient.service}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      patient.status === "En cours" 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}>
-                      {patient.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <a href="#" className="text-blue-600 hover:text-blue-800 text-sm font-medium">Afficher</a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 };
