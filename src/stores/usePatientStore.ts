@@ -28,7 +28,7 @@ export const usePatientStore = create<PatientStore>((set) => ({
   patients: [
     { 
       id: "P-1234", 
-      name: "Jean Dupont", 
+      name: "JEAN DUPONT", 
       firstName: "Jean",
       lastName: "Dupont",
       company: "PERENCO", 
@@ -41,7 +41,7 @@ export const usePatientStore = create<PatientStore>((set) => ({
     },
     { 
       id: "P-1235", 
-      name: "Marie Lambert", 
+      name: "MARIE LAMBERT", 
       firstName: "Marie",
       lastName: "Lambert",
       company: "Total SA", 
@@ -60,7 +60,7 @@ export const usePatientStore = create<PatientStore>((set) => ({
         id: `P-${Math.floor(Math.random() * 9000) + 1000}`,
         status: "En attente",
         registeredAt: new Date().toISOString(),
-        name: `${patient.firstName} ${patient.lastName}`
+        name: `${patient.firstName} ${patient.lastName}`.toUpperCase()
       },
       ...state.patients
     ]

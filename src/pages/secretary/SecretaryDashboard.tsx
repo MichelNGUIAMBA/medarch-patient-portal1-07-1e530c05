@@ -1,16 +1,43 @@
-
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, ClipboardCheck, Hospital, UserCheck, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { usePatientStore } from '@/stores/usePatientStore';
+import SearchBar from '@/components/secretary/SearchBar';
 
 const SecretaryDashboard = () => {
   const navigate = useNavigate();
   const patients = usePatientStore((state) => state.patients);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('time');
 
-  // Calculate waiting list data from actual patients
+  const filteredAndSortedPatients = useMemo(() => {
+    let result = [...patients];
+    
+    // Appliquer la recherche
+    if (searchTerm) {
+      result = result.filter(patient => 
+        patient.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Appliquer le tri
+    switch (sortOrder) {
+      case 'alpha-asc':
+        return result.sort((a, b) => a.name.localeCompare(b.name));
+      case 'alpha-desc':
+        return result.sort((a, b) => b.name.localeCompare(a.name));
+      case 'time':
+        return result.sort((a, b) => 
+          new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime()
+        );
+      default:
+        return result;
+    }
+  }, [patients, searchTerm, sortOrder]);
+
+  // Calculer les données de la liste d'attente
   const waitingListData = {
     vm: patients.filter(p => p.service === "VM" && p.status === "En attente").length,
     cons: patients.filter(p => p.service === "Cons" && p.status === "En attente").length,
@@ -88,6 +115,12 @@ const SecretaryDashboard = () => {
         </div>
       </div>
 
+      {/* Barre de recherche */}
+      <SearchBar
+        onSearch={setSearchTerm}
+        onSortChange={setSortOrder}
+      />
+
       {/* Liste des patients récents */}
       <div className="bg-white rounded-lg shadow">
         <div className="p-4 border-b">
@@ -109,10 +142,10 @@ const SecretaryDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {patients.map((patient) => (
+              {filteredAndSortedPatients.map((patient) => (
                 <tr key={patient.id} className="border-b hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">{patient.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap font-medium">{patient.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap font-medium uppercase">{patient.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{patient.company}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
