@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { usePatientStore } from '@/stores/usePatientStore';
+import { usePatientStore, Patient } from '@/stores/usePatientStore';
 import { Import } from 'lucide-react';
 
 type CsvRow = {
@@ -52,7 +52,7 @@ const CsvImport = () => {
         }
         
         // Parse CSV data into an array of objects
-        const patients: CsvRow[] = [];
+        const patients: Omit<Patient, "id" | "status" | "registeredAt" | "name">[] = [];
         
         for (let i = 1; i < lines.length; i++) {
           if (!lines[i].trim()) continue;  // Skip empty lines
@@ -68,16 +68,27 @@ const CsvImport = () => {
           });
           
           // Validate service value
-          if (patient.service && !['VM', 'Cons', 'Ug'].includes(patient.service)) {
-            toast.error(`Ligne ${i}: Valeur de service invalide "${patient.service}". Doit être VM, Cons, ou Ug.`);
-            continue;
+          if (patient.service) {
+            const serviceValue = patient.service.toUpperCase();
+            if (!['VM', 'CONS', 'UG'].includes(serviceValue)) {
+              toast.error(`Ligne ${i}: Valeur de service invalide "${patient.service}". Doit être VM, Cons, ou Ug.`);
+              continue;
+            }
+            
+            // Convert to proper format
+            let normalizedService: "VM" | "Cons" | "Ug";
+            if (serviceValue === 'VM') normalizedService = "VM";
+            else if (serviceValue === 'CONS') normalizedService = "Cons";
+            else normalizedService = "Ug";
+            
+            patient.service = normalizedService;
           }
           
           // Check if all required fields are present
           const isValid = requiredFields.every(field => patient[field as keyof CsvRow]);
           
           if (isValid) {
-            patients.push(patient as CsvRow);
+            patients.push(patient as Omit<Patient, "id" | "status" | "registeredAt" | "name">);
           } else {
             toast.error(`Ligne ${i}: données incomplètes, ignorée`);
           }
@@ -150,7 +161,6 @@ const CsvImport = () => {
             />
             <label htmlFor="csvFile">
               <Button 
-                as="span" 
                 variant="outline" 
                 className="flex items-center gap-2 cursor-pointer"
                 disabled={isLoading}
