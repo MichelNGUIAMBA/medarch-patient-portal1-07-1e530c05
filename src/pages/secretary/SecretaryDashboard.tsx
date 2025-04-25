@@ -11,15 +11,35 @@ const SecretaryDashboard = () => {
   const patients = usePatientStore((state) => state.patients);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('time');
+  const [activeFilters, setActiveFilters] = useState<string[]>(['name']);
 
   const filteredAndSortedPatients = useMemo(() => {
     let result = [...patients];
     
     // Appliquer la recherche
     if (searchTerm) {
-      result = result.filter(patient => 
-        patient.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      result = result.filter(patient => {
+        const searchLower = searchTerm.toLowerCase();
+        
+        // Recherche dans tous les champs selon les filtres actifs
+        return activeFilters.some(filter => {
+          switch (filter) {
+            case 'name':
+              return patient.name.toLowerCase().includes(searchLower) ||
+                     patient.firstName.toLowerCase().includes(searchLower) ||
+                     patient.lastName.toLowerCase().includes(searchLower);
+            case 'company':
+              return patient.company.toLowerCase().includes(searchLower);
+            case 'age':
+              const age = differenceInYears(new Date(), new Date(patient.birthDate));
+              return age.toString().includes(searchLower);
+            case 'service':
+              return patient.service.toLowerCase().includes(searchLower);
+            default:
+              return false;
+          }
+        });
+      });
     }
 
     // Appliquer le tri
@@ -35,7 +55,7 @@ const SecretaryDashboard = () => {
       default:
         return result;
     }
-  }, [patients, searchTerm, sortOrder]);
+  }, [patients, searchTerm, sortOrder, activeFilters]);
 
   // Calculer les données de la liste d'attente
   const waitingListData = {
@@ -115,10 +135,12 @@ const SecretaryDashboard = () => {
         </div>
       </div>
 
-      {/* Barre de recherche */}
+      {/* Barre de recherche avec nouveaux filtres */}
       <SearchBar
         onSearch={setSearchTerm}
         onSortChange={setSortOrder}
+        onFilterChange={setActiveFilters}
+        activeFilters={activeFilters}
       />
 
       {/* Liste des patients récents */}
