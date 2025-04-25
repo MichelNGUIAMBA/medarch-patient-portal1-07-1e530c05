@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/sonner';
@@ -109,10 +110,20 @@ const NewPatient = () => {
       if (formData.services.urg) serviceType = "Ug";
       else if (formData.services.cons) serviceType = "Cons";
 
+      // Make sure to pass all the required fields from the Patient type
       addPatient({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         name: `${formData.firstName} ${formData.lastName}`,
+        birthDate: formData.birthDate,
+        gender: formData.gender,
         company: formData.company,
-        service: serviceType
+        service: serviceType,
+        idNumber: formData.idNumber || undefined,
+        email: formData.email || undefined,
+        phone: formData.phone || undefined,
+        address: formData.address || undefined,
+        employeeId: formData.employeeId || undefined
       });
 
       toast.success("Patient enregistré avec succès");
