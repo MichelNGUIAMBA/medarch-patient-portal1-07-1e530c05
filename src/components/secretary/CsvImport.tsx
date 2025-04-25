@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +22,7 @@ type CsvRow = {
 const CsvImport = () => {
   const addPatientsFromCSV = usePatientStore((state) => state.addPatientsFromCSV);
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const processCSVFile = (file: File) => {
     setIsLoading(true);
@@ -133,6 +133,11 @@ const CsvImport = () => {
     // Reset the input to allow the same file to be selected again
     e.target.value = '';
   };
+  
+  const handleButtonClick = () => {
+    // Programmatically trigger the hidden file input when the button is clicked
+    fileInputRef.current?.click();
+  };
 
   return (
     <Card>
@@ -153,23 +158,23 @@ const CsvImport = () => {
           
           <div className="flex flex-col space-y-4">
             <input
+              ref={fileInputRef}
               id="csvFile"
               type="file"
               accept=".csv"
               onChange={handleFileUpload}
               className="hidden"
             />
-            <label htmlFor="csvFile">
-              <Button 
-                variant="outline" 
-                className="flex items-center gap-2 cursor-pointer"
-                disabled={isLoading}
-                type="button"
-              >
-                <Import className="h-4 w-4" />
-                {isLoading ? "Importation..." : "Sélectionner un fichier CSV"}
-              </Button>
-            </label>
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2 cursor-pointer"
+              disabled={isLoading}
+              type="button"
+              onClick={handleButtonClick}
+            >
+              <Import className="h-4 w-4" />
+              {isLoading ? "Importation..." : "Sélectionner un fichier CSV"}
+            </Button>
           </div>
         </div>
       </CardContent>
