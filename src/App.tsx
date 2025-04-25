@@ -14,6 +14,8 @@ import UserManagement from "./pages/admin/UserManagement";
 import LabExams from "./pages/laboratory/LabExams";
 import { AuthProvider, useAuth } from "./hooks/use-auth-context";
 import UnderConstructionPage from "./pages/UnderConstructionPage";
+import WaitingList from "./pages/secretary/WaitingList";
+import PatientDetails from "./pages/secretary/PatientDetails";
 
 const queryClient = new QueryClient();
 
@@ -49,8 +51,8 @@ const App = () => (
               
               {/* Secretary routes */}
               <Route path="new-patient" element={<NewPatient />} />
-              <Route path="search-patient" element={<UnderConstructionPage />} />
-              <Route path="waiting-lists" element={<UnderConstructionPage />} />
+              <Route path="waiting-lists" element={<WaitingList />} />
+              <Route path="patient/:id" element={<PatientDetails />} />
               
               {/* Nurse routes */}
               <Route path="waiting-patients" element={<UnderConstructionPage />} />
