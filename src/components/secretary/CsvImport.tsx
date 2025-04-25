@@ -151,19 +151,20 @@ const CsvImport = () => {
             Colonnes optionnelles : idNumber, phone, email, address, employeeId
           </p>
           
-          <div className="flex items-center">
+          <div className="flex flex-col space-y-4">
             <input
               id="csvFile"
               type="file"
               accept=".csv"
               onChange={handleFileUpload}
-              className="sr-only"
+              className="hidden"
             />
             <label htmlFor="csvFile">
               <Button 
                 variant="outline" 
                 className="flex items-center gap-2 cursor-pointer"
                 disabled={isLoading}
+                type="button"
               >
                 <Import className="h-4 w-4" />
                 {isLoading ? "Importation..." : "Sélectionner un fichier CSV"}
