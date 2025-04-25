@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth-context";
@@ -38,7 +37,6 @@ const DashboardLayout = () => {
     navigate("/");
   };
 
-  // Navigation items based on user role
   const getNavigationItems = () => {
     const commonItems = [
       {
@@ -66,11 +64,6 @@ const DashboardLayout = () => {
           title: "Nouveaux patients",
           url: "/dashboard/new-patient",
           icon: User,
-        },
-        {
-          title: "Rechercher patient",
-          url: "/dashboard/search-patient",
-          icon: Search,
         },
         {
           title: "Listes d'attente",

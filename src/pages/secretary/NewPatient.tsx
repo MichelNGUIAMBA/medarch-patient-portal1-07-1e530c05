@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/sonner';
@@ -9,9 +8,11 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { usePatientStore } from '@/stores/usePatientStore';
 
 const NewPatient = () => {
   const navigate = useNavigate();
+  const addPatient = usePatientStore((state) => state.addPatient);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -103,18 +104,25 @@ const NewPatient = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateStep2()) {
-      // In a real app, this would save the patient to the database
-      console.log("Patient data:", formData);
+      // Ajout du patient au store
+      let serviceType: "VM" | "Cons" | "Ug" = "VM";
+      if (formData.services.urg) serviceType = "Ug";
+      else if (formData.services.cons) serviceType = "Cons";
+
+      addPatient({
+        name: `${formData.firstName} ${formData.lastName}`,
+        company: formData.company,
+        service: serviceType
+      });
+
       toast.success("Patient enregistré avec succès");
       
-      // Navigate to waiting list or show confirmation
       setTimeout(() => {
         navigate("/dashboard/waiting-lists");
       }, 1500);
     }
   };
 
-  // Determine available services based on company selection
   const getAvailableServices = () => {
     switch (formData.company) {
       case 'PERENCO':

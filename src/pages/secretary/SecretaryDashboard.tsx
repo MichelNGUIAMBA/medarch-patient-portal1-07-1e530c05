@@ -1,18 +1,19 @@
-
 import React from 'react';
-import { Calendar, ClipboardCheck, Hospital, UserCheck, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Calendar, ClipboardCheck, Hospital, UserCheck } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { usePatientStore } from '@/stores/usePatientStore';
 
 const SecretaryDashboard = () => {
   const navigate = useNavigate();
+  const patients = usePatientStore((state) => state.patients);
 
-  // Mock data
+  // Calculate waiting list data from actual patients
   const waitingListData = {
-    vm: 5,
-    cons: 8,
-    urg: 2,
+    vm: patients.filter(p => p.service === "VM" && p.status === "En attente").length,
+    cons: patients.filter(p => p.service === "Cons" && p.status === "En attente").length,
+    urg: patients.filter(p => p.service === "Ug").length,
   };
 
   return (
@@ -107,11 +108,7 @@ const SecretaryDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {[
-                { id: "P-1234", name: "Jean Dupont", company: "PERENCO", service: "VM", status: "En attente" },
-                { id: "P-1235", name: "Marie Lambert", company: "Total SA", service: "Ug", status: "En cours" },
-                { id: "P-1236", name: "Philippe Martin", company: "Dixstone", service: "Cons", status: "En attente" }
-              ].map((patient) => (
+              {patients.map((patient) => (
                 <tr key={patient.id} className="border-b hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">{patient.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap font-medium">{patient.name}</td>
