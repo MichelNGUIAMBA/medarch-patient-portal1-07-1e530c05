@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { usePatientStore } from '@/stores/usePatientStore';
 import SearchBar from '@/components/secretary/SearchBar';
+import { differenceInYears } from 'date-fns';
 
 const SecretaryDashboard = () => {
   const navigate = useNavigate();
