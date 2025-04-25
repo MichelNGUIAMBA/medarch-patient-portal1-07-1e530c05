@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import MedicalVisitForm from "./pages/nurse/MedicalVisitForm";
 import UserManagement from "./pages/admin/UserManagement";
 import LabExams from "./pages/laboratory/LabExams";
 import { AuthProvider, useAuth } from "./hooks/use-auth-context";
+import UnderConstructionPage from "./pages/UnderConstructionPage";
 
 const queryClient = new QueryClient();
 
@@ -49,26 +49,26 @@ const App = () => (
               
               {/* Secretary routes */}
               <Route path="new-patient" element={<NewPatient />} />
-              <Route path="search-patient" element={<Dashboard />} />
-              <Route path="waiting-lists" element={<Dashboard />} />
+              <Route path="search-patient" element={<UnderConstructionPage />} />
+              <Route path="waiting-lists" element={<UnderConstructionPage />} />
               
               {/* Nurse routes */}
-              <Route path="waiting-patients" element={<Dashboard />} />
+              <Route path="waiting-patients" element={<UnderConstructionPage />} />
               <Route path="medical-visits" element={<MedicalVisitForm />} />
-              <Route path="consultations" element={<Dashboard />} />
-              <Route path="emergencies" element={<Dashboard />} />
+              <Route path="consultations" element={<UnderConstructionPage />} />
+              <Route path="emergencies" element={<UnderConstructionPage />} />
               
               {/* Lab routes */}
               <Route path="pending-exams" element={<LabExams />} />
-              <Route path="exam-history" element={<Dashboard />} />
+              <Route path="exam-history" element={<UnderConstructionPage />} />
               
               {/* Admin routes */}
               <Route path="users" element={<UserManagement />} />
-              <Route path="settings" element={<Dashboard />} />
+              <Route path="settings" element={<UnderConstructionPage />} />
               
               {/* Doctor routes */}
-              <Route path="patients-to-see" element={<Dashboard />} />
-              <Route path="medical-records" element={<Dashboard />} />
+              <Route path="patients-to-see" element={<UnderConstructionPage />} />
+              <Route path="medical-records" element={<UnderConstructionPage />} />
             </Route>
 
             {/* Catch-all route */}

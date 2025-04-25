@@ -1,12 +1,31 @@
 
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Outlet } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth-context";
 import { Button } from "@/components/ui/button";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import { 
+  Sidebar, 
+  SidebarContent, 
+  SidebarGroup, 
+  SidebarGroupContent, 
+  SidebarGroupLabel, 
+  SidebarMenu, 
+  SidebarMenuButton, 
+  SidebarMenuItem 
+} from "@/components/ui/sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Hospital, User, Users, Database, ClipboardCheck, LogOut, FileText, Calendar, UserCheck, SearchIcon } from "lucide-react";
+import { 
+  Hospital, 
+  User, 
+  Users, 
+  Database, 
+  ClipboardCheck, 
+  LogOut, 
+  FileText, 
+  Calendar, 
+  UserCheck, 
+  Search
+} from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 
 const DashboardLayout = () => {
@@ -51,7 +70,7 @@ const DashboardLayout = () => {
         {
           title: "Rechercher patient",
           url: "/dashboard/search-patient",
-          icon: SearchIcon,
+          icon: Search,
         },
         {
           title: "Listes d'attente",
@@ -126,11 +145,12 @@ const DashboardLayout = () => {
                 <SidebarMenu>
                   {getNavigationItems().map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
-                        <a href={item.url} className="flex items-center gap-3">
-                          <item.icon className="h-5 w-5" />
-                          <span>{item.title}</span>
-                        </a>
+                      <SidebarMenuButton 
+                        onClick={() => navigate(item.url)}
+                        className="flex items-center gap-3 cursor-pointer"
+                      >
+                        <item.icon className="h-5 w-5" />
+                        <span>{item.title}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
