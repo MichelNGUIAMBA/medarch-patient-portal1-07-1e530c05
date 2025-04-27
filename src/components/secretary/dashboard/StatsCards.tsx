@@ -2,7 +2,7 @@
 import React from 'react';
 import { Calendar, ClipboardCheck, Hospital } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PatientStats } from '../types/dashboardTypes';
+import { PatientStats } from '@/types/dashboardTypes';
 
 interface StatsCardsProps {
   stats: PatientStats;
