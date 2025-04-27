@@ -3,6 +3,9 @@ import { useAuth } from '@/hooks/use-auth-context';
 import SecretaryDashboard from './secretary/SecretaryDashboard';
 import { Calendar, ClipboardCheck, Hospital, Users, UserCheck } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { usePatientStore } from '@/stores/usePatientStore';
+import { Button } from '@/components/ui/button';
+import { format, differenceInMinutes } from 'date-fns';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -34,29 +37,80 @@ const Dashboard = () => {
 };
 
 const NurseDashboard = () => {
+  const patients = usePatientStore((state) => state.patients);
+  
+  // Calculate patient statistics
+  const patientStats = {
+    vm: patients.filter(p => p.service === "VM").length,
+    consultations: patients.filter(p => p.service === "Cons").length,
+    emergencies: patients.filter(p => p.service === "Ug").length,
+    waiting: patients.filter(p => p.status === "En attente").length
+  };
+  
+  // Calculate wait time in minutes
+  const calculateWaitTime = (registeredAt: string) => {
+    const waitMinutes = differenceInMinutes(new Date(), new Date(registeredAt));
+    return `${waitMinutes} min`;
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {[
-          { title: "Visites médicales", count: 12, icon: Calendar, color: "blue" },
-          { title: "Consultations", count: 8, icon: ClipboardCheck, color: "green" },
-          { title: "Urgences", count: 3, icon: Hospital, color: "red" },
-          { title: "Patients en attente", count: 23, icon: Users, color: "purple" }
-        ].map((item, index) => (
-          <Card key={index}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {item.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <item.icon className={`h-5 w-5 text-${item.color}-600 mr-2`} />
-                <span className="text-2xl font-bold">{item.count}</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Visites médicales
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center">
+              <Calendar className="h-5 w-5 text-blue-600 mr-2" />
+              <span className="text-2xl font-bold">{patientStats.vm}</span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Consultations
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center">
+              <ClipboardCheck className="h-5 w-5 text-green-600 mr-2" />
+              <span className="text-2xl font-bold">{patientStats.consultations}</span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Urgences
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center">
+              <Hospital className="h-5 w-5 text-red-600 mr-2" />
+              <span className="text-2xl font-bold">{patientStats.emergencies}</span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Patients en attente
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center">
+              <Users className="h-5 w-5 text-purple-600 mr-2" />
+              <span className="text-2xl font-bold">{patientStats.waiting}</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="bg-white rounded-lg shadow">
@@ -76,21 +130,27 @@ const NurseDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {[
-                { id: "P-1234", name: "Jean Dupont", service: "VM", waitTime: "15 min", company: "PERENCO", priority: "normale" },
-                { id: "P-1235", name: "Marie Lambert", service: "Ug", waitTime: "5 min", company: "Total SA", priority: "haute" },
-                { id: "P-1236", name: "Philippe Martin", service: "Cons", waitTime: "20 min", company: "Dixstone", priority: "normale" },
-                { id: "P-1237", name: "Sarah Dubois", service: "VM", waitTime: "30 min", company: "PERENCO", priority: "normale" }
-              ].map((patient) => (
+              {patients.filter(p => p.status === "En attente").map((patient) => (
                 <tr key={patient.id} className="border-b hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">{patient.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{patient.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{patient.service}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{patient.waitTime}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      patient.service === "VM" 
+                        ? "bg-blue-100 text-blue-800"
+                        : patient.service === "Ug"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-green-100 text-green-800"
+                    }`}>
+                      {patient.service}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{calculateWaitTime(patient.registeredAt)}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{patient.company}</td>
                   <td className="px-6 py-4 whitespace-nowrap flex gap-2">
-                    <a 
-                      href="#" 
+                    <Button 
+                      variant="default" 
+                      size="sm"
                       className={`text-white px-3 py-1 rounded text-xs font-medium ${
                         patient.service === "Ug" 
                           ? "bg-red-600 hover:bg-red-700" 
@@ -98,7 +158,7 @@ const NurseDashboard = () => {
                       }`}
                     >
                       Prendre en charge
-                    </a>
+                    </Button>
                   </td>
                 </tr>
               ))}
