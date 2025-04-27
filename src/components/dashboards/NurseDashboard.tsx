@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Calendar, ClipboardCheck, Hospital, Users } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { format, differenceInMinutes } from 'date-fns';
+import StatsCard from '@/components/shared/StatsCard';
 
 const NurseDashboard = () => {
   const patients = usePatientStore((state) => state.patients);
@@ -24,61 +23,30 @@ const NurseDashboard = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Visites médicales
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <Calendar className="h-5 w-5 text-blue-600 mr-2" />
-              <span className="text-2xl font-bold">{patientStats.vm}</span>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Consultations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <ClipboardCheck className="h-5 w-5 text-green-600 mr-2" />
-              <span className="text-2xl font-bold">{patientStats.consultations}</span>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Urgences
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <Hospital className="h-5 w-5 text-red-600 mr-2" />
-              <span className="text-2xl font-bold">{patientStats.emergencies}</span>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Patients en attente
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <Users className="h-5 w-5 text-purple-600 mr-2" />
-              <span className="text-2xl font-bold">{patientStats.waiting}</span>
-            </div>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Visites médicales"
+          value={patientStats.vm}
+          icon={Calendar}
+          iconColor="text-blue-600"
+        />
+        <StatsCard
+          title="Consultations"
+          value={patientStats.consultations}
+          icon={ClipboardCheck}
+          iconColor="text-green-600"
+        />
+        <StatsCard
+          title="Urgences"
+          value={patientStats.emergencies}
+          icon={Hospital}
+          iconColor="text-red-600"
+        />
+        <StatsCard
+          title="Patients en attente"
+          value={patientStats.waiting}
+          icon={Users}
+          iconColor="text-purple-600"
+        />
       </div>
 
       <div className="bg-white rounded-lg shadow">

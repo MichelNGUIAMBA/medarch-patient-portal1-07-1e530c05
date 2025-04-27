@@ -1,39 +1,23 @@
-
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ClipboardCheck } from 'lucide-react';
+import StatsCard from '@/components/shared/StatsCard';
 
 const LabDashboard = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Examens en attente
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <ClipboardCheck className="h-5 w-5 text-orange-600 mr-2" />
-              <span className="text-2xl font-bold">14</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Examens réalisés aujourd'hui
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <ClipboardCheck className="h-5 w-5 text-green-600 mr-2" />
-              <span className="text-2xl font-bold">23</span>
-            </div>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Examens en attente"
+          value={14}
+          icon={ClipboardCheck}
+          iconColor="text-orange-600"
+        />
+        <StatsCard
+          title="Examens réalisés aujourd'hui"
+          value={23}
+          icon={ClipboardCheck}
+          iconColor="text-green-600"
+        />
       </div>
 
       <div className="bg-white rounded-lg shadow">

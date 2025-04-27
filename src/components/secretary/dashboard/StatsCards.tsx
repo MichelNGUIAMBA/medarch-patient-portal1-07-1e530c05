@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Calendar, ClipboardCheck, Hospital } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PatientStats } from '@/types/dashboardTypes';
+import StatsCard from '@/components/shared/StatsCard';
 
 interface StatsCardsProps {
   stats: PatientStats;
@@ -11,47 +11,24 @@ interface StatsCardsProps {
 const StatsCards = ({ stats }: StatsCardsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Card className="hover:shadow-lg transition-shadow">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Patients en attente de VM
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center">
-            <Calendar className="h-5 w-5 text-blue-600 mr-2" />
-            <span className="text-2xl font-bold">{stats.vm}</span>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="hover:shadow-lg transition-shadow">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Patients en attente de consultation
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center">
-            <ClipboardCheck className="h-5 w-5 text-green-600 mr-2" />
-            <span className="text-2xl font-bold">{stats.cons}</span>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="hover:shadow-lg transition-shadow">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Urgences en cours
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center">
-            <Hospital className="h-5 w-5 text-red-600 mr-2" />
-            <span className="text-2xl font-bold">{stats.urg}</span>
-          </div>
-        </CardContent>
-      </Card>
+      <StatsCard
+        title="Patients en attente de VM"
+        value={stats.vm}
+        icon={Calendar}
+        iconColor="text-blue-600"
+      />
+      <StatsCard
+        title="Patients en attente de consultation"
+        value={stats.cons}
+        icon={ClipboardCheck}
+        iconColor="text-green-600"
+      />
+      <StatsCard
+        title="Urgences en cours"
+        value={stats.urg}
+        icon={Hospital}
+        iconColor="text-red-600"
+      />
     </div>
   );
 };

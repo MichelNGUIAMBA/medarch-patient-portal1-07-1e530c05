@@ -1,53 +1,29 @@
-
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Users, Calendar, Hospital } from 'lucide-react';
+import StatsCard from '@/components/shared/StatsCard';
 
 const DoctorDashboard = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Patients en attente
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <Users className="h-5 w-5 text-blue-600 mr-2" />
-              <span className="text-2xl font-bold">5</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Consultations aujourd'hui
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <Calendar className="h-5 w-5 text-green-600 mr-2" />
-              <span className="text-2xl font-bold">12</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Urgences
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <Hospital className="h-5 w-5 text-red-600 mr-2" />
-              <span className="text-2xl font-bold">2</span>
-            </div>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Patients en attente"
+          value={5}
+          icon={Users}
+          iconColor="text-blue-600"
+        />
+        <StatsCard
+          title="Consultations aujourd'hui"
+          value={12}
+          icon={Calendar}
+          iconColor="text-green-600"
+        />
+        <StatsCard
+          title="Urgences"
+          value={2}
+          icon={Hospital}
+          iconColor="text-red-600"
+        />
       </div>
 
       <div className="bg-white rounded-lg shadow">
