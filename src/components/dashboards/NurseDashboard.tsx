@@ -1,12 +1,19 @@
+
 import React from 'react';
 import { Calendar, ClipboardCheck, Hospital, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { format, differenceInMinutes } from 'date-fns';
+import { useAuth } from '@/hooks/use-auth-context';
 import StatsCard from '@/components/shared/StatsCard';
+import { toast } from '@/components/ui/sonner';
 
 const NurseDashboard = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const patients = usePatientStore((state) => state.patients);
+  const takeCharge = usePatientStore((state) => state.takeCharge);
   
   const patientStats = {
     vm: patients.filter(p => p.service === "VM").length,
@@ -18,6 +25,24 @@ const NurseDashboard = () => {
   const calculateWaitTime = (registeredAt: string) => {
     const waitMinutes = differenceInMinutes(new Date(), new Date(registeredAt));
     return `${waitMinutes} min`;
+  };
+
+  const handleTakeCharge = (patientId: string, service: "VM" | "Cons" | "Ug") => {
+    if (!user) return;
+
+    takeCharge(patientId, { name: user.name, role: user.role });
+    toast.success("Patient pris en charge");
+
+    // Redirection selon le service
+    switch (service) {
+      case "VM":
+        navigate(`/dashboard/medical-visits/${patientId}`);
+        break;
+      case "Cons":
+      case "Ug":
+        navigate(`/dashboard/consultations/${patientId}`);
+        break;
+    }
   };
 
   return (
@@ -92,6 +117,7 @@ const NurseDashboard = () => {
                           ? "bg-red-600 hover:bg-red-700" 
                           : "bg-blue-600 hover:bg-blue-700"
                       }`}
+                      onClick={() => handleTakeCharge(patient.id, patient.service)}
                     >
                       Prendre en charge
                     </Button>

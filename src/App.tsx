@@ -17,6 +17,7 @@ import UnderConstructionPage from "./pages/UnderConstructionPage";
 import WaitingLists from "./pages/secretary/WaitingLists";
 import PatientDetails from "./pages/secretary/PatientDetails";
 import SearchPatient from "./pages/secretary/SearchPatient";
+import ConsultationForm from "./pages/nurse/ConsultationForm";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,10 @@ const App = () => (
               <Route path="patients-to-see" element={<UnderConstructionPage />} />
               <Route path="medical-records" element={<UnderConstructionPage />} />
             </Route>
+            
+            {/* Nurse routes */}
+            <Route path="medical-visits/:patientId" element={<MedicalVisitForm />} />
+            <Route path="consultations/:patientId" element={<ConsultationForm />} />
 
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

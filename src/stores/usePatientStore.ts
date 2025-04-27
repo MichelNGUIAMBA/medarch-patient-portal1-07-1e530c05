@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 
 export type ModificationRecord = {
@@ -36,6 +35,7 @@ type PatientStore = {
   addPatient: (patient: Omit<Patient, "id" | "status" | "registeredAt">) => void;
   updatePatient: (id: string, updatedData: Partial<Patient>, modifiedBy: { name: string; role: string }) => void;
   addPatientsFromCSV: (patientsData: Array<Omit<Patient, "id" | "status" | "registeredAt" | "name">>) => void;
+  takeCharge: (id: string, nurse: { name: string; role: string }) => void;
 };
 
 export const usePatientStore = create<PatientStore>((set) => ({
@@ -87,7 +87,6 @@ export const usePatientStore = create<PatientStore>((set) => ({
     const currentPatient = state.patients[patientIndex];
     const modifications: ModificationRecord[] = [];
     
-    // Generate modification records for changed fields
     Object.keys(updatedData).forEach(key => {
       const fieldName = key as keyof Patient;
       if (fieldName !== 'modificationHistory' && updatedData[fieldName] !== currentPatient[fieldName]) {
@@ -101,14 +100,12 @@ export const usePatientStore = create<PatientStore>((set) => ({
       }
     });
     
-    // If the name components changed, update the full name
     if (updatedData.firstName || updatedData.lastName) {
       const newFirstName = updatedData.firstName || currentPatient.firstName;
       const newLastName = updatedData.lastName || currentPatient.lastName;
       updatedData.name = `${newFirstName} ${newLastName}`.toUpperCase();
     }
     
-    // Create new patients array with the updated patient
     const updatedPatients = [...state.patients];
     updatedPatients[patientIndex] = {
       ...currentPatient,
@@ -132,5 +129,27 @@ export const usePatientStore = create<PatientStore>((set) => ({
       })),
       ...state.patients
     ]
-  }))
+  })),
+  takeCharge: (id, nurse) => set((state) => {
+    const patientIndex = state.patients.findIndex(p => p.id === id);
+    if (patientIndex === -1) return state;
+
+    const updatedPatients = [...state.patients];
+    updatedPatients[patientIndex] = {
+      ...updatedPatients[patientIndex],
+      status: "En cours",
+      modificationHistory: [
+        {
+          field: "status",
+          oldValue: "En attente",
+          newValue: "En cours",
+          modifiedBy: nurse,
+          timestamp: new Date().toISOString()
+        },
+        ...(updatedPatients[patientIndex].modificationHistory || [])
+      ]
+    };
+
+    return { patients: updatedPatients };
+  })
 }));
