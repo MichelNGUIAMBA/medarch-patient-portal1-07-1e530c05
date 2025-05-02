@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +11,9 @@ import { useNavigate } from 'react-router-dom';
 
 const MedicalVisitsStats = () => {
   const navigate = useNavigate();
+  // Fix: Separate state selectors to prevent infinite re-renders
   const patients = usePatientStore((state) => state.patients);
+  
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCompleteEditOpen, setIsCompleteEditOpen] = useState(false);

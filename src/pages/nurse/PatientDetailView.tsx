@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +18,7 @@ const PatientDetailView = () => {
   const { patientId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  // Fix: Separate state selectors to prevent infinite re-renders
   const patients = usePatientStore((state) => state.patients);
   
   // Récupérer le patient des paramètres ou de l'état passé via la navigation
@@ -28,9 +29,22 @@ const PatientDetailView = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCompleteEditOpen, setIsCompleteEditOpen] = useState(false);
   
+  // Récupérer les données précédentes lors du montage du composant
+  useEffect(() => {
+    if (patient) {
+      // Vérifier s'il y a des données de service enregistrées pour ce patient
+      const storedServiceData = sessionStorage.getItem(`service-data-${patient.id}`);
+      if (!storedServiceData) {
+        // Si aucune donnée n'est trouvée et qu'il s'agit d'une page précédemment visitée,
+        // nous pourrions vouloir initialiser des données par défaut ou afficher un message
+        console.log("Aucune donnée de service précédente trouvée pour ce patient");
+      }
+    }
+  }, [patient]);
+  
   if (!patient) {
     toast.error("Patient non trouvé");
-    navigate('/dashboard/emergencies');
+    navigate('/dashboard');
     return null;
   }
   

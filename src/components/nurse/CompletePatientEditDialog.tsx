@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Patient } from '@/types/patient';
 import { useAuth } from '@/hooks/use-auth-context';
 import { toast } from '@/components/ui/sonner';
+import { usePatientStore } from '@/stores/usePatientStore';
 import ConsultationFormWrapper from '@/components/consultations/ConsultationFormWrapper';
 import MedicalVisitFormWrapper from '@/components/medicalvisits/MedicalVisitFormWrapper';
 import EmergencyFormWrapper from '@/components/emergencies/EmergencyFormWrapper';
@@ -21,14 +22,27 @@ const CompletePatientEditDialog = ({ patient, isOpen, onClose }: CompletePatient
   const navigate = useNavigate();
   const [initialData, setInitialData] = useState<any>({});
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Separate state and actions from the store
+  const updatePatient = usePatientStore((state) => state.updatePatient);
 
   // Charger les données précédentes selon le service du patient
   useEffect(() => {
     if (isOpen && patient) {
       setIsLoading(true);
       
-      // Dans un environnement réel, on récupérerait ces données depuis une API
-      // Pour ce prototype, nous simulons un chargement de données basé sur l'historique de modification
+      // Récupérer les données existantes depuis sessionStorage si disponibles
+      const storedData = sessionStorage.getItem(`service-data-${patient.id}`);
+      if (storedData) {
+        try {
+          const parsedData = JSON.parse(storedData);
+          setInitialData(parsedData);
+          setIsLoading(false);
+          return;
+        } catch (e) {
+          console.error("Erreur lors du parsing des données:", e);
+        }
+      }
       
       // Valeurs par défaut pour tous les services
       const defaultData = {
@@ -48,23 +62,23 @@ const CompletePatientEditDialog = ({ patient, isOpen, onClose }: CompletePatient
           allergies: 'Aucune connue',
           medicalHistory: patient.notes || 'Aucun antécédent notable',
           currentMedications: 'Aucun',
-          physicalExamResults: 'Normal',
+          generalAppearance: 'Normal',
           diagnosis: 'En bonne santé',
-          treatmentPlan: 'Aucun traitement nécessaire',
-          followUpInstructions: 'Visite de routine dans 1 an'
+          treatment: 'Aucun traitement nécessaire',
+          followUp: 'Visite de routine dans 1 an'
         };
       }
       else if (patient.service === 'VM') {
         serviceData = {
           workstation: patient.notes?.replace('Visite médicale: ', '') || 'Poste administratif',
           exposureFactors: 'Travail sur écran prolongé',
-          workExperience: '5 ans',
-          previousInjuries: 'Aucune',
-          bodyWeight: '70',
-          bodyHeight: '175',
+          protectiveEquipment: 'Équipement standard',
+          workplaceRisks: 'Risques mineurs',
           vision: 'Normale',
           hearing: 'Normale',
-          workAccommodations: 'Aucune'
+          respiratory: 'Normal',
+          fitForWork: true,
+          recommendations: 'Continuer le travail habituel'
         };
       }
       else if (patient.service === 'Ug') {
@@ -85,12 +99,6 @@ const CompletePatientEditDialog = ({ patient, isOpen, onClose }: CompletePatient
         };
       }
       
-      // Si le patient a un historique de modifications, nous pouvons extraire des informations plus précises
-      if (patient.modificationHistory && patient.modificationHistory.length > 0) {
-        // On pourrait améliorer cette partie pour récupérer les valeurs spécifiques depuis l'historique
-        // Pour l'instant, on utilise simplement les notes comme indication
-      }
-      
       // Combinaison des données par défaut avec les données spécifiques au service
       setInitialData({...defaultData, ...serviceData});
       setIsLoading(false);
@@ -103,34 +111,48 @@ const CompletePatientEditDialog = ({ patient, isOpen, onClose }: CompletePatient
       return;
     }
     
-    // En fonction du service du patient, on redirige vers la page appropriée
-    let editPath = '';
+    // Sauvegarder les données pour une utilisation ultérieure
+    sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(formData));
+    
+    // Mise à jour des notes du patient en fonction du service
+    let notesPrefix = '';
+    let patientUpdates: Partial<Patient> = {};
+    
     switch(patient.service) {
       case 'VM':
-        editPath = `/medical-visits/${patient.id}/edit`;
+        notesPrefix = 'Visite médicale: ';
+        patientUpdates = {
+          notes: `${notesPrefix}${formData.workstation || ''} - ${formData.recommendations || 'Aucune recommandation'}`
+        };
         break;
       case 'Cons':
-        editPath = `/consultations/${patient.id}/edit`;
+        notesPrefix = 'Consultation: ';
+        patientUpdates = {
+          notes: `${notesPrefix}${formData.mainComplaint || ''} - ${formData.diagnosis || 'Aucun diagnostic'}`
+        };
         break;
       case 'Ug':
-        editPath = `/emergencies/${patient.id}/edit`;
+        notesPrefix = 'Urgence: ';
+        patientUpdates = {
+          notes: `${notesPrefix}${formData.mainComplaint || ''} - ${formData.immediateActions || 'Aucune action immédiate'}`
+        };
         break;
-      default:
-        toast.error("Type de service non reconnu");
-        return;
     }
     
-    // Stockage temporaire des données dans sessionStorage pour les récupérer sur la page d'édition
-    sessionStorage.setItem(`edit-${patient.id}`, JSON.stringify({
-      formData,
-      patientId: patient.id
-    }));
+    // Mettre à jour le patient
+    updatePatient(
+      patient.id,
+      patientUpdates,
+      { name: user.name, role: user.role }
+    );
     
     // Fermer le dialogue
     onClose();
     
-    // Rediriger vers la page d'édition appropriée
-    navigate(editPath);
+    toast.success("Modifications enregistrées avec succès");
+    
+    // Rediriger vers la page de détails du patient
+    navigate(`/dashboard/patient-details/${patient.id}`);
   };
   
   return (
@@ -138,6 +160,10 @@ const CompletePatientEditDialog = ({ patient, isOpen, onClose }: CompletePatient
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Modification complète du dossier médical</DialogTitle>
+          <DialogDescription>
+            Modifiez les informations de cette {patient?.service === "VM" ? "visite médicale" : 
+                                               patient?.service === "Cons" ? "consultation" : "urgence"}
+          </DialogDescription>
         </DialogHeader>
         
         <div className="py-4">
