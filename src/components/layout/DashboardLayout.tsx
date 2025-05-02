@@ -29,21 +29,25 @@ import {
   Ambulance
 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
+import ThemeSwitcher from "./ThemeSwitcher";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const DashboardLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleLogout = () => {
     logout();
-    toast.success("Vous êtes déconnecté");
+    toast.success(t('logout'));
     navigate("/");
   };
 
   const getNavigationItems = () => {
     const commonItems = [
       {
-        title: "Tableau de bord",
+        title: t('dashboard'),
         url: "/dashboard",
         icon: FileText,
       },
@@ -52,46 +56,46 @@ const DashboardLayout = () => {
     const roleBasedItems = {
       admin: [
         {
-          title: "Gestion utilisateurs",
+          title: t('users'),
           url: "/dashboard/users",
           icon: Users,
         },
         {
-          title: "Paramètres système",
+          title: t('settings'),
           url: "/dashboard/settings",
           icon: Database,
         }
       ],
       secretary: [
         {
-          title: "Nouveaux patients",
+          title: t('newPatient'),
           url: "/dashboard/new-patient",
           icon: User,
         },
         {
-          title: "Listes d'attente",
+          title: t('waitingLists'),
           url: "/dashboard/waiting-lists",
           icon: ClipboardCheck,
         }
       ],
       nurse: [
         {
-          title: "Patients en attente",
+          title: t('waitingPatients'),
           url: "/dashboard/waiting-patients",
           icon: Users,
         },
         {
-          title: "Visites médicales",
+          title: t('medicalVisits'),
           url: "/dashboard/medical-visits",
           icon: Calendar,
         },
         {
-          title: "Consultations",
+          title: t('consultations'),
           url: "/dashboard/consultations",
           icon: MessageSquare,
         },
         {
-          title: "Urgences",
+          title: t('emergencies'),
           url: "/dashboard/emergencies",
           icon: Ambulance,
         }
@@ -129,11 +133,11 @@ const DashboardLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50">
-        <Sidebar className="border-r border-gray-200 bg-white">
-          <div className="flex h-16 items-center border-b px-6">
+      <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
+        <Sidebar className="border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 dark:text-white">
+          <div className="flex h-16 items-center border-b px-6 border-gray-200 dark:border-gray-700">
             <Hospital className="h-6 w-6 text-blue-600" />
-            <span className="ml-2 text-lg font-semibold text-blue-800">MedArch</span>
+            <span className="ml-2 text-lg font-semibold text-blue-800 dark:text-blue-400">MedArch</span>
           </div>
           <SidebarContent>
             <SidebarGroup>
@@ -155,24 +159,24 @@ const DashboardLayout = () => {
             </SidebarGroup>
             
             <SidebarGroup>
-              <SidebarGroupLabel>Votre compte</SidebarGroupLabel>
+              <SidebarGroupLabel>{t('yourAccount')}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <div className="px-4 py-2">
                   <div className="mb-2 font-medium">{user?.name}</div>
                   <div className="text-sm text-muted-foreground capitalize">
-                    {user?.role === "secretary" ? "Secrétaire" : 
-                     user?.role === "nurse" ? "Infirmier(e)" :
-                     user?.role === "lab" ? "Laboratoire" :
-                     user?.role === "doctor" ? "Médecin" : "Administrateur"}
+                    {user?.role === "secretary" ? t('secretary') : 
+                     user?.role === "nurse" ? t('nurse') :
+                     user?.role === "lab" ? t('lab') :
+                     user?.role === "doctor" ? t('doctor') : t('admin')}
                   </div>
                 </div>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
                   onClick={handleLogout}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  Déconnexion
+                  {t('logout')}
                 </Button>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -180,7 +184,7 @@ const DashboardLayout = () => {
         </Sidebar>
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          <header className="h-16 flex items-center border-b px-6 bg-white">
+          <header className="h-16 flex items-center border-b px-6 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white">
             <SidebarTrigger />
             <div className="ml-4">
               <h1 className="text-lg font-semibold">
@@ -190,14 +194,16 @@ const DashboardLayout = () => {
                  user?.role === "doctor" ? "Portail du médecin" : "Portail administrateur"}
               </h1>
             </div>
-            <div className="ml-auto flex items-center">
-              <span className="mr-2 text-sm text-muted-foreground">
-                Connecté en tant que {user?.name}
+            <div className="ml-auto flex items-center gap-2">
+              <ThemeSwitcher />
+              <LanguageSwitcher />
+              <span className="ml-2 text-sm text-muted-foreground">
+                {t('takenCareBy')} {user?.name}
               </span>
             </div>
           </header>
           
-          <main className="flex-1 overflow-y-auto p-6">
+          <main className="flex-1 overflow-y-auto p-6 dark:bg-gray-900 dark:text-white">
             <Outlet />
           </main>
         </div>

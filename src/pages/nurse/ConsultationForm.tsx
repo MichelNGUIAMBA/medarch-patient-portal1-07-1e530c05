@@ -95,7 +95,7 @@ const ConsultationForm = () => {
     
     // Redirection vers la page de détails du patient
     setTimeout(() => {
-      navigate(`/dashboard/patient-details/${patient.id}`);
+      navigate(`/patient-details/${patient.id}`);
     }, 1000);
   };
 

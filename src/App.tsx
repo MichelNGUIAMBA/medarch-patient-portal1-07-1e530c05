@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +24,9 @@ import MedicalVisitsStats from "./pages/nurse/MedicalVisitsStats";
 import ConsultationsStats from "./pages/nurse/ConsultationsStats";
 import EmergenciesStats from "./pages/nurse/EmergenciesStats";
 import PatientDetailView from "./pages/nurse/PatientDetailView";
+import { ThemeProvider } from "./hooks/useTheme";
+import { LanguageProvider } from "./hooks/useLanguage";
+import Chatbot from "./components/chatbot/Chatbot";
 
 const queryClient = new QueryClient();
 
@@ -42,117 +44,122 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <DashboardLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Dashboard />} />
-              
-              {/* Secretary routes */}
-              <Route path="new-patient" element={<NewPatient />} />
-              <Route path="waiting-lists" element={<WaitingLists />} />
-              <Route path="patient/:id" element={<PatientDetails />} />
-              <Route path="search-patient" element={<SearchPatient />} />
-              
-              {/* Nurse routes */}
-              <Route path="waiting-patients" element={<WaitingPatients />} />
-              <Route path="medical-visits/:patientId" element={<MedicalVisitForm />} />
-              <Route path="medical-visits/:patientId/edit" element={<MedicalVisitForm />} />
-              <Route path="medical-visits" element={<MedicalVisitsStats />} />
-              <Route path="consultations/:patientId" element={<ConsultationForm />} />
-              <Route path="consultations/:patientId/edit" element={<ConsultationForm />} />
-              <Route path="consultations" element={<ConsultationsStats />} />
-              <Route path="emergencies/:patientId" element={<EmergencyForm />} />
-              <Route path="emergencies/:patientId/edit" element={<EmergencyForm />} />
-              <Route path="emergencies" element={<EmergenciesStats />} />
-              <Route path="patient-details/:patientId" element={<PatientDetailView />} />
-              
-              {/* Lab routes */}
-              <Route path="pending-exams" element={<LabExams />} />
-              <Route path="exam-history" element={<UnderConstructionPage />} />
-              
-              {/* Admin routes */}
-              <Route path="users" element={<UserManagement />} />
-              <Route path="settings" element={<UnderConstructionPage />} />
-              
-              {/* Doctor routes */}
-              <Route path="patients-to-see" element={<UnderConstructionPage />} />
-              <Route path="medical-records" element={<UnderConstructionPage />} />
-            </Route>
-            
-            {/* Routes accessibles directement */}
-            <Route 
-              path="/medical-visits/:patientId" 
-              element={
-                <ProtectedRoute>
-                  <MedicalVisitForm />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/medical-visits/:patientId/edit" 
-              element={
-                <ProtectedRoute>
-                  <MedicalVisitForm />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/consultations/:patientId" 
-              element={
-                <ProtectedRoute>
-                  <ConsultationForm />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/consultations/:patientId/edit" 
-              element={
-                <ProtectedRoute>
-                  <ConsultationForm />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/emergencies/:patientId" 
-              element={
-                <ProtectedRoute>
-                  <EmergencyForm />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/emergencies/:patientId/edit" 
-              element={
-                <ProtectedRoute>
-                  <EmergencyForm />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/patient-details/:patientId" 
-              element={
-                <ProtectedRoute>
-                  <PatientDetailView />
-                </ProtectedRoute>
-              } 
-            />
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Login />} />
+                <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<Dashboard />} />
+                  
+                  {/* Secretary routes */}
+                  <Route path="new-patient" element={<NewPatient />} />
+                  <Route path="waiting-lists" element={<WaitingLists />} />
+                  <Route path="patient/:id" element={<PatientDetails />} />
+                  <Route path="search-patient" element={<SearchPatient />} />
+                  
+                  {/* Nurse routes */}
+                  <Route path="waiting-patients" element={<WaitingPatients />} />
+                  <Route path="medical-visits/:patientId" element={<MedicalVisitForm />} />
+                  <Route path="medical-visits/:patientId/edit" element={<MedicalVisitForm />} />
+                  <Route path="medical-visits" element={<MedicalVisitsStats />} />
+                  <Route path="consultations/:patientId" element={<ConsultationForm />} />
+                  <Route path="consultations/:patientId/edit" element={<ConsultationForm />} />
+                  <Route path="consultations" element={<ConsultationsStats />} />
+                  <Route path="emergencies/:patientId" element={<EmergencyForm />} />
+                  <Route path="emergencies/:patientId/edit" element={<EmergencyForm />} />
+                  <Route path="emergencies" element={<EmergenciesStats />} />
+                  <Route path="patient-details/:patientId" element={<PatientDetailView />} />
+                  
+                  {/* Lab routes */}
+                  <Route path="pending-exams" element={<LabExams />} />
+                  <Route path="exam-history" element={<UnderConstructionPage />} />
+                  
+                  {/* Admin routes */}
+                  <Route path="users" element={<UserManagement />} />
+                  <Route path="settings" element={<UnderConstructionPage />} />
+                  
+                  {/* Doctor routes */}
+                  <Route path="patients-to-see" element={<UnderConstructionPage />} />
+                  <Route path="medical-records" element={<UnderConstructionPage />} />
+                </Route>
+                
+                {/* Routes accessibles directement */}
+                <Route 
+                  path="/medical-visits/:patientId" 
+                  element={
+                    <ProtectedRoute>
+                      <MedicalVisitForm />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/medical-visits/:patientId/edit" 
+                  element={
+                    <ProtectedRoute>
+                      <MedicalVisitForm />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/consultations/:patientId" 
+                  element={
+                    <ProtectedRoute>
+                      <ConsultationForm />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/consultations/:patientId/edit" 
+                  element={
+                    <ProtectedRoute>
+                      <ConsultationForm />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/emergencies/:patientId" 
+                  element={
+                    <ProtectedRoute>
+                      <EmergencyForm />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/emergencies/:patientId/edit" 
+                  element={
+                    <ProtectedRoute>
+                      <EmergencyForm />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/patient-details/:patientId" 
+                  element={
+                    <ProtectedRoute>
+                      <PatientDetailView />
+                    </ProtectedRoute>
+                  } 
+                />
 
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+                {/* Catch-all route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Chatbot />
+            </BrowserRouter>
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

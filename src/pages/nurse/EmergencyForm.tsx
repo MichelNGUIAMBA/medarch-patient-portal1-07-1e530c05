@@ -20,6 +20,7 @@ const EmergencyForm = () => {
   // Fix: Use primitive selectors to prevent unnecessary rerenders
   const patients = usePatientStore((state) => state.patients);
   const updatePatient = usePatientStore((state) => state.updatePatient);
+  const setPatientCompleted = usePatientStore((state) => state.setPatientCompleted);
 
   const patient = patients.find(p => p.id === patientId);
 
@@ -28,8 +29,23 @@ const EmergencyForm = () => {
     if (isEditMode && patient) {
       const storedData = sessionStorage.getItem(`edit-${patient.id}`);
       if (storedData) {
-        const { formData } = JSON.parse(storedData);
-        setInitialData(formData);
+        try {
+          const { formData } = JSON.parse(storedData);
+          setInitialData(formData);
+        } catch (e) {
+          console.error("Erreur lors du parsing des données:", e);
+        }
+      } else {
+        // Essayer d'obtenir les données de service générales
+        const serviceData = sessionStorage.getItem(`service-data-${patient.id}`);
+        if (serviceData) {
+          try {
+            const parsedData = JSON.parse(serviceData);
+            setInitialData(parsedData);
+          } catch (e) {
+            console.error("Erreur lors du parsing des données de service:", e);
+          }
+        }
       }
     }
   }, [isEditMode, patient]);
@@ -44,13 +60,15 @@ const EmergencyForm = () => {
       return;
     }
 
+    // Sauvegarder les données du formulaire
+    sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(formData));
+
     if (isEditMode) {
       // Mettre à jour le patient avec les nouvelles données
       updatePatient(
         patient.id,
         {
-          // Vous pourriez également vouloir mettre à jour d'autres champs du patient
-          notes: `Urgence mise à jour: ${formData.mainComplaint || 'Non spécifié'}`
+          notes: `Urgence: ${formData.mainComplaint || 'Non spécifié'} - ${formData.immediateActions || 'Aucune action immédiate'}`
         },
         { name: user.name, role: user.role }
       );
@@ -60,20 +78,30 @@ const EmergencyForm = () => {
       // Nettoyer le stockage temporaire
       sessionStorage.removeItem(`edit-${patient.id}`);
     } else {
-      // Enregistrer un nouveau traitement d'urgence
-      console.log("Emergency data:", { patientData: patient, formData });
+      // Pour un nouveau traitement d'urgence
+      updatePatient(
+        patient.id,
+        {
+          notes: `Urgence: ${formData.mainComplaint || 'Non spécifié'} - ${formData.immediateActions || 'Aucune action immédiate'}`
+        },
+        { name: user.name, role: user.role }
+      );
+      
+      // Marquer le patient comme terminé
+      setPatientCompleted(patient.id, { name: user.name, role: user.role });
+      
       toast.success("Traitement d'urgence enregistré avec succès");
     }
     
-    // Retour au tableau de bord
+    // Redirection vers la page de détails du patient
     setTimeout(() => {
-      navigate("/dashboard/emergencies");
-    }, 1500);
+      navigate(`/patient-details/${patient.id}`);
+    }, 1000);
   };
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-red-600">
+      <h1 className="text-2xl font-bold mb-6 text-red-600 dark:text-red-400">
         {isEditMode ? "Modification du traitement d'urgence" : "Traitement d'urgence"} - {patient.name}
       </h1>
       
