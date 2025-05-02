@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth-context";
@@ -23,7 +24,9 @@ import {
   FileText, 
   Calendar, 
   UserCheck, 
-  Search
+  Search,
+  MessageSquare,
+  Ambulance
 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 
@@ -85,12 +88,12 @@ const DashboardLayout = () => {
         {
           title: "Consultations",
           url: "/dashboard/consultations",
-          icon: ClipboardCheck,
+          icon: MessageSquare,
         },
         {
           title: "Urgences",
           url: "/dashboard/emergencies",
-          icon: Hospital,
+          icon: Ambulance,
         }
       ],
       lab: [
