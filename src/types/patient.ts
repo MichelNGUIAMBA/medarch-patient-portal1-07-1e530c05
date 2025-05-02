@@ -1,4 +1,6 @@
 
+import { ModificationRecord } from '@/stores/usePatientStore';
+
 export interface Patient {
   id: string;
   name: string;
@@ -19,4 +21,5 @@ export interface Patient {
     name: string;
     role: string;
   };
+  modificationHistory?: ModificationRecord[];
 }

@@ -1,8 +1,10 @@
+
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { usePatientStore, Patient } from '@/stores/usePatientStore';
+import { usePatientStore } from '@/stores/usePatientStore';
+import { Patient } from '@/types/patient';
 import { Import } from 'lucide-react';
 
 type CsvRow = {
