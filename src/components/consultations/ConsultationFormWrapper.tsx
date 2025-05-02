@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,9 +15,16 @@ import StepDiagnosisTreatment from './StepDiagnosisTreatment';
 interface ConsultationFormWrapperProps {
   patient: Patient;
   onSubmit: (formData: any) => void;
+  isEditMode?: boolean;
+  initialData?: any;
 }
 
-const ConsultationFormWrapper = ({ patient, onSubmit }: ConsultationFormWrapperProps) => {
+const ConsultationFormWrapper = ({ 
+  patient, 
+  onSubmit, 
+  isEditMode = false,
+  initialData = {}
+}: ConsultationFormWrapperProps) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     // Signes vitaux
@@ -50,6 +57,8 @@ const ConsultationFormWrapper = ({ patient, onSubmit }: ConsultationFormWrapperP
     imaging: false,
     followUp: '',
     notes: '',
+    
+    ...initialData // Remplir avec les données initiales si fournies
   });
 
   // Determine if it's an emergency consultation
@@ -115,10 +124,18 @@ const ConsultationFormWrapper = ({ patient, onSubmit }: ConsultationFormWrapperP
     <Card className="w-full">
       <CardHeader>
         <CardTitle>
-          {isEmergency ? "Formulaire de consultation d'urgence" : "Formulaire de consultation"}
+          {isEditMode 
+            ? "Modification de consultation" 
+            : isEmergency 
+              ? "Formulaire de consultation d'urgence" 
+              : "Formulaire de consultation"
+          }
         </CardTitle>
         <CardDescription>
-          Veuillez renseigner les informations concernant la consultation
+          {isEditMode 
+            ? "Modifiez les informations de la consultation"
+            : "Veuillez renseigner les informations concernant la consultation"
+          }
         </CardDescription>
       </CardHeader>
       
@@ -180,7 +197,12 @@ const ConsultationFormWrapper = ({ patient, onSubmit }: ConsultationFormWrapperP
             onClick={handleSubmit} 
             className={isEmergency ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}
           >
-            {isEmergency ? "Valider la consultation d'urgence" : "Valider la consultation"}
+            {isEditMode 
+              ? "Valider les modifications" 
+              : isEmergency 
+                ? "Valider la consultation d'urgence" 
+                : "Valider la consultation"
+            }
           </Button>
         )}
       </CardFooter>
