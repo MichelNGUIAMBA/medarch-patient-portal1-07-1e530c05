@@ -2,14 +2,16 @@
 import React, { useState } from 'react';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Ambulance, Edit, FileEdit } from 'lucide-react';
+import { Ambulance, Edit, FileEdit, Eye } from 'lucide-react';
 import { Patient } from '@/types/patient';
 import { Button } from '@/components/ui/button';
 import PatientEditDialog from '@/components/nurse/PatientEditDialog';
 import ModificationHistory from '@/components/nurse/ModificationHistory';
 import CompletePatientEditDialog from '@/components/nurse/CompletePatientEditDialog';
+import { useNavigate } from 'react-router-dom';
 
 const EmergenciesStats = () => {
+  const navigate = useNavigate();
   const patients = usePatientStore((state) => state.patients);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -37,6 +39,10 @@ const EmergenciesStats = () => {
   const handleCompleteEdit = (patient: Patient) => {
     setSelectedPatient(patient);
     setIsCompleteEditOpen(true);
+  };
+
+  const handleViewDetails = (patient: Patient) => {
+    navigate(`/dashboard/patient-details/${patient.id}`, { state: { patientData: patient } });
   };
 
   const handleCloseDialog = () => {
@@ -146,6 +152,14 @@ const EmergenciesStats = () => {
                               >
                                 <FileEdit className="h-4 w-4 mr-1" />
                                 Modif. complète
+                              </Button>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => handleViewDetails(patient)}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Afficher
                               </Button>
                               <Button
                                 variant="ghost"

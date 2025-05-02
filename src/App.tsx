@@ -24,6 +24,7 @@ import WaitingPatients from "./pages/nurse/WaitingPatients";
 import MedicalVisitsStats from "./pages/nurse/MedicalVisitsStats";
 import ConsultationsStats from "./pages/nurse/ConsultationsStats";
 import EmergenciesStats from "./pages/nurse/EmergenciesStats";
+import PatientDetailView from "./pages/nurse/PatientDetailView";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,7 @@ const App = () => (
               <Route path="emergencies/:patientId" element={<EmergencyForm />} />
               <Route path="emergencies/:patientId/edit" element={<EmergencyForm />} />
               <Route path="emergencies" element={<EmergenciesStats />} />
+              <Route path="patient-details/:patientId" element={<PatientDetailView />} />
               
               {/* Lab routes */}
               <Route path="pending-exams" element={<LabExams />} />
@@ -134,6 +136,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <EmergencyForm />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/patient-details/:patientId" 
+              element={
+                <ProtectedRoute>
+                  <PatientDetailView />
                 </ProtectedRoute>
               } 
             />
