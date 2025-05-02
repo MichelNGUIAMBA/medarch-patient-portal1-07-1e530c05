@@ -17,12 +17,9 @@ const EmergencyForm = () => {
   const isEditMode = location.pathname.includes('/edit');
   const [initialData, setInitialData] = useState({});
   
-  const { patients, updatePatient } = usePatientStore(
-    (state) => ({
-      patients: state.patients,
-      updatePatient: state.updatePatient
-    })
-  );
+  // Fix: Use primitive selectors to prevent unnecessary rerenders
+  const patients = usePatientStore((state) => state.patients);
+  const updatePatient = usePatientStore((state) => state.updatePatient);
 
   const patient = patients.find(p => p.id === patientId);
 
