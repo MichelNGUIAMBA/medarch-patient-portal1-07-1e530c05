@@ -19,6 +19,7 @@ import WaitingLists from "./pages/secretary/WaitingLists";
 import PatientDetails from "./pages/secretary/PatientDetails";
 import SearchPatient from "./pages/secretary/SearchPatient";
 import ConsultationForm from "./pages/nurse/ConsultationForm";
+import EmergencyForm from "./pages/nurse/EmergencyForm";
 import WaitingPatients from "./pages/nurse/WaitingPatients";
 
 const queryClient = new QueryClient();
@@ -61,9 +62,9 @@ const App = () => (
               
               {/* Nurse routes */}
               <Route path="waiting-patients" element={<WaitingPatients />} />
-              <Route path="medical-visits" element={<MedicalVisitForm />} />
-              <Route path="consultations" element={<UnderConstructionPage />} />
-              <Route path="emergencies" element={<UnderConstructionPage />} />
+              <Route path="medical-visits/:patientId" element={<MedicalVisitForm />} />
+              <Route path="consultations/:patientId" element={<ConsultationForm />} />
+              <Route path="emergencies/:patientId" element={<EmergencyForm />} />
               
               {/* Lab routes */}
               <Route path="pending-exams" element={<LabExams />} />
@@ -78,9 +79,31 @@ const App = () => (
               <Route path="medical-records" element={<UnderConstructionPage />} />
             </Route>
             
-            {/* Nurse routes */}
-            <Route path="medical-visits/:patientId" element={<MedicalVisitForm />} />
-            <Route path="consultations/:patientId" element={<ConsultationForm />} />
+            {/* Routes accessibles directement */}
+            <Route 
+              path="/medical-visits/:patientId" 
+              element={
+                <ProtectedRoute>
+                  <MedicalVisitForm />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/consultations/:patientId" 
+              element={
+                <ProtectedRoute>
+                  <ConsultationForm />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/emergencies/:patientId" 
+              element={
+                <ProtectedRoute>
+                  <EmergencyForm />
+                </ProtectedRoute>
+              } 
+            />
 
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

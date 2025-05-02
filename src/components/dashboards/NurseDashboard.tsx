@@ -36,11 +36,13 @@ const NurseDashboard = () => {
     // Redirection selon le service
     switch (service) {
       case "VM":
-        navigate(`/dashboard/medical-visits/${patientId}`);
+        navigate(`/medical-visits/${patientId}`);
         break;
       case "Cons":
+        navigate(`/consultations/${patientId}`);
+        break;
       case "Ug":
-        navigate(`/dashboard/consultations/${patientId}`);
+        navigate(`/emergencies/${patientId}`);
         break;
     }
   };
