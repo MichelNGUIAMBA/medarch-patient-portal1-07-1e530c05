@@ -11,7 +11,7 @@ const EmergenciesStats = () => {
   // Count patients who have been taken care of for emergencies
   const completedEmergencies = patients.filter((p: Patient) => 
     p.service === "Ug" && 
-    p.status !== "En attente" && 
+    (p.status !== "En attente" || p.status === "Terminé") && 
     p.takenCareBy
   ).length;
   
@@ -73,7 +73,7 @@ const EmergenciesStats = () => {
                 </thead>
                 <tbody>
                   {patients
-                    .filter((p: Patient) => p.service === "Ug" && p.status !== "En attente" && p.takenCareBy)
+                    .filter((p: Patient) => p.service === "Ug" && (p.status !== "En attente" || p.status === "Terminé") && p.takenCareBy)
                     .map((patient: Patient) => (
                       <tr key={patient.id} className="border-b hover:bg-gray-50">
                         <td className="px-4 py-2">{patient.id}</td>

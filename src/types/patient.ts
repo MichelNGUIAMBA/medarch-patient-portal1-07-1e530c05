@@ -4,7 +4,7 @@ export interface Patient {
   name: string;
   company: string;
   service: "VM" | "Cons" | "Ug";
-  status: "En attente" | "En cours";
+  status: "En attente" | "En cours" | "Terminé";
   birthDate: string;
   registeredAt: string;
   firstName: string;

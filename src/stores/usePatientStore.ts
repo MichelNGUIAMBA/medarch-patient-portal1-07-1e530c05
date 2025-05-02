@@ -1,4 +1,6 @@
+
 import { create } from 'zustand';
+import { Patient } from '@/types/patient';
 
 export type ModificationRecord = {
   field: string;
@@ -11,31 +13,13 @@ export type ModificationRecord = {
   timestamp: string;
 };
 
-export type Patient = {
-  id: string;
-  name: string;
-  company: string;
-  service: "VM" | "Cons" | "Ug";
-  status: "En attente" | "En cours";
-  birthDate: string;
-  registeredAt: string;
-  firstName: string;
-  lastName: string;
-  gender: string;
-  idNumber?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  employeeId?: string;
-  modificationHistory?: ModificationRecord[];
-};
-
 type PatientStore = {
   patients: Patient[];
   addPatient: (patient: Omit<Patient, "id" | "status" | "registeredAt">) => void;
   updatePatient: (id: string, updatedData: Partial<Patient>, modifiedBy: { name: string; role: string }) => void;
   addPatientsFromCSV: (patientsData: Array<Omit<Patient, "id" | "status" | "registeredAt" | "name">>) => void;
   takeCharge: (id: string, nurse: { name: string; role: string }) => void;
+  setPatientCompleted: (id: string, caregiver: { name: string; role: string }) => void;
 };
 
 export const usePatientStore = create<PatientStore>((set) => ({
@@ -64,7 +48,45 @@ export const usePatientStore = create<PatientStore>((set) => ({
       birthDate: "1988-12-03",
       registeredAt: "2025-04-25T09:15:00",
       gender: "F",
-      employeeId: "EMP002"
+      employeeId: "EMP002",
+      takenCareBy: {
+        name: "Dr Sophie Martin",
+        role: "Médecin urgentiste"
+      }
+    },
+    { 
+      id: "P-1236", 
+      name: "PAUL DUBOIS", 
+      firstName: "Paul",
+      lastName: "Dubois",
+      company: "PERENCO", 
+      service: "Cons", 
+      status: "En cours",
+      birthDate: "1978-06-22",
+      registeredAt: "2025-04-25T10:00:00",
+      gender: "M",
+      employeeId: "EMP003",
+      takenCareBy: {
+        name: "Dr Michel Bernard",
+        role: "Médecin généraliste"
+      }
+    },
+    { 
+      id: "P-1237", 
+      name: "LUCIE MARTIN", 
+      firstName: "Lucie",
+      lastName: "Martin",
+      company: "Total SA", 
+      service: "VM", 
+      status: "En cours",
+      birthDate: "1992-08-17",
+      registeredAt: "2025-04-25T10:30:00",
+      gender: "F",
+      employeeId: "EMP004",
+      takenCareBy: {
+        name: "Infirmière Claire Dupont",
+        role: "Infirmière"
+      }
     }
   ],
   addPatient: (patient) => set((state) => ({
@@ -138,12 +160,36 @@ export const usePatientStore = create<PatientStore>((set) => ({
     updatedPatients[patientIndex] = {
       ...updatedPatients[patientIndex],
       status: "En cours",
+      takenCareBy: nurse,
       modificationHistory: [
         {
           field: "status",
           oldValue: "En attente",
           newValue: "En cours",
           modifiedBy: nurse,
+          timestamp: new Date().toISOString()
+        },
+        ...(updatedPatients[patientIndex].modificationHistory || [])
+      ]
+    };
+
+    return { patients: updatedPatients };
+  }),
+  setPatientCompleted: (id, caregiver) => set((state) => {
+    const patientIndex = state.patients.findIndex(p => p.id === id);
+    if (patientIndex === -1) return state;
+
+    const updatedPatients = [...state.patients];
+    updatedPatients[patientIndex] = {
+      ...updatedPatients[patientIndex],
+      status: "Terminé",
+      takenCareBy: caregiver,
+      modificationHistory: [
+        {
+          field: "status",
+          oldValue: updatedPatients[patientIndex].status,
+          newValue: "Terminé",
+          modifiedBy: caregiver,
           timestamp: new Date().toISOString()
         },
         ...(updatedPatients[patientIndex].modificationHistory || [])
