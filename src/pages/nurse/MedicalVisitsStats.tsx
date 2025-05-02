@@ -1,12 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar } from 'lucide-react';
+import { Calendar, Edit } from 'lucide-react';
 import { Patient } from '@/types/patient';
+import { Button } from '@/components/ui/button';
+import PatientEditDialog from '@/components/nurse/PatientEditDialog';
+import ModificationHistory from '@/components/nurse/ModificationHistory';
 
 const MedicalVisitsStats = () => {
   const patients = usePatientStore((state) => state.patients);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showHistory, setShowHistory] = useState<string | null>(null);
   
   // Count patients who have been taken care of for medical visits
   const completedVisits = patients.filter((p: Patient) => 
@@ -20,6 +26,24 @@ const MedicalVisitsStats = () => {
     p.service === "VM" && 
     p.status === "En attente"
   ).length;
+
+  const handleEdit = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedPatient(null);
+  };
+
+  const toggleHistory = (patientId: string) => {
+    if (showHistory === patientId) {
+      setShowHistory(null);
+    } else {
+      setShowHistory(patientId);
+    }
+  };
 
   return (
     <div className="container mx-auto py-6">
@@ -69,18 +93,59 @@ const MedicalVisitsStats = () => {
                     <th className="px-4 py-2 text-left">Nom</th>
                     <th className="px-4 py-2 text-left">Entreprise</th>
                     <th className="px-4 py-2 text-left">Pris en charge par</th>
+                    <th className="px-4 py-2 text-left">Statut</th>
+                    <th className="px-4 py-2 text-left">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {patients
                     .filter((p: Patient) => p.service === "VM" && p.status !== "En attente" && p.takenCareBy)
                     .map((patient: Patient) => (
-                      <tr key={patient.id} className="border-b hover:bg-gray-50">
-                        <td className="px-4 py-2">{patient.id}</td>
-                        <td className="px-4 py-2">{patient.name}</td>
-                        <td className="px-4 py-2">{patient.company}</td>
-                        <td className="px-4 py-2">{patient.takenCareBy?.name}</td>
-                      </tr>
+                      <React.Fragment key={patient.id}>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="px-4 py-2">{patient.id}</td>
+                          <td className="px-4 py-2">{patient.name}</td>
+                          <td className="px-4 py-2">{patient.company}</td>
+                          <td className="px-4 py-2">{patient.takenCareBy?.name}</td>
+                          <td className="px-4 py-2">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              patient.status === "Terminé" 
+                                ? "bg-green-100 text-green-800" 
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}>
+                              {patient.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2">
+                            <div className="flex space-x-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => handleEdit(patient)}
+                              >
+                                <Edit className="h-4 w-4 mr-1" />
+                                Modifier
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => toggleHistory(patient.id)}
+                              >
+                                {showHistory === patient.id ? 'Masquer' : 'Historique'}
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                        {showHistory === patient.id && (
+                          <tr>
+                            <td colSpan={6} className="p-0">
+                              <div className="p-4 bg-gray-50">
+                                <ModificationHistory patient={patient} />
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     ))}
                 </tbody>
               </table>
@@ -95,6 +160,14 @@ const MedicalVisitsStats = () => {
             </p>
           </CardContent>
         </Card>
+      )}
+
+      {selectedPatient && (
+        <PatientEditDialog 
+          patient={selectedPatient}
+          isOpen={isDialogOpen}
+          onClose={handleCloseDialog}
+        />
       )}
     </div>
   );

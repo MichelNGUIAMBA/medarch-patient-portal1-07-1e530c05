@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { Patient } from '@/types/patient';
 
@@ -61,15 +60,28 @@ export const usePatientStore = create<PatientStore>((set) => ({
       lastName: "Dubois",
       company: "PERENCO", 
       service: "Cons", 
-      status: "En cours",
+      status: "Terminé",
       birthDate: "1978-06-22",
       registeredAt: "2025-04-25T10:00:00",
       gender: "M",
       employeeId: "EMP003",
+      notes: "Consultation routine, pas de problème détecté.",
       takenCareBy: {
         name: "Dr Michel Bernard",
         role: "Médecin généraliste"
-      }
+      },
+      modificationHistory: [
+        {
+          field: "status",
+          oldValue: "En cours",
+          newValue: "Terminé",
+          modifiedBy: {
+            name: "Dr Michel Bernard",
+            role: "Médecin généraliste"
+          },
+          timestamp: "2025-04-25T11:30:00"
+        }
+      ]
     },
     { 
       id: "P-1237", 

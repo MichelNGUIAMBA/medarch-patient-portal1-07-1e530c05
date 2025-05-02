@@ -17,6 +17,7 @@ export interface Patient {
   phone?: string;
   address?: string;
   employeeId?: string;
+  notes?: string;
   takenCareBy?: {
     name: string;
     role: string;
