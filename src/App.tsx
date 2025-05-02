@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +19,7 @@ import WaitingLists from "./pages/secretary/WaitingLists";
 import PatientDetails from "./pages/secretary/PatientDetails";
 import SearchPatient from "./pages/secretary/SearchPatient";
 import ConsultationForm from "./pages/nurse/ConsultationForm";
+import WaitingPatients from "./pages/nurse/WaitingPatients";
 
 const queryClient = new QueryClient();
 
@@ -58,7 +60,7 @@ const App = () => (
               <Route path="search-patient" element={<SearchPatient />} />
               
               {/* Nurse routes */}
-              <Route path="waiting-patients" element={<UnderConstructionPage />} />
+              <Route path="waiting-patients" element={<WaitingPatients />} />
               <Route path="medical-visits" element={<MedicalVisitForm />} />
               <Route path="consultations" element={<UnderConstructionPage />} />
               <Route path="emergencies" element={<UnderConstructionPage />} />
