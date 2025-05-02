@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,8 @@ import { Patient } from '@/types/patient';
 import { useAuth } from '@/hooks/use-auth-context';
 import { toast } from '@/components/ui/sonner';
 import ConsultationFormWrapper from '@/components/consultations/ConsultationFormWrapper';
+import MedicalVisitFormWrapper from '@/components/medicalvisits/MedicalVisitFormWrapper';
+import EmergencyFormWrapper from '@/components/emergencies/EmergencyFormWrapper';
 
 interface CompletePatientEditDialogProps {
   patient: Patient;
@@ -17,6 +19,38 @@ interface CompletePatientEditDialogProps {
 const CompletePatientEditDialog = ({ patient, isOpen, onClose }: CompletePatientEditDialogProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [initialData, setInitialData] = useState<any>({});
+
+  // Simuler le chargement des données précédentes pour le formulaire d'édition
+  // Dans une véritable application, vous récupéreriez ces données depuis une API
+  useEffect(() => {
+    if (isOpen && patient) {
+      // Chargement des données précédentes selon le service
+      // Ces données simulées représenteraient les données enregistrées lors de la première visite
+      const mockPreviousData = {
+        // Données communes à tous les services
+        temperature: '37.2',
+        bloodPressureSys: '120',
+        bloodPressureDia: '80',
+        heartRate: '72',
+        oxygenSaturation: '98',
+        
+        // Données spécifiques aux consultations
+        mainComplaint: patient.service === 'Cons' ? 'Consultation de routine' : '',
+        allergies: 'Aucune',
+        
+        // Données spécifiques aux visites médicales
+        workstation: patient.service === 'VM' ? 'Poste administratif' : '',
+        exposureFactors: patient.service === 'VM' ? 'Travail sur écran prolongé' : '',
+        
+        // Données spécifiques aux urgences
+        emergencySeverity: patient.service === 'Ug' ? 'medium' : '',
+        triageNotes: patient.service === 'Ug' ? 'Patient stable' : '',
+      };
+      
+      setInitialData(mockPreviousData);
+    }
+  }, [isOpen, patient]);
   
   const handleFormSubmit = (formData: any) => {
     if (!user) {
@@ -67,18 +101,24 @@ const CompletePatientEditDialog = ({ patient, isOpen, onClose }: CompletePatient
               patient={patient} 
               onSubmit={handleFormSubmit}
               isEditMode={true}
-              initialData={{}} // Les données initiales seraient récupérées depuis le dossier du patient
+              initialData={initialData}
             />
           )}
           {patient.service === "VM" && (
-            <p className="text-center text-amber-600">
-              La modification complète des visites médicales sera implémentée prochainement.
-            </p>
+            <MedicalVisitFormWrapper
+              patient={patient}
+              onSubmit={handleFormSubmit}
+              isEditMode={true}
+              initialData={initialData}
+            />
           )}
           {patient.service === "Ug" && (
-            <p className="text-center text-amber-600">
-              La modification complète des urgences sera implémentée prochainement.
-            </p>
+            <EmergencyFormWrapper
+              patient={patient}
+              onSubmit={handleFormSubmit}
+              isEditMode={true}
+              initialData={initialData}
+            />
           )}
         </div>
         

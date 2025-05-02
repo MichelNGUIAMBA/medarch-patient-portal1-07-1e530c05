@@ -66,10 +66,13 @@ const App = () => (
               {/* Nurse routes */}
               <Route path="waiting-patients" element={<WaitingPatients />} />
               <Route path="medical-visits/:patientId" element={<MedicalVisitForm />} />
+              <Route path="medical-visits/:patientId/edit" element={<MedicalVisitForm />} />
               <Route path="medical-visits" element={<MedicalVisitsStats />} />
               <Route path="consultations/:patientId" element={<ConsultationForm />} />
+              <Route path="consultations/:patientId/edit" element={<ConsultationForm />} />
               <Route path="consultations" element={<ConsultationsStats />} />
               <Route path="emergencies/:patientId" element={<EmergencyForm />} />
+              <Route path="emergencies/:patientId/edit" element={<EmergencyForm />} />
               <Route path="emergencies" element={<EmergenciesStats />} />
               
               {/* Lab routes */}
@@ -95,6 +98,14 @@ const App = () => (
               } 
             />
             <Route 
+              path="/medical-visits/:patientId/edit" 
+              element={
+                <ProtectedRoute>
+                  <MedicalVisitForm />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
               path="/consultations/:patientId" 
               element={
                 <ProtectedRoute>
@@ -103,7 +114,23 @@ const App = () => (
               } 
             />
             <Route 
+              path="/consultations/:patientId/edit" 
+              element={
+                <ProtectedRoute>
+                  <ConsultationForm />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
               path="/emergencies/:patientId" 
+              element={
+                <ProtectedRoute>
+                  <EmergencyForm />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/emergencies/:patientId/edit" 
               element={
                 <ProtectedRoute>
                   <EmergencyForm />

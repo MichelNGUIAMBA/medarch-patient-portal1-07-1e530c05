@@ -8,22 +8,22 @@ import { Patient } from '@/types/patient';
 
 // Import step components
 import StepVitalSigns from '@/components/consultations/StepVitalSigns';
-import StepInitialAssessment from './StepInitialAssessment';
-import StepTreatment from './StepTreatment';
+import StepWorkEnvironment from './StepWorkEnvironment';
+import StepPhysicalExam from './StepPhysicalExam';
 
-interface EmergencyFormWrapperProps {
+interface MedicalVisitFormWrapperProps {
   patient: Patient;
   onSubmit: (formData: any) => void;
   isEditMode?: boolean;
   initialData?: any;
 }
 
-const EmergencyFormWrapper = ({ 
+const MedicalVisitFormWrapper = ({ 
   patient, 
-  onSubmit,
+  onSubmit, 
   isEditMode = false,
   initialData = {}
-}: EmergencyFormWrapperProps) => {
+}: MedicalVisitFormWrapperProps) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     // Signes vitaux
@@ -33,21 +33,26 @@ const EmergencyFormWrapper = ({
     heartRate: '',
     oxygenSaturation: '',
     
-    // Évaluation initiale
-    emergencySeverity: 'high', // 'low', 'medium', 'high'
-    mainComplaint: '',
-    triageNotes: '',
-    consciousness: 'alert', // 'alert', 'verbal', 'pain', 'unresponsive'
+    // Environnement de travail
+    workstation: '',
+    exposureFactors: '',
+    protectiveEquipment: '',
+    workplaceRisks: '',
     
-    // Traitement d'urgence
-    immediateActions: '',
-    medications: '',
-    procedures: '',
-    responseToTreatment: '',
-    furtherActions: '',
-    referralToSpecialist: false,
-    hospitalization: false,
-    monitoringRequired: false,
+    // Examen physique
+    vision: '',
+    hearing: '',
+    respiratory: '',
+    cardiovascular: '',
+    musculoskeletal: '',
+    neurological: '',
+    
+    // Conclusion
+    fitForWork: true,
+    restrictions: '',
+    recommendations: '',
+    followUpNeeded: false,
+    followUpDate: '',
     notes: '',
     
     ...initialData // Remplir avec les données initiales si fournies
@@ -61,13 +66,6 @@ const EmergencyFormWrapper = ({
     }));
   };
 
-  const handleSelectChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
   const handleCheckboxChange = (field: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
@@ -75,23 +73,30 @@ const EmergencyFormWrapper = ({
     }));
   };
 
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   const validateStep1 = () => {
-    const requiredFields = ['temperature', 'bloodPressureSys', 'bloodPressureDia', 'heartRate', 'oxygenSaturation'];
+    const requiredFields = ['temperature', 'bloodPressureSys', 'bloodPressureDia', 'heartRate'];
     const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
     
     if (missingFields.length > 0) {
-      toast.error("Les signes vitaux sont essentiels en situation d'urgence");
+      toast.error("Veuillez remplir tous les champs obligatoires");
       return false;
     }
     return true;
   };
 
   const validateStep2 = () => {
-    const requiredFields = ['mainComplaint', 'triageNotes'];
+    const requiredFields = ['workstation', 'exposureFactors'];
     const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
     
     if (missingFields.length > 0) {
-      toast.error("L'évaluation initiale est incomplète");
+      toast.error("Veuillez remplir tous les champs obligatoires");
       return false;
     }
     return true;
@@ -115,18 +120,18 @@ const EmergencyFormWrapper = ({
   };
 
   return (
-    <Card className="w-full border-red-200">
-      <CardHeader className="bg-red-50">
-        <CardTitle className="text-red-700">
+    <Card className="w-full border-blue-200">
+      <CardHeader className="bg-blue-50">
+        <CardTitle className="text-blue-700">
           {isEditMode 
-            ? "Modification du traitement d'urgence" 
-            : "Formulaire de traitement d'urgence"
+            ? "Modification de visite médicale" 
+            : "Formulaire de visite médicale"
           }
         </CardTitle>
         <CardDescription>
           {isEditMode 
-            ? "Modifiez les informations du traitement d'urgence" 
-            : "Ce formulaire est utilisé pour documenter les interventions d'urgence"
+            ? "Modifiez les informations de la visite médicale"
+            : "Veuillez renseigner les informations de la visite médicale"
           }
         </CardDescription>
       </CardHeader>
@@ -138,10 +143,10 @@ const EmergencyFormWrapper = ({
               1. Signes vitaux
             </TabsTrigger>
             <TabsTrigger value="step2" disabled={step !== 2}>
-              2. Évaluation initiale
+              2. Environnement de travail
             </TabsTrigger>
             <TabsTrigger value="step3" disabled={step !== 3}>
-              3. Traitement d'urgence
+              3. Examen physique
             </TabsTrigger>
           </TabsList>
 
@@ -150,15 +155,14 @@ const EmergencyFormWrapper = ({
           </TabsContent>
 
           <TabsContent value="step2">
-            <StepInitialAssessment 
-              formData={formData} 
-              handleInputChange={handleInputChange} 
-              handleSelectChange={handleSelectChange}
+            <StepWorkEnvironment
+              formData={formData}
+              handleInputChange={handleInputChange}
             />
           </TabsContent>
 
           <TabsContent value="step3">
-            <StepTreatment 
+            <StepPhysicalExam 
               formData={formData} 
               handleInputChange={handleInputChange}
               handleCheckboxChange={handleCheckboxChange}
@@ -180,17 +184,17 @@ const EmergencyFormWrapper = ({
         )}
         
         {step < 3 ? (
-          <Button onClick={handleNextStep} className="bg-red-600 hover:bg-red-700">
+          <Button onClick={handleNextStep} className="bg-blue-600 hover:bg-blue-700">
             Suivant
           </Button>
         ) : (
           <Button 
             onClick={handleSubmit} 
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-blue-600 hover:bg-blue-700"
           >
             {isEditMode 
               ? "Valider les modifications" 
-              : "Valider le traitement d'urgence"
+              : "Valider la visite médicale"
             }
           </Button>
         )}
@@ -199,4 +203,4 @@ const EmergencyFormWrapper = ({
   );
 };
 
-export default EmergencyFormWrapper;
+export default MedicalVisitFormWrapper;
