@@ -3,19 +3,20 @@ import React from 'react';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
+import { Patient } from '@/types/patient';
 
 const MedicalVisitsStats = () => {
   const patients = usePatientStore((state) => state.patients);
   
   // Count patients who have been taken care of for medical visits
-  const completedVisits = patients.filter(p => 
+  const completedVisits = patients.filter((p: Patient) => 
     p.service === "VM" && 
     p.status !== "En attente" && 
     p.takenCareBy
   ).length;
   
   // Count waiting patients for medical visits
-  const waitingVisits = patients.filter(p => 
+  const waitingVisits = patients.filter((p: Patient) => 
     p.service === "VM" && 
     p.status === "En attente"
   ).length;
@@ -72,8 +73,8 @@ const MedicalVisitsStats = () => {
                 </thead>
                 <tbody>
                   {patients
-                    .filter(p => p.service === "VM" && p.status !== "En attente" && p.takenCareBy)
-                    .map((patient) => (
+                    .filter((p: Patient) => p.service === "VM" && p.status !== "En attente" && p.takenCareBy)
+                    .map((patient: Patient) => (
                       <tr key={patient.id} className="border-b hover:bg-gray-50">
                         <td className="px-4 py-2">{patient.id}</td>
                         <td className="px-4 py-2">{patient.name}</td>
