@@ -8,54 +8,43 @@ import PatientEditDialog from '@/components/nurse/PatientEditDialog';
 import ModificationHistory from '@/components/nurse/ModificationHistory';
 import CompletePatientEditDialog from '@/components/nurse/CompletePatientEditDialog';
 import { useNavigate } from 'react-router-dom';
-
 const MedicalVisitsStats = () => {
   const navigate = useNavigate();
   // Fix: Separate state selectors to prevent infinite re-renders
-  const patients = usePatientStore((state) => state.patients);
-  
+  const patients = usePatientStore(state => state.patients);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCompleteEditOpen, setIsCompleteEditOpen] = useState(false);
   const [showHistory, setShowHistory] = useState<string | null>(null);
-  
-  // Count patients who have been taken care of for medical visits
-  const completedVisits = patients.filter((p: Patient) => 
-    p.service === "VM" && 
-    p.status !== "En attente" && 
-    p.takenCareBy
-  ).length;
-  
-  // Count waiting patients for medical visits
-  const waitingVisits = patients.filter((p: Patient) => 
-    p.service === "VM" && 
-    p.status === "En attente"
-  ).length;
 
+  // Count patients who have been taken care of for medical visits
+  const completedVisits = patients.filter((p: Patient) => p.service === "VM" && p.status !== "En attente" && p.takenCareBy).length;
+
+  // Count waiting patients for medical visits
+  const waitingVisits = patients.filter((p: Patient) => p.service === "VM" && p.status === "En attente").length;
   const handleEdit = (patient: Patient) => {
     setSelectedPatient(patient);
     setIsDialogOpen(true);
   };
-
   const handleCompleteEdit = (patient: Patient) => {
     setSelectedPatient(patient);
     setIsCompleteEditOpen(true);
   };
-  
   const handleViewDetails = (patient: Patient) => {
-    navigate(`/dashboard/patient-details/${patient.id}`, { state: { patientData: patient } });
+    navigate(`/dashboard/patient-details/${patient.id}`, {
+      state: {
+        patientData: patient
+      }
+    });
   };
-
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedPatient(null);
   };
-
   const handleCloseCompleteEdit = () => {
     setIsCompleteEditOpen(false);
     setSelectedPatient(null);
   };
-
   const toggleHistory = (patientId: string) => {
     if (showHistory === patientId) {
       setShowHistory(null);
@@ -63,9 +52,7 @@ const MedicalVisitsStats = () => {
       setShowHistory(patientId);
     }
   };
-
-  return (
-    <div className="container mx-auto py-6">
+  return <div className="container mx-auto py-6">
       <h1 className="text-2xl font-bold mb-6">Statistiques des visites médicales</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -98,8 +85,7 @@ const MedicalVisitsStats = () => {
         </Card>
       </div>
       
-      {completedVisits > 0 ? (
-        <Card>
+      {completedVisits > 0 ? <Card>
           <CardHeader>
             <CardTitle>Patients ayant reçu une visite médicale</CardTitle>
           </CardHeader>
@@ -117,103 +103,61 @@ const MedicalVisitsStats = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {patients
-                    .filter((p: Patient) => p.service === "VM" && p.status !== "En attente" && p.takenCareBy)
-                    .map((patient: Patient) => (
-                      <React.Fragment key={patient.id}>
+                  {patients.filter((p: Patient) => p.service === "VM" && p.status !== "En attente" && p.takenCareBy).map((patient: Patient) => <React.Fragment key={patient.id}>
                         <tr className="border-b hover:bg-gray-50">
                           <td className="px-4 py-2">{patient.id}</td>
                           <td className="px-4 py-2">{patient.name}</td>
                           <td className="px-4 py-2">{patient.company}</td>
                           <td className="px-4 py-2">{patient.takenCareBy?.name}</td>
                           <td className="px-4 py-2">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              patient.status === "Terminé" 
-                                ? "bg-green-100 text-green-800" 
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${patient.status === "Terminé" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}>
                               {patient.status}
                             </span>
                           </td>
                           <td className="px-4 py-2">
                             <div className="flex flex-wrap gap-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => handleEdit(patient)}
-                              >
+                              <Button variant="outline" size="sm" onClick={() => handleEdit(patient)}>
                                 <Edit className="h-4 w-4 mr-1" />
                                 Modif. simple
                               </Button>
-                              <Button 
-                                variant="default" 
-                                size="sm" 
-                                onClick={() => handleCompleteEdit(patient)}
-                                className="bg-blue-600 hover:bg-blue-700"
-                              >
+                              <Button variant="default" size="sm" onClick={() => handleCompleteEdit(patient)} className="bg-blue-600 hover:bg-blue-700">
                                 <FileEdit className="h-4 w-4 mr-1" />
                                 Modif. complète
                               </Button>
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => handleViewDetails(patient)}
-                              >
+                              <Button variant="secondary" size="sm" onClick={() => handleViewDetails(patient)}>
                                 <Eye className="h-4 w-4 mr-1" />
                                 Afficher
                               </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => toggleHistory(patient.id)}
-                              >
+                              <Button variant="ghost" size="sm" onClick={() => toggleHistory(patient.id)}>
                                 {showHistory === patient.id ? 'Masquer' : 'Historique'}
                               </Button>
                             </div>
                           </td>
                         </tr>
-                        {showHistory === patient.id && (
-                          <tr>
+                        {showHistory === patient.id && <tr>
                             <td colSpan={6} className="p-0">
-                              <div className="p-4 bg-gray-50">
+                              <div className="p-4 bg-inherit">
                                 <ModificationHistory patient={patient} />
                               </div>
                             </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    ))}
+                          </tr>}
+                      </React.Fragment>)}
                 </tbody>
               </table>
             </div>
           </CardContent>
-        </Card>
-      ) : (
-        <Card>
+        </Card> : <Card>
           <CardContent className="py-8">
             <p className="text-center text-muted-foreground">
               Aucune visite médicale complétée pour le moment.
             </p>
           </CardContent>
-        </Card>
-      )}
+        </Card>}
 
-      {selectedPatient && (
-        <>
-          <PatientEditDialog 
-            patient={selectedPatient}
-            isOpen={isDialogOpen}
-            onClose={handleCloseDialog}
-          />
-          <CompletePatientEditDialog
-            patient={selectedPatient}
-            isOpen={isCompleteEditOpen}
-            onClose={handleCloseCompleteEdit}
-          />
-        </>
-      )}
-    </div>
-  );
+      {selectedPatient && <>
+          <PatientEditDialog patient={selectedPatient} isOpen={isDialogOpen} onClose={handleCloseDialog} />
+          <CompletePatientEditDialog patient={selectedPatient} isOpen={isCompleteEditOpen} onClose={handleCloseCompleteEdit} />
+        </>}
+    </div>;
 };
-
 export default MedicalVisitsStats;
