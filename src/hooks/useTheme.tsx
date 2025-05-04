@@ -31,22 +31,29 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   
   // Function to apply theme to DOM with smooth transition
   const applyThemeToDOM = (theme: Theme) => {
-    // Add transition class to body for smooth color transitions
-    document.body.classList.add('theme-transition');
+    // Add transition class to document for smooth color transitions
+    document.documentElement.classList.add('theme-transition');
     
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
     }
     
     // Add event listener to remove transition class after transition completes
     const transitionEndHandler = () => {
-      document.body.classList.remove('theme-transition');
-      document.body.removeEventListener('transitionend', transitionEndHandler);
+      document.documentElement.classList.remove('theme-transition');
+      document.documentElement.removeEventListener('transitionend', transitionEndHandler);
     };
     
-    document.body.addEventListener('transitionend', transitionEndHandler);
+    document.documentElement.addEventListener('transitionend', transitionEndHandler);
+    
+    // Fallback: remove transition class after a delay in case transitionend doesn't fire
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transition');
+    }, 1000);
   };
   
   // Apply the theme when the component mounts

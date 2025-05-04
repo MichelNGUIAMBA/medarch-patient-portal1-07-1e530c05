@@ -45,21 +45,32 @@ const Chatbot = () => {
     if (savedMessages) {
       try {
         const parsedMessages = JSON.parse(savedMessages);
-        setMessages(parsedMessages);
+        // Parse dates back to Date objects
+        const messagesWithDates = parsedMessages.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }));
+        setMessages(messagesWithDates);
       } catch (error) {
         console.error('Failed to parse saved messages:', error);
+        addWelcomeMessage();
       }
     } else {
       // Add welcome message if no previous messages found
-      const welcomeMessage: Message = {
-        id: Date.now().toString(),
-        text: t('chatbotWelcome'),
-        sender: 'bot',
-        timestamp: new Date()
-      };
-      setMessages([welcomeMessage]);
+      addWelcomeMessage();
     }
-  }, [user, isAuthenticated, t]);
+  }, [user, isAuthenticated, language, t]);
+
+  // Welcome message function
+  const addWelcomeMessage = () => {
+    const welcomeMessage: Message = {
+      id: Date.now().toString(),
+      text: t('chatbotWelcome'),
+      sender: 'bot',
+      timestamp: new Date()
+    };
+    setMessages([welcomeMessage]);
+  };
 
   // Save messages to localStorage whenever they change
   useEffect(() => {
@@ -228,6 +239,39 @@ const Chatbot = () => {
         return 'Normal blood pressure is around 120/80 mmHg. Hypertension is typically defined as pressure above 130/80 mmHg. For accurate blood pressure measurement, the patient should be seated calmly for 5 minutes before the measurement.';
       }
     }
+
+    // Medical emergencies
+    else if (userInputLower.includes('urgence') || userInputLower.includes('emergency') || userInputLower.includes('notfall')) {
+      if (currentLanguage === 'fr') {
+        return 'En cas d\'urgence médicale, il est crucial d\'évaluer rapidement l\'état du patient selon le protocole ABC (Airway, Breathing, Circulation). Documentez l\'heure d\'arrivée, les signes vitaux et les symptômes présentés. Le traitement des urgences est priorisé selon la gravité.';
+      } else if (currentLanguage === 'de') {
+        return 'Bei einem medizinischen Notfall ist es entscheidend, den Zustand des Patienten schnell nach dem ABC-Protokoll (Atemwege, Beatmung, Kreislauf) zu beurteilen. Dokumentieren Sie die Ankunftszeit, Vitalzeichen und präsentierten Symptome. Die Behandlung von Notfällen wird nach Schweregrad priorisiert.';
+      } else {
+        return 'In a medical emergency, it\'s crucial to quickly assess the patient\'s condition following the ABC protocol (Airway, Breathing, Circulation). Document the time of arrival, vital signs, and presented symptoms. Emergency treatment is prioritized according to severity.';
+      }
+    }
+    
+    // Medication information
+    else if (userInputLower.includes('medicament') || userInputLower.includes('medication') || userInputLower.includes('medikament')) {
+      if (currentLanguage === 'fr') {
+        return 'Les médicaments doivent être administrés avec précaution, en vérifiant toujours la posologie, les contre-indications et les allergies du patient. Tous les médicaments administrés doivent être documentés précisément dans le dossier du patient, en incluant le nom, la dose, la voie d\'administration et l\'heure.';
+      } else if (currentLanguage === 'de') {
+        return 'Medikamente sollten mit Vorsicht verabreicht werden, wobei immer die Dosierung, Kontraindikationen und Allergien des Patienten überprüft werden müssen. Alle verabreichten Medikamente müssen genau in der Patientenakte dokumentiert werden, einschließlich Name, Dosis, Verabreichungsweg und Uhrzeit.';
+      } else {
+        return 'Medications should be administered with caution, always checking the dosage, contraindications, and patient allergies. All administered medications must be accurately documented in the patient\'s record, including the name, dose, route of administration, and time.';
+      }
+    }
+    
+    // General health advice
+    else if (userInputLower.includes('santé') || userInputLower.includes('health') || userInputLower.includes('gesundheit')) {
+      if (currentLanguage === 'fr') {
+        return 'Une bonne santé repose sur une alimentation équilibrée, une activité physique régulière, un sommeil adéquat et une gestion du stress. Les visites de contrôle régulières sont essentielles pour la détection précoce des problèmes de santé. Le système MedArch permet de suivre l\'évolution de la santé des patients sur la durée.';
+      } else if (currentLanguage === 'de') {
+        return 'Eine gute Gesundheit basiert auf ausgewogener Ernährung, regelmäßiger körperlicher Aktivität, ausreichendem Schlaf und Stressbewältigung. Regelmäßige Kontrolluntersuchungen sind für die Früherkennung von Gesundheitsproblemen unerlässlich. Das MedArch-System ermöglicht es, die Entwicklung der Gesundheit von Patienten im Laufe der Zeit zu verfolgen.';
+      } else {
+        return 'Good health is based on a balanced diet, regular physical activity, adequate sleep, and stress management. Regular check-ups are essential for early detection of health issues. The MedArch system allows tracking patients\' health evolution over time.';
+      }
+    }
     
     // Default responses when no specific pattern is matched
     else {
@@ -245,7 +289,16 @@ const Chatbot = () => {
   const chatbotButtonVariants = {
     initial: { scale: 0.8, opacity: 0 },
     animate: { scale: 1, opacity: 1, transition: { type: "spring", damping: 12 } },
-    hover: { scale: 1.1, rotate: [0, -10, 10, -10, 0], transition: { duration: 0.5 } },
+    hover: { 
+      scale: 1.1, 
+      rotate: [0, -10, 10, -10, 0], 
+      boxShadow: [
+        '0 0 0 rgba(0,0,0,0)',
+        '0 0 15px rgba(79, 70, 229, 0.6)',
+        '0 0 0 rgba(0,0,0,0)'
+      ],
+      transition: { duration: 0.5 } 
+    },
     tap: { scale: 0.9 }
   };
 
@@ -404,7 +457,20 @@ const Chatbot = () => {
                           theme === 'dark' ? 'bg-gray-700' : 'bg-muted'
                         }`}>
                           <div className="flex items-center space-x-2">
-                            <Brain size={16} className="animate-pulse" />
+                            <motion.div
+                              animate={{
+                                scale: [0.8, 1.2, 0.8],
+                                rotate: [0, 180, 360],
+                                opacity: [0.6, 1, 0.6]
+                              }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                              }}
+                            >
+                              <Brain size={16} className="text-indigo-400" />
+                            </motion.div>
                             <p className="text-sm">{t('thinking')}...</p>
                           </div>
                         </div>
@@ -423,17 +489,17 @@ const Chatbot = () => {
                         }`}>
                           <div className="flex space-x-1 items-end h-6">
                             <motion.div 
-                              className={`w-2 h-2 rounded-full ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-400'}`}
+                              className={`w-2 h-2 rounded-full ${theme === 'dark' ? 'bg-indigo-400' : 'bg-primary'}`}
                               animate={{ y: [0, -8, 0] }}
                               transition={{ repeat: Infinity, duration: 0.8, delay: 0 }}
                             />
                             <motion.div 
-                              className={`w-2 h-2 rounded-full ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-400'}`}
+                              className={`w-2 h-2 rounded-full ${theme === 'dark' ? 'bg-indigo-400' : 'bg-primary'}`}
                               animate={{ y: [0, -8, 0] }}
                               transition={{ repeat: Infinity, duration: 0.8, delay: 0.2 }}
                             />
                             <motion.div 
-                              className={`w-2 h-2 rounded-full ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-400'}`}
+                              className={`w-2 h-2 rounded-full ${theme === 'dark' ? 'bg-indigo-400' : 'bg-primary'}`}
                               animate={{ y: [0, -8, 0] }}
                               transition={{ repeat: Infinity, duration: 0.8, delay: 0.4 }}
                             />
