@@ -7,7 +7,7 @@ const QuickActions = () => {
   return <div className="rounded-lg shadow p-6 bg-inherit">
       <h2 className="text-lg font-semibold mb-4">Actions rapides</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Button variant="outline" className="h-auto py-6 flex flex-col items-center justify-center hover:bg-blue-50 hover:border-blue-200 transition-colors" onClick={() => navigate('/dashboard/new-patient')}>
+        <Button variant="outline" onClick={() => navigate('/dashboard/new-patient')} className="h-auto py-6 flex flex-col items-center justify-center hover:border-blue-200 transition-colors text-base text-inherit bg-slate-950 hover:bg-slate-800">
           <UserCheck className="h-8 w-8 text-blue-600 mb-2" />
           <span className="font-medium">Nouveau patient</span>
         </Button>
