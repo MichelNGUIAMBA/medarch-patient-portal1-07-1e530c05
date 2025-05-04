@@ -1,19 +1,16 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Patient } from '@/types/patient';
-
 interface PatientInfoCardProps {
   patient: Patient;
 }
-
-const PatientInfoCard = ({ patient }: PatientInfoCardProps) => {
+const PatientInfoCard = ({
+  patient
+}: PatientInfoCardProps) => {
   // Determine if it's an emergency
   const isEmergency = patient.service === "Ug";
-
-  return (
-    <Card className="w-full mb-6">
-      <CardHeader className={isEmergency ? "bg-red-50" : "bg-green-50"}>
+  return <Card className="w-full mb-6">
+      <CardHeader className="">
         <CardTitle className="text-lg">Informations du patient</CardTitle>
       </CardHeader>
       <CardContent className="pt-4">
@@ -46,8 +43,6 @@ const PatientInfoCard = ({ patient }: PatientInfoCardProps) => {
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
-
 export default PatientInfoCard;
