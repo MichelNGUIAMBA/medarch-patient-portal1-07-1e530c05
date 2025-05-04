@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/use-auth-context";
 import { Button } from "@/components/ui/button";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Hospital, User, Users, Database, ClipboardCheck, LogOut, FileText, Calendar, UserCheck, Search, MessageSquare, Ambulance } from "lucide-react";
+import { Hospital, User, Users, Database, ClipboardCheck, LogOut, FileText, Calendar, UserCheck, Search, MessageSquare, Ambulance, Archive } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import ThemeSwitcher from "./ThemeSwitcher";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -23,11 +23,18 @@ const DashboardLayout = () => {
   };
 
   const getNavigationItems = () => {
-    const commonItems = [{
-      title: t('dashboard'),
-      url: "/dashboard",
-      icon: FileText
-    }];
+    const commonItems = [
+      {
+        title: t('dashboard'),
+        url: "/dashboard",
+        icon: FileText
+      },
+      {
+        title: t('dailyActivities'),
+        url: "/dashboard/daily-activities",
+        icon: Archive
+      }
+    ];
 
     const roleBasedItems = {
       admin: [{

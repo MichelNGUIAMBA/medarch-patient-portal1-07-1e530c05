@@ -19,6 +19,7 @@ type PatientStore = {
   addPatientsFromCSV: (patientsData: Array<Omit<Patient, "id" | "status" | "registeredAt" | "name">>) => void;
   takeCharge: (id: string, nurse: { name: string; role: string }) => void;
   setPatientCompleted: (id: string, caregiver: { name: string; role: string }) => void;
+  assignServiceForDay: (id: string, service: "VM" | "Cons" | "Ug", assignedBy: { name: string; role: string }) => void;
 };
 
 export const usePatientStore = create<PatientStore>((set) => ({
@@ -209,5 +210,38 @@ export const usePatientStore = create<PatientStore>((set) => ({
     };
 
     return { patients: updatedPatients };
-  })
+  }),
+  assignServiceForDay: (id, service, assignedBy) => set((state) => {
+    const patientIndex = state.patients.findIndex(p => p.id === id);
+    if (patientIndex === -1) return state;
+
+    const currentPatient = state.patients[patientIndex];
+    const updatedPatients = [...state.patients];
+    
+    updatedPatients[patientIndex] = {
+      ...currentPatient,
+      service,
+      status: "En attente",
+      registeredAt: new Date().toISOString(),
+      modificationHistory: [
+        {
+          field: "service",
+          oldValue: currentPatient.service || '',
+          newValue: service,
+          modifiedBy: assignedBy,
+          timestamp: new Date().toISOString()
+        },
+        {
+          field: "status",
+          oldValue: currentPatient.status || '',
+          newValue: "En attente",
+          modifiedBy: assignedBy,
+          timestamp: new Date().toISOString()
+        },
+        ...(currentPatient.modificationHistory || [])
+      ]
+    };
+
+    return { patients: updatedPatients };
+  }),
 }));
