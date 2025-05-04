@@ -1,17 +1,17 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Patient } from '@/types/patient';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
 interface ServiceFormReadonlyViewerProps {
   patient: Patient;
   serviceData: any;
 }
-
-const ServiceFormReadonlyViewer = ({ patient, serviceData }: ServiceFormReadonlyViewerProps) => {
+const ServiceFormReadonlyViewer = ({
+  patient,
+  serviceData
+}: ServiceFormReadonlyViewerProps) => {
   const getServiceName = (service: string) => {
-    switch(service) {
+    switch (service) {
       case 'Ug':
         return 'Urgence';
       case 'VM':
@@ -22,9 +22,8 @@ const ServiceFormReadonlyViewer = ({ patient, serviceData }: ServiceFormReadonly
         return service;
     }
   };
-
   const getServiceColor = (service: string) => {
-    switch(service) {
+    switch (service) {
       case 'Ug':
         return 'text-red-600';
       case 'VM':
@@ -38,8 +37,7 @@ const ServiceFormReadonlyViewer = ({ patient, serviceData }: ServiceFormReadonly
 
   // Render different data based on service type
   const renderConsultationData = () => {
-    return (
-      <Tabs defaultValue="vitalSigns" className="w-full">
+    return <Tabs defaultValue="vitalSigns" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="vitalSigns">Signes vitaux</TabsTrigger>
           <TabsTrigger value="history">Antécédents</TabsTrigger>
@@ -126,13 +124,10 @@ const ServiceFormReadonlyViewer = ({ patient, serviceData }: ServiceFormReadonly
             </div>
           </div>
         </TabsContent>
-      </Tabs>
-    );
+      </Tabs>;
   };
-
   const renderMedicalVisitData = () => {
-    return (
-      <Tabs defaultValue="vitalSigns" className="w-full">
+    return <Tabs defaultValue="vitalSigns" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="vitalSigns">Signes vitaux</TabsTrigger>
           <TabsTrigger value="workstation">Environnement de travail</TabsTrigger>
@@ -141,19 +136,19 @@ const ServiceFormReadonlyViewer = ({ patient, serviceData }: ServiceFormReadonly
 
         <TabsContent value="vitalSigns" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="border rounded-md p-3 bg-gray-50">
+            <div className="border rounded-md p-3 bg-inherit">
               <p className="text-sm font-medium text-gray-500">Température</p>
               <p className="text-lg">{serviceData.temperature} °C</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
+            <div className="border rounded-md p-3 bg-inherit">
               <p className="text-sm font-medium text-gray-500">Pression artérielle</p>
               <p className="text-lg">{serviceData.bloodPressureSys}/{serviceData.bloodPressureDia} mmHg</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
+            <div className="border rounded-md p-3 bg-inherit">
               <p className="text-sm font-medium text-gray-500">Fréquence cardiaque</p>
               <p className="text-lg">{serviceData.heartRate} bpm</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
+            <div className="border rounded-md p-3 bg-inherit">
               <p className="text-sm font-medium text-gray-500">Saturation en oxygène</p>
               <p className="text-lg">{serviceData.oxygenSaturation} %</p>
             </div>
@@ -205,13 +200,10 @@ const ServiceFormReadonlyViewer = ({ patient, serviceData }: ServiceFormReadonly
             </div>
           </div>
         </TabsContent>
-      </Tabs>
-    );
+      </Tabs>;
   };
-
   const renderEmergencyData = () => {
-    return (
-      <Tabs defaultValue="assessment" className="w-full">
+    return <Tabs defaultValue="assessment" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="assessment">Évaluation initiale</TabsTrigger>
           <TabsTrigger value="treatment">Traitement</TabsTrigger>
@@ -221,8 +213,7 @@ const ServiceFormReadonlyViewer = ({ patient, serviceData }: ServiceFormReadonly
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="border rounded-md p-3 bg-gray-50">
               <p className="text-sm font-medium text-gray-500">Sévérité</p>
-              <p>{serviceData.emergencySeverity === 'high' ? 'Élevée' : 
-                  serviceData.emergencySeverity === 'medium' ? 'Moyenne' : 'Basse'}</p>
+              <p>{serviceData.emergencySeverity === 'high' ? 'Élevée' : serviceData.emergencySeverity === 'medium' ? 'Moyenne' : 'Basse'}</p>
             </div>
             <div className="border rounded-md p-3 bg-gray-50">
               <p className="text-sm font-medium text-gray-500">Plainte principale</p>
@@ -230,9 +221,7 @@ const ServiceFormReadonlyViewer = ({ patient, serviceData }: ServiceFormReadonly
             </div>
             <div className="border rounded-md p-3 bg-gray-50">
               <p className="text-sm font-medium text-gray-500">État de conscience</p>
-              <p>{serviceData.consciousness === 'alert' ? 'Alerte' : 
-                  serviceData.consciousness === 'verbal' ? 'Réponse verbale' :
-                  serviceData.consciousness === 'pain' ? 'Réponse à la douleur' : 'Non réactif'}</p>
+              <p>{serviceData.consciousness === 'alert' ? 'Alerte' : serviceData.consciousness === 'verbal' ? 'Réponse verbale' : serviceData.consciousness === 'pain' ? 'Réponse à la douleur' : 'Non réactif'}</p>
             </div>
             <div className="border rounded-md p-3 bg-gray-50">
               <p className="text-sm font-medium text-gray-500">Signes vitaux</p>
@@ -277,16 +266,10 @@ const ServiceFormReadonlyViewer = ({ patient, serviceData }: ServiceFormReadonly
             </div>
           </div>
         </TabsContent>
-      </Tabs>
-    );
+      </Tabs>;
   };
-
-  return (
-    <Card className="w-full mb-6">
-      <CardHeader className={`
-        ${patient.service === 'Ug' ? 'bg-red-50' : 
-          patient.service === 'VM' ? 'bg-blue-50' : 'bg-green-50'}
-      `}>
+  return <Card className="w-full mb-6">
+      <CardHeader className="">
         <CardTitle className={getServiceColor(patient.service)}>
           Données du {getServiceName(patient.service)}
         </CardTitle>
@@ -296,8 +279,6 @@ const ServiceFormReadonlyViewer = ({ patient, serviceData }: ServiceFormReadonly
         {patient.service === 'VM' && renderMedicalVisitData()}
         {patient.service === 'Ug' && renderEmergencyData()}
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
-
 export default ServiceFormReadonlyViewer;
