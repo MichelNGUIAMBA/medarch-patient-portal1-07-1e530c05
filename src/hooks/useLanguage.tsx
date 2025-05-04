@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
-type Language = 'fr' | 'en';
+type Language = 'fr' | 'en' | 'de';
 
 interface LanguageContextType {
   language: Language;
@@ -170,6 +170,93 @@ const translations = {
     confirm: 'Confirm',
     patientAssignedToService: 'Patient assigned to service',
     assignedTo: 'assigned to'
+  },
+  de: {
+    // German translations
+    dashboard: 'Dashboard',
+    login: 'Anmelden',
+    logout: 'Abmelden',
+    username: 'Benutzername',
+    password: 'Passwort',
+    welcomeBack: 'Willkommen zurück',
+    enterCredentials: 'Geben Sie Ihre Anmeldedaten ein',
+    loginSuccess: 'Anmeldung erfolgreich',
+    loginError: 'Ungültige Anmeldedaten',
+    users: 'Benutzer',
+    settings: 'Einstellungen',
+    newPatient: 'Neuer Patient',
+    waitingLists: 'Wartelisten',
+    waitingPatients: 'Wartende Patienten',
+    medicalVisits: 'Medizinische Besuche',
+    consultations: 'Konsultationen',
+    emergencies: 'Notfälle',
+    pendingExams: 'Ausstehende Untersuchungen',
+    examHistory: 'Untersuchungsverlauf',
+    patientsToSee: 'Zu sehende Patienten',
+    medicalRecords: 'Krankenakten',
+    yourAccount: 'Ihr Konto',
+    secretary: 'Sekretär(in)',
+    nurse: 'Krankenpfleger(in)',
+    lab: 'Labor',
+    doctor: 'Arzt',
+    admin: 'Administrator',
+    secretaryPortal: 'Sekretärsportal',
+    nursePortal: 'Krankenpflegerportal',
+    labPortal: 'Laborportal',
+    doctorPortal: 'Arztportal',
+    adminPortal: 'Administratorportal',
+    takenCareBy: 'Betreut von',
+    darkMode: 'Dunkelmodus',
+    lightMode: 'Hellmodus',
+    
+    // Translations for daily activities
+    dailyActivities: 'Tägliche Aktivitäten',
+    noActivitiesYet: 'Noch keine Aktivitäten aufgezeichnet',
+    activitiesFor: 'Aktivitäten für',
+    backToDailyActivities: 'Zurück zu täglichen Aktivitäten',
+    patients: 'Patienten',
+    newPatients: 'neue Patienten',
+    activityLog: 'Aktivitätsprotokoll',
+    time: 'Zeit',
+    type: 'Typ',
+    description: 'Beschreibung',
+    performedBy: 'Durchgeführt von',
+    patient: 'Patient',
+    noActivitiesRecorded: 'Keine Aktivitäten für diesen Tag aufgezeichnet',
+    
+    // Activity types
+    patient_registration: 'Patientenregistrierung',
+    service_assignment: 'Servicezuweisung',
+    medical_visit: 'Medizinischer Besuch',
+    consultation: 'Beratung',
+    emergency: 'Notfall',
+    lab_exam: 'Laboruntersuchung',
+    status_change: 'Statusänderung',
+    
+    // Secretary dashboard updates
+    lastRegisteredPatients: 'Zuletzt registrierte Patienten',
+    patientId: 'Patienten-ID',
+    name: 'Name',
+    company: 'Unternehmen',
+    service: 'Service',
+    status: 'Status',
+    actions: 'Aktionen',
+    show: 'Anzeigen',
+    newService: 'Neuer Service',
+    noStatus: 'Kein Status',
+    assignService: 'Service zuweisen',
+    selectService: 'Service auswählen',
+    medicalVisit: 'Medizinischer Besuch',
+    cancel: 'Abbrechen',
+    confirm: 'Bestätigen',
+    patientAssignedToService: 'Patient dem Service zugewiesen',
+    assignedTo: 'zugewiesen zu',
+    
+    // Language translations
+    french: 'Französisch',
+    english: 'Englisch',
+    german: 'Deutsch',
+    language: 'Sprache'
   }
 };
 
@@ -181,7 +268,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Load language preference from localStorage on initial render
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language');
-    if (savedLanguage && (savedLanguage === 'fr' || savedLanguage === 'en')) {
+    if (savedLanguage && (savedLanguage === 'fr' || savedLanguage === 'en' || savedLanguage === 'de')) {
       setLanguage(savedLanguage);
     }
   }, []);

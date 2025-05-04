@@ -1,18 +1,31 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS, de } from 'date-fns/locale';
 import { Archive } from 'lucide-react';
 import { useDailyActivityStore } from '@/stores/useDailyActivityStore';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/useLanguage';
 
 const DailyActivities = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const getDates = useDailyActivityStore(state => state.getDates);
   const dates = getDates();
+  
+  // Get the correct locale based on the selected language
+  const getLocale = () => {
+    switch (language) {
+      case 'fr':
+        return fr;
+      case 'de':
+        return de;
+      case 'en':
+      default:
+        return enUS;
+    }
+  };
   
   const navigateToDateDetail = (date: string) => {
     navigate(`/dashboard/daily-activities/${date}`);
@@ -37,7 +50,7 @@ const DailyActivities = () => {
             >
               <Archive className="h-16 w-16 text-blue-600 dark:text-blue-400 mb-4" />
               <span className="font-medium text-lg">
-                {format(parseISO(date), 'EEEE d MMMM yyyy', { locale: fr })}
+                {format(parseISO(date), 'EEEE d MMMM yyyy', { locale: getLocale() })}
               </span>
             </Button>
           ))}
