@@ -24,7 +24,7 @@ const ThemeSwitcher = () => {
         opacity: 0
       }} transition={{
         duration: 0.3
-      }} className="absolute inset-0">
+      }} className="absolute inset-0 mx-[2px] my-[2px]">
             <Sun className="h-5 w-5 text-yellow-300 transition-all" />
           </motion.div> : <motion.div initial={{
         y: -20,
