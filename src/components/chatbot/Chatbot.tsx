@@ -19,7 +19,7 @@ interface Message {
 const Chatbot = () => {
   const { t, language } = useLanguage();
   const { theme } = useTheme();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -28,36 +28,46 @@ const Chatbot = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load previous messages from localStorage when component mounts
-  useEffect(() => {
-    if (user) {
-      const savedMessages = localStorage.getItem(`chatbot_messages_${user.id}`);
-      if (savedMessages) {
-        try {
-          const parsedMessages = JSON.parse(savedMessages);
-          setMessages(parsedMessages);
-        } catch (error) {
-          console.error('Failed to parse saved messages:', error);
-        }
-      } else {
-        // Add welcome message if no previous messages found
-        const welcomeMessage: Message = {
-          id: Date.now().toString(),
-          text: t('chatbotWelcome'),
-          sender: 'bot',
-          timestamp: new Date()
-        };
-        setMessages([welcomeMessage]);
-      }
+  // Generate storage key based on user authentication status
+  const getStorageKey = () => {
+    if (isAuthenticated && user) {
+      return `chatbot_messages_${user.id}`;
+    } else {
+      return 'chatbot_messages_guest';
     }
-  }, [user, t]);
+  };
+
+  // Load previous messages from localStorage when component mounts or user changes
+  useEffect(() => {
+    const storageKey = getStorageKey();
+    const savedMessages = localStorage.getItem(storageKey);
+    
+    if (savedMessages) {
+      try {
+        const parsedMessages = JSON.parse(savedMessages);
+        setMessages(parsedMessages);
+      } catch (error) {
+        console.error('Failed to parse saved messages:', error);
+      }
+    } else {
+      // Add welcome message if no previous messages found
+      const welcomeMessage: Message = {
+        id: Date.now().toString(),
+        text: t('chatbotWelcome'),
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages([welcomeMessage]);
+    }
+  }, [user, isAuthenticated, t]);
 
   // Save messages to localStorage whenever they change
   useEffect(() => {
-    if (user && messages.length > 0) {
-      localStorage.setItem(`chatbot_messages_${user.id}`, JSON.stringify(messages));
+    if (messages.length > 0) {
+      const storageKey = getStorageKey();
+      localStorage.setItem(storageKey, JSON.stringify(messages));
     }
-  }, [messages, user]);
+  }, [messages, user, isAuthenticated]);
 
   // Scroll to bottom of messages when new message is added
   useEffect(() => {

@@ -29,13 +29,24 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
   
-  // Function to apply theme to DOM
+  // Function to apply theme to DOM with smooth transition
   const applyThemeToDOM = (theme: Theme) => {
+    // Add transition class to body for smooth color transitions
+    document.body.classList.add('theme-transition');
+    
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
+    
+    // Add event listener to remove transition class after transition completes
+    const transitionEndHandler = () => {
+      document.body.classList.remove('theme-transition');
+      document.body.removeEventListener('transitionend', transitionEndHandler);
+    };
+    
+    document.body.addEventListener('transitionend', transitionEndHandler);
   };
   
   // Apply the theme when the component mounts
