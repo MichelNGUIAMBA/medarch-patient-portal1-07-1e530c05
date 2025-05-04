@@ -119,6 +119,27 @@
   .dark * {
     scrollbar-color: var(--gray-600) transparent;
   }
+  
+  /* Tables in dark mode */
+  .dark table {
+    @apply bg-gray-800 text-gray-100;
+  }
+  
+  .dark table th {
+    @apply bg-gray-800 text-gray-100;
+  }
+  
+  .dark table tr {
+    @apply border-gray-700;
+  }
+  
+  .dark table tr:hover {
+    @apply bg-gray-700;
+  }
+  
+  .dark table td {
+    @apply text-gray-100;
+  }
 }
 
 /* Custom utility classes */
@@ -194,7 +215,7 @@
 .theme-transition {
   transition-property: background-color, border-color, color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+  transition-duration: 300ms;
 }
 
 html, body {

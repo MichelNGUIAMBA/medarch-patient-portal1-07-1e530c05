@@ -74,8 +74,21 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
     
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    try {
+      mediaQuery.addEventListener('change', handleChange);
+    } catch (error) {
+      // Fallback for browsers that don't support addEventListener
+      mediaQuery.addListener(handleChange);
+    }
+    
+    return () => {
+      try {
+        mediaQuery.removeEventListener('change', handleChange);
+      } catch (error) {
+        // Fallback for browsers that don't support removeEventListener
+        mediaQuery.removeListener(handleChange);
+      }
+    };
   }, []);
   
   const value = { theme, setTheme, toggleTheme };

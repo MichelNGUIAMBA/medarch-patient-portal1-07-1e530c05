@@ -15,7 +15,7 @@ const ThemeSwitcher = () => {
       size="icon" 
       onClick={toggleTheme} 
       title={theme === 'dark' ? t('lightMode') : t('darkMode')} 
-      className="rounded-full w-9 h-9 relative overflow-hidden transition-all duration-300 hover:bg-primary/10"
+      className="rounded-full w-9 h-9 relative overflow-hidden transition-all duration-300 hover:bg-primary/10 dark:hover:bg-primary/20"
       aria-label={theme === 'dark' ? t('lightMode') : t('darkMode')}
     >
       <AnimatePresence mode="wait">
@@ -40,7 +40,7 @@ const ThemeSwitcher = () => {
               transition={{ duration: 0.3, type: "spring", stiffness: 200 }}
               className="absolute inset-0 rounded-none mx-[2px] my-[2px] px-0 py-0"
             >
-              <Moon className="h-5 w-5 text-indigo-500 transition-all" />
+              <Moon className="h-5 w-5 text-indigo-500 dark:text-indigo-400 transition-all" />
             </motion.div>
           )}
         </div>

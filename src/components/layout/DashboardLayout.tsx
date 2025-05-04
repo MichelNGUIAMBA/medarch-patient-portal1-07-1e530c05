@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth-context";
@@ -9,26 +10,25 @@ import { toast } from "@/components/ui/sonner";
 import ThemeSwitcher from "./ThemeSwitcher";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/hooks/useLanguage";
+
 const DashboardLayout = () => {
-  const {
-    user,
-    logout
-  } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const {
-    t
-  } = useLanguage();
+  const { t } = useLanguage();
+
   const handleLogout = () => {
     logout();
     toast.success(t('logout'));
     navigate("/");
   };
+
   const getNavigationItems = () => {
     const commonItems = [{
       title: t('dashboard'),
       url: "/dashboard",
       icon: FileText
     }];
+
     const roleBasedItems = {
       admin: [{
         title: t('users'),
@@ -66,32 +66,34 @@ const DashboardLayout = () => {
         icon: Ambulance
       }],
       lab: [{
-        title: "Examens en attente",
+        title: t('pendingExams'),
         url: "/dashboard/pending-exams",
         icon: ClipboardCheck
       }, {
-        title: "Historique d'examens",
+        title: t('examHistory'),
         url: "/dashboard/exam-history",
         icon: FileText
       }],
       doctor: [{
-        title: "Patients à voir",
+        title: t('patientsToSee'),
         url: "/dashboard/patients-to-see",
         icon: UserCheck
       }, {
-        title: "Dossiers médicaux",
+        title: t('medicalRecords'),
         url: "/dashboard/medical-records",
         icon: FileText
       }]
     };
+
     return user?.role && roleBasedItems[user.role] ? [...commonItems, ...roleBasedItems[user.role]] : commonItems;
   };
+
   return <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
         <Sidebar className="border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 dark:text-white">
           <div className="flex h-16 items-center border-b px-6 border-gray-200 dark:border-gray-700">
-            <Hospital className="h-6 w-6 text-blue-600" />
-            <span className="ml-2 text-lg font-semibold text-blue-800 dark:text-blue-400">MedArch</span>
+            <Hospital className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <span className="ml-2 text-lg font-semibold text-blue-800 dark:text-blue-300">MedArch</span>
           </div>
           <SidebarContent>
             <SidebarGroup>
@@ -116,7 +118,7 @@ const DashboardLayout = () => {
                     {user?.role === "secretary" ? t('secretary') : user?.role === "nurse" ? t('nurse') : user?.role === "lab" ? t('lab') : user?.role === "doctor" ? t('doctor') : t('admin')}
                   </div>
                 </div>
-                <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950" onClick={handleLogout}>
+                <Button variant="ghost" className="w-full justify-start text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 dark:hover:text-red-300" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   {t('logout')}
                 </Button>
@@ -130,7 +132,11 @@ const DashboardLayout = () => {
             <SidebarTrigger />
             <div className="ml-4">
               <h1 className="text-lg font-semibold">
-                {user?.role === "secretary" ? "Portail de la secrétaire" : user?.role === "nurse" ? "Portail infirmier" : user?.role === "lab" ? "Portail du laboratoire" : user?.role === "doctor" ? "Portail du médecin" : "Portail administrateur"}
+                {user?.role === "secretary" ? t('secretaryPortal') : 
+                 user?.role === "nurse" ? t('nursePortal') : 
+                 user?.role === "lab" ? t('labPortal') : 
+                 user?.role === "doctor" ? t('doctorPortal') : 
+                 t('adminPortal')}
               </h1>
             </div>
             <div className="ml-auto flex items-center gap-2">
@@ -142,11 +148,12 @@ const DashboardLayout = () => {
             </div>
           </header>
           
-          <main className="flex-1 overflow-y-auto p-6 dark:bg-gray-900 dark:text-white">
+          <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 dark:text-white">
             <Outlet />
           </main>
         </div>
       </div>
     </SidebarProvider>;
 };
+
 export default DashboardLayout;
