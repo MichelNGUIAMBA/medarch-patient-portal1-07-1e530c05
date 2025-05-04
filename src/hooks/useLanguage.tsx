@@ -90,9 +90,10 @@ const translations = {
     
     // Chatbot
     'chatbot': 'Assistant virtuel',
-    'chatbotWelcome': 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?',
+    'chatbotWelcome': 'Bonjour! Je suis votre assistant virtuel MedArch. Comment puis-je vous aider aujourd\'hui?',
     'typeMessage': 'Tapez votre message...',
     'send': 'Envoyer',
+    'thinking': 'Réflexion en cours',
     
     // Theme
     'darkMode': 'Mode sombre',
@@ -103,6 +104,30 @@ const translations = {
     'french': 'Français',
     'english': 'Anglais',
     'german': 'Allemand',
+    
+    // Dashboard sections
+    'recentPatients': 'Patients récents',
+    'statistics': 'Statistiques',
+    'quickActions': 'Actions rapides',
+    'upcomingAppointments': 'Rendez-vous à venir',
+    'patientBreakdown': 'Répartition des patients',
+    'activityLog': 'Journal d\'activité',
+    
+    // Medical terms
+    'bloodPressure': 'Pression artérielle',
+    'heartRate': 'Fréquence cardiaque',
+    'temperature': 'Température',
+    'respiratoryRate': 'Fréquence respiratoire',
+    'height': 'Taille',
+    'weight': 'Poids',
+    'bmi': 'IMC',
+    'allergies': 'Allergies',
+    'medications': 'Médicaments',
+    'diagnosis': 'Diagnostic',
+    'treatment': 'Traitement',
+    'labResults': 'Résultats de laboratoire',
+    'symptoms': 'Symptômes',
+    'medicalHistory': 'Antécédents médicaux',
   },
   en: {
     // Auth
@@ -184,9 +209,10 @@ const translations = {
     
     // Chatbot
     'chatbot': 'Virtual assistant',
-    'chatbotWelcome': 'Hello! I am your virtual assistant. How can I help you today?',
+    'chatbotWelcome': 'Hello! I am your MedArch virtual assistant. How can I help you today?',
     'typeMessage': 'Type your message...',
     'send': 'Send',
+    'thinking': 'Thinking',
     
     // Theme
     'darkMode': 'Dark mode',
@@ -197,6 +223,30 @@ const translations = {
     'french': 'French',
     'english': 'English',
     'german': 'German',
+    
+    // Dashboard sections
+    'recentPatients': 'Recent patients',
+    'statistics': 'Statistics',
+    'quickActions': 'Quick actions',
+    'upcomingAppointments': 'Upcoming appointments',
+    'patientBreakdown': 'Patient breakdown',
+    'activityLog': 'Activity log',
+    
+    // Medical terms
+    'bloodPressure': 'Blood pressure',
+    'heartRate': 'Heart rate',
+    'temperature': 'Temperature',
+    'respiratoryRate': 'Respiratory rate',
+    'height': 'Height',
+    'weight': 'Weight',
+    'bmi': 'BMI',
+    'allergies': 'Allergies',
+    'medications': 'Medications',
+    'diagnosis': 'Diagnosis',
+    'treatment': 'Treatment',
+    'labResults': 'Lab results',
+    'symptoms': 'Symptoms',
+    'medicalHistory': 'Medical history',
   },
   de: {
     // Auth
@@ -278,9 +328,10 @@ const translations = {
     
     // Chatbot
     'chatbot': 'Virtueller Assistent',
-    'chatbotWelcome': 'Hallo! Ich bin Ihr virtueller Assistent. Wie kann ich Ihnen heute helfen?',
+    'chatbotWelcome': 'Hallo! Ich bin Ihr MedArch virtueller Assistent. Wie kann ich Ihnen heute helfen?',
     'typeMessage': 'Geben Sie Ihre Nachricht ein...',
     'send': 'Senden',
+    'thinking': 'Nachdenken',
     
     // Theme
     'darkMode': 'Dunkelmodus',
@@ -291,6 +342,30 @@ const translations = {
     'french': 'Französisch',
     'english': 'Englisch',
     'german': 'Deutsch',
+    
+    // Dashboard sections
+    'recentPatients': 'Aktuelle Patienten',
+    'statistics': 'Statistiken',
+    'quickActions': 'Schnellaktionen',
+    'upcomingAppointments': 'Bevorstehende Termine',
+    'patientBreakdown': 'Patientenverteilung',
+    'activityLog': 'Aktivitätsprotokoll',
+    
+    // Medical terms
+    'bloodPressure': 'Blutdruck',
+    'heartRate': 'Herzfrequenz',
+    'temperature': 'Temperatur',
+    'respiratoryRate': 'Atemfrequenz',
+    'height': 'Größe',
+    'weight': 'Gewicht',
+    'bmi': 'BMI',
+    'allergies': 'Allergien',
+    'medications': 'Medikamente',
+    'diagnosis': 'Diagnose',
+    'treatment': 'Behandlung',
+    'labResults': 'Laborergebnisse',
+    'symptoms': 'Symptome',
+    'medicalHistory': 'Krankengeschichte',
   }
 };
 
@@ -304,12 +379,19 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
   const setLanguage = (newLanguage: Language) => {
     localStorage.setItem('language', newLanguage);
     setLanguageState(newLanguage);
+    // Force HTML lang attribute update
+    document.documentElement.setAttribute('lang', newLanguage);
   };
   
   // Translation function
   const t = (key: string): string => {
     return translations[language][key as keyof typeof translations[typeof language]] || key;
   };
+  
+  // Set HTML lang attribute on mount and language change
+  useEffect(() => {
+    document.documentElement.setAttribute('lang', language);
+  }, [language]);
   
   const value = { language, setLanguage, t };
   

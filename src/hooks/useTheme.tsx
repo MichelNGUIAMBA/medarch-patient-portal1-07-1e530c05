@@ -13,23 +13,29 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setThemeState] = useState<Theme>(
-    () => (localStorage.getItem('theme') as Theme) || 'light'
+    () => (localStorage.getItem('theme') as Theme) || 
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
   );
   
   // Update the theme in localStorage and apply it to the document
   const setTheme = (newTheme: Theme) => {
     localStorage.setItem('theme', newTheme);
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    applyThemeToDOM(newTheme);
     setThemeState(newTheme);
   };
   
   // Toggle between light and dark mode
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+  
+  // Function to apply theme to DOM
+  const applyThemeToDOM = (theme: Theme) => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   };
   
   // Apply the theme when the component mounts
@@ -41,6 +47,17 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       setTheme('dark');
     }
+    
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('theme')) {
+        setTheme(e.matches ? 'dark' : 'light');
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
   
   const value = { theme, setTheme, toggleTheme };

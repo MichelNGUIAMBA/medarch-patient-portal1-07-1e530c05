@@ -3,6 +3,7 @@ import { Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/useLanguage';
+import { motion } from 'framer-motion';
 
 const ThemeSwitcher = () => {
   const { theme, toggleTheme } = useTheme();
@@ -14,13 +15,32 @@ const ThemeSwitcher = () => {
       size="icon"
       onClick={toggleTheme}
       title={theme === 'dark' ? t('lightMode') : t('darkMode')}
-      className="rounded-full w-9 h-9"
+      className="rounded-full w-9 h-9 relative overflow-hidden"
+      aria-label={theme === 'dark' ? t('lightMode') : t('darkMode')}
     >
-      {theme === 'dark' ? (
-        <Sun className="h-5 w-5 text-yellow-300 transition-all hover:text-yellow-500" />
-      ) : (
-        <Moon className="h-5 w-5 transition-all hover:text-indigo-500" />
-      )}
+      <div className="relative w-5 h-5">
+        {theme === 'dark' ? (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0"
+          >
+            <Sun className="h-5 w-5 text-yellow-300 transition-all" />
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 20, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0"
+          >
+            <Moon className="h-5 w-5 text-indigo-500 transition-all" />
+          </motion.div>
+        )}
+      </div>
     </Button>
   );
 };
