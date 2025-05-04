@@ -72,7 +72,7 @@ const NurseDashboard = () => {
             <tbody>
               {patients.filter(p => p.status === "En attente").map(patient => <tr key={patient.id} className="border-b hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">{patient.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap bg-slate-950">{patient.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap bg-inherit">{patient.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${patient.service === "VM" ? "bg-blue-100 text-blue-800" : patient.service === "Ug" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"}`}>
                       {patient.service}
