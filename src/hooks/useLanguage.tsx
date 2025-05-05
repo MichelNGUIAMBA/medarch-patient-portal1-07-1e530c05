@@ -148,18 +148,17 @@ const translations = {
     // Footer
     'allRightsReserved': 'Tous droits réservés',
     
-    // Translations for new language
-    back: "Retour",
-    potentialDuplicateFound: "Doublon potentiel détecté",
-    patientAlreadyExists: "Un patient avec ce nom et cette date de naissance existe déjà dans le système. ",
-    useExistingPatient: "Utiliser le patient existant",
-    newPatientRegistration: "Enregistrement d'un nouveau patient",
-    existingPatient: "Patient existant",
-    manualEntry: "Saisie manuelle",
-    csvImport: "Import CSV",
-    personalInformation: "Informations personnelles",
-    companyAndServices: "Entreprise et services",
-    fillPatientInfo: "Veuillez remplir les informations du patient pour l'enregistrer dans le système"
+    // New translations
+    'back': 'Retour',
+    'potentialDuplicateFound': 'Doublon potentiel détecté',
+    'patientAlreadyExists': 'Un patient avec ce nom et cette date de naissance existe déjà dans le système.',
+    'useExistingPatient': 'Utiliser le patient existant',
+    'newPatientRegistration': 'Enregistrement d\'un nouveau patient',
+    'manualEntry': 'Saisie manuelle',
+    'csvImport': 'Import CSV',
+    'personalInformation': 'Informations personnelles',
+    'companyAndServices': 'Entreprise et services',
+    'fillPatientInfo': 'Veuillez remplir les informations du patient pour l\'enregistrer dans le système'
   },
   en: {
     // Auth
@@ -300,18 +299,17 @@ const translations = {
     // Footer
     'allRightsReserved': 'All rights reserved',
     
-    // Translations for new language
-    back: "Back",
-    potentialDuplicateFound: "Potential duplicate found",
-    patientAlreadyExists: "A patient with this name and birth date already exists in the system. ",
-    useExistingPatient: "Use existing patient",
-    newPatientRegistration: "New Patient Registration",
-    existingPatient: "Existing Patient",
-    manualEntry: "Manual Entry",
-    csvImport: "CSV Import",
-    personalInformation: "Personal Information",
-    companyAndServices: "Company & Services",
-    fillPatientInfo: "Please fill in the patient information to register them in the system"
+    // New translations
+    'back': 'Back',
+    'potentialDuplicateFound': 'Potential duplicate found',
+    'patientAlreadyExists': 'A patient with this name and birth date already exists in the system.',
+    'useExistingPatient': 'Use existing patient',
+    'newPatientRegistration': 'New Patient Registration',
+    'manualEntry': 'Manual Entry',
+    'csvImport': 'CSV Import',
+    'personalInformation': 'Personal Information',
+    'companyAndServices': 'Company & Services',
+    'fillPatientInfo': 'Please fill in the patient information to register them in the system'
   },
   de: {
     // Auth
@@ -452,18 +450,17 @@ const translations = {
     // Footer
     'allRightsReserved': 'Alle Rechte vorbehalten',
     
-    // Translations for new language
-    back: "Back",
-    potentialDuplicateFound: "Potential duplicate found",
-    patientAlreadyExists: "A patient with this name and birth date already exists in the system. ",
-    useExistingPatient: "Use existing patient",
-    newPatientRegistration: "New Patient Registration",
-    existingPatient: "Existing Patient",
-    manualEntry: "Manual Entry",
-    csvImport: "CSV Import",
-    personalInformation: "Personal Information",
-    companyAndServices: "Company & Services",
-    fillPatientInfo: "Please fill in the patient information to register them in the system"
+    // New translations
+    'back': 'Zurück',
+    'potentialDuplicateFound': 'Potenzieller Duplikat gefunden',
+    'patientAlreadyExists': 'Ein Patient mit diesem Namen und Geburtsdatum existiert bereits im System.',
+    'useExistingPatient': 'Bestehenden Patienten verwenden',
+    'newPatientRegistration': 'Neue Patientenregistrierung',
+    'manualEntry': 'Manuelle Eingabe',
+    'csvImport': 'CSV-Import',
+    'personalInformation': 'Persönliche Informationen',
+    'companyAndServices': 'Unternehmen & Dienstleistungen',
+    'fillPatientInfo': 'Bitte füllen Sie die Patienteninformationen aus, um den Patienten im System zu registrieren'
   }
 };
 

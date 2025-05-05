@@ -1,5 +1,6 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { usePatientStore } from '@/stores/usePatientStore';
 import BackButton from '@/components/shared/BackButton';
 import { format, differenceInYears } from 'date-fns';
