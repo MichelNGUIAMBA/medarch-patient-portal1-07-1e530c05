@@ -11,8 +11,8 @@ const PatientsTable = ({
 }: PatientsTableProps) => {
   const navigate = useNavigate();
   return <div className="rounded-lg shadow bg-inherit">
-      <div className="p-4 border-b rounded-none bg- bg-slate-950">
-        <h2 className="text-lg font-semibold flex items-center">
+      <div className="p-4 border-b rounded-none bg- bg-inherit py-[15px] px-[15px]">
+        <h2 className="text-lg font-semibold flex items-center text-inherit">
           <ClipboardCheck className="h-5 w-5 mr-2" />
           Derniers patients enregistrés
         </h2>
