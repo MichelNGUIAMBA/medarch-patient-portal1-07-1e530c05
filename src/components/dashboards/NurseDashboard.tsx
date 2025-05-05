@@ -54,15 +54,15 @@ const NurseDashboard = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <div className="p-4 border-b bg-slate-950">
+        <div className="p-4 border-b bg-inherit">
           <h2 className="text-lg font-semibold">Patients à traiter</h2>
         </div>
         <div className="p-0">
           <table className="w-full">
             <thead>
               <tr className="text-xs font-medium text-gray-500 bg-gray-50 border-b">
-                <th className="px-6 py-3 text-left bg-slate-950">ID</th>
-                <th className="px-6 py-3 text-left bg-slate-950">Nom</th>
+                <th className="px-6 py-3 text-left bg-inherit">ID</th>
+                <th className="px-6 py-3 text-left bg-inherit">Nom</th>
                 <th className="px-6 py-3 text-left">Service</th>
                 <th className="px-6 py-3 text-left">Temps d'attente</th>
                 <th className="px-6 py-3 text-left">Entreprise</th>
