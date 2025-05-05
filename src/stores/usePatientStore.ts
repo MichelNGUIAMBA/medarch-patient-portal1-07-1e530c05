@@ -19,6 +19,10 @@ type PatientStore = {
   addPatientsFromCSV: (patientsData: Array<Omit<Patient, "id" | "status" | "registeredAt" | "name">>) => void;
   takeCharge: (id: string, nurse: { name: string; role: string }) => void;
   setPatientCompleted: (id: string, caregiver: { name: string; role: string }) => void;
+  addNewServiceToExistingPatient: (
+    patientId: string, 
+    service: "VM" | "Cons" | "Ug"
+  ) => void;
 };
 
 export const usePatientStore = create<PatientStore>((set) => ({
@@ -209,5 +213,26 @@ export const usePatientStore = create<PatientStore>((set) => ({
     };
 
     return { patients: updatedPatients };
+  }),
+  addNewServiceToExistingPatient: (patientId, service) => set((state) => {
+    const existingPatient = state.patients.find(p => p.id === patientId);
+    
+    if (!existingPatient) return state;
+    
+    // Créer une nouvelle entrée pour le patient avec le même ID mais un nouveau registeredAt
+    const newPatientEntry: Patient = {
+      ...existingPatient,
+      service,
+      status: "En attente",
+      registeredAt: new Date().toISOString(),
+      // Réinitialiser les champs spécifiques au service précédent
+      notes: undefined,
+      takenCareBy: undefined,
+      modificationHistory: []
+    };
+    
+    return {
+      patients: [newPatientEntry, ...state.patients]
+    };
   })
 }));

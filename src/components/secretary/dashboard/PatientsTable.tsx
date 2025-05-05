@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardCheck } from 'lucide-react';
@@ -30,7 +31,7 @@ const PatientsTable = ({
             </tr>
           </thead>
           <tbody>
-            {patients.map(patient => <tr key={patient.id} className="border-b hover:bg-gray-50">
+            {patients.map(patient => <tr key={`${patient.id}-${patient.registeredAt}`} className="border-b hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">{patient.id}</td>
                 <td className="px-6 py-4 whitespace-nowrap font-medium uppercase">{patient.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{patient.company}</td>
