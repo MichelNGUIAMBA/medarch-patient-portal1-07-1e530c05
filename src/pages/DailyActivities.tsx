@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { fr, enUS, de } from 'date-fns/locale';
-import { Archive } from 'lucide-react';
+import { Archive, Plus } from 'lucide-react';
 import { useDailyActivityStore } from '@/stores/useDailyActivityStore';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -31,9 +31,22 @@ const DailyActivities = () => {
     navigate(`/dashboard/daily-activities/${date}`);
   };
 
+  const navigateToNewDay = () => {
+    navigate('/dashboard/new-day');
+  };
+
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-6">{t('dailyActivities')}</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">{t('dailyActivities')}</h1>
+        <Button 
+          onClick={navigateToNewDay}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          <Plus className="h-4 w-4" />
+          {t('newDay')}
+        </Button>
+      </div>
       
       {dates.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">

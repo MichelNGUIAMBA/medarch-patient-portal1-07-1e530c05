@@ -26,6 +26,9 @@ import {
 import { toast } from '@/components/ui/sonner';
 import { Patient } from '@/types/patient';
 
+// Define the service type for type safety
+type ServiceType = "VM" | "Cons" | "Ug";
+
 const NewDay = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -36,7 +39,7 @@ const NewDay = () => {
   const addActivity = useDailyActivityStore(state => state.addActivity);
   
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [selectedService, setSelectedService] = useState<"VM" | "Cons" | "Ug" | "">("");
+  const [selectedService, setSelectedService] = useState<ServiceType | "">("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const calculateAge = (birthDate: string) => {
@@ -74,7 +77,7 @@ const NewDay = () => {
     
     assignServiceForDay(
       selectedPatient.id,
-      selectedService as "VM" | "Cons" | "Ug", // Ensure we cast to the correct type
+      selectedService, // Now correctly typed as ServiceType
       { name: user.name, role: user.role }
     );
     
@@ -98,6 +101,13 @@ const NewDay = () => {
     });
   };
 
+  // Filter to only show patients who have been taken care of at least once
+  const treatedPatients = patients.filter(patient => 
+    patient.modificationHistory && patient.modificationHistory.some(
+      record => record.field === "status" && ["En cours", "Terminé"].includes(record.newValue)
+    )
+  );
+
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center justify-between mb-6">
@@ -105,10 +115,10 @@ const NewDay = () => {
           <Button
             variant="ghost"
             className="mr-4 flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/dashboard/daily-activities')}
           >
             <ChevronLeft className="h-4 w-4 mr-2" />
-            {t('backToDashboard')}
+            {t('backToDailyActivities')}
           </Button>
           <h1 className="text-2xl font-bold">{t('newDay')}</h1>
         </div>
@@ -147,8 +157,8 @@ const NewDay = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {patients.length > 0 ? (
-                patients.map((patient) => (
+              {treatedPatients.length > 0 ? (
+                treatedPatients.map((patient) => (
                   <TableRow key={patient.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <TableCell className="whitespace-nowrap dark:text-gray-200">{patient.id}</TableCell>
                     <TableCell className="font-medium uppercase whitespace-nowrap dark:text-gray-200">{patient.name}</TableCell>
@@ -205,7 +215,7 @@ const NewDay = () => {
           <div className="py-4">
             <Select 
               value={selectedService} 
-              onValueChange={(value: "VM" | "Cons" | "Ug") => setSelectedService(value)}
+              onValueChange={(value: ServiceType) => setSelectedService(value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder={t('selectService')} />

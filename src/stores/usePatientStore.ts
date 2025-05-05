@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { Patient } from '@/types/patient';
 
@@ -13,6 +14,7 @@ export type ModificationRecord = {
 };
 
 type PatientStatus = "En attente" | "En cours" | "Terminé";
+type ServiceType = "VM" | "Cons" | "Ug";
 
 type PatientStore = {
   patients: Patient[];
@@ -21,7 +23,7 @@ type PatientStore = {
   addPatientsFromCSV: (patientsData: Array<Omit<Patient, "id" | "status" | "registeredAt" | "name">>) => void;
   takeCharge: (id: string, nurse: { name: string; role: string }) => void;
   setPatientCompleted: (id: string, caregiver: { name: string; role: string }) => void;
-  assignServiceForDay: (id: string, service: "VM" | "Cons" | "Ug", assignedBy: { name: string; role: string }) => void;
+  assignServiceForDay: (id: string, service: ServiceType, assignedBy: { name: string; role: string }) => void;
   getActivePatient: () => Patient | null;
   resetPatientStatuses: () => void;
 };
