@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth-context";
@@ -10,25 +9,26 @@ import { toast } from "@/components/ui/sonner";
 import ThemeSwitcher from "./ThemeSwitcher";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/hooks/useLanguage";
-
 const DashboardLayout = () => {
-  const { user, logout } = useAuth();
+  const {
+    user,
+    logout
+  } = useAuth();
   const navigate = useNavigate();
-  const { t } = useLanguage();
-
+  const {
+    t
+  } = useLanguage();
   const handleLogout = () => {
     logout();
     toast.success(t('logout'));
     navigate("/");
   };
-
   const getNavigationItems = () => {
     const commonItems = [{
       title: t('dashboard'),
       url: "/dashboard",
       icon: FileText
     }];
-
     const roleBasedItems = {
       admin: [{
         title: t('users'),
@@ -84,10 +84,8 @@ const DashboardLayout = () => {
         icon: FileText
       }]
     };
-
     return user?.role && roleBasedItems[user.role] ? [...commonItems, ...roleBasedItems[user.role]] : commonItems;
   };
-
   return <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
         <Sidebar className="border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 dark:text-white">
@@ -132,11 +130,7 @@ const DashboardLayout = () => {
             <SidebarTrigger />
             <div className="ml-4">
               <h1 className="text-lg font-semibold">
-                {user?.role === "secretary" ? t('secretaryPortal') : 
-                 user?.role === "nurse" ? t('nursePortal') : 
-                 user?.role === "lab" ? t('labPortal') : 
-                 user?.role === "doctor" ? t('doctorPortal') : 
-                 t('adminPortal')}
+                {user?.role === "secretary" ? t('secretaryPortal') : user?.role === "nurse" ? t('nursePortal') : user?.role === "lab" ? t('labPortal') : user?.role === "doctor" ? t('doctorPortal') : t('adminPortal')}
               </h1>
             </div>
             <div className="ml-auto flex items-center gap-2">
@@ -148,12 +142,11 @@ const DashboardLayout = () => {
             </div>
           </header>
           
-          <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 dark:text-white">
+          <main className="flex-1 overflow-y-auto p-6 dark:text-white bg-inherit">
             <Outlet />
           </main>
         </div>
       </div>
     </SidebarProvider>;
 };
-
 export default DashboardLayout;

@@ -10,7 +10,7 @@ const PatientsTable = ({
   patients
 }: PatientsTableProps) => {
   const navigate = useNavigate();
-  return <div className="bg-white rounded-lg shadow">
+  return <div className="rounded-lg shadow bg-slate-950">
       <div className="p-4 border-b rounded-none bg- bg-inherit">
         <h2 className="text-lg font-semibold flex items-center">
           <ClipboardCheck className="h-5 w-5 mr-2" />
