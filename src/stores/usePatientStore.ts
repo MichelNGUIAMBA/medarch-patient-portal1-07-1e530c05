@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { Patient } from '@/types/patient';
 
@@ -13,9 +12,6 @@ export type ModificationRecord = {
   timestamp: string;
 };
 
-type PatientStatus = "En attente" | "En cours" | "Terminé";
-type ServiceType = "VM" | "Cons" | "Ug";
-
 type PatientStore = {
   patients: Patient[];
   addPatient: (patient: Omit<Patient, "id" | "status" | "registeredAt">) => void;
@@ -23,12 +19,9 @@ type PatientStore = {
   addPatientsFromCSV: (patientsData: Array<Omit<Patient, "id" | "status" | "registeredAt" | "name">>) => void;
   takeCharge: (id: string, nurse: { name: string; role: string }) => void;
   setPatientCompleted: (id: string, caregiver: { name: string; role: string }) => void;
-  assignServiceForDay: (id: string, service: ServiceType, assignedBy: { name: string; role: string }) => void;
-  getActivePatient: () => Patient | null;
-  resetPatientStatuses: () => void;
 };
 
-export const usePatientStore = create<PatientStore>((set, get) => ({
+export const usePatientStore = create<PatientStore>((set) => ({
   patients: [
     { 
       id: "P-1234", 
@@ -113,7 +106,7 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
       {
         ...patient,
         id: `P-${Math.floor(Math.random() * 9000) + 1000}`,
-        status: "En attente" as PatientStatus,
+        status: "En attente",
         registeredAt: new Date().toISOString(),
         name: `${patient.firstName} ${patient.lastName}`.toUpperCase()
       },
@@ -164,7 +157,7 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
       ...patientsData.map(patient => ({
         ...patient,
         id: `P-${Math.floor(Math.random() * 9000) + 1000}`,
-        status: "En attente" as PatientStatus,
+        status: "En attente" as const,
         registeredAt: new Date().toISOString(),
         name: `${patient.firstName} ${patient.lastName}`.toUpperCase()
       })),
@@ -172,76 +165,27 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
     ]
   })),
   takeCharge: (id, nurse) => set((state) => {
-    // Check if there's already a patient in treatment
-    const patientInTreatment = state.patients.find(p => p.status === "En cours" && p.id !== id);
-    
-    if (patientInTreatment) {
-      // Set the current active patient to "En attente" before taking charge of the new one
-      const updatedPatients = state.patients.map(p => {
-        if (p.id === patientInTreatment.id) {
-          return {
-            ...p,
-            status: "En attente" as PatientStatus,
-            modificationHistory: [
-              {
-                field: "status",
-                oldValue: "En cours",
-                newValue: "En attente",
-                modifiedBy: nurse,
-                timestamp: new Date().toISOString()
-              },
-              ...(p.modificationHistory || [])
-            ]
-          };
-        }
-        return p;
-      });
-      
-      // Now take charge of the new patient
-      const patientIndex = updatedPatients.findIndex(p => p.id === id);
-      if (patientIndex === -1) return state;
+    const patientIndex = state.patients.findIndex(p => p.id === id);
+    if (patientIndex === -1) return state;
 
-      updatedPatients[patientIndex] = {
-        ...updatedPatients[patientIndex],
-        status: "En cours" as PatientStatus,
-        takenCareBy: nurse,
-        modificationHistory: [
-          {
-            field: "status",
-            oldValue: "En attente",
-            newValue: "En cours",
-            modifiedBy: nurse,
-            timestamp: new Date().toISOString()
-          },
-          ...(updatedPatients[patientIndex].modificationHistory || [])
-        ]
-      };
+    const updatedPatients = [...state.patients];
+    updatedPatients[patientIndex] = {
+      ...updatedPatients[patientIndex],
+      status: "En cours",
+      takenCareBy: nurse,
+      modificationHistory: [
+        {
+          field: "status",
+          oldValue: "En attente",
+          newValue: "En cours",
+          modifiedBy: nurse,
+          timestamp: new Date().toISOString()
+        },
+        ...(updatedPatients[patientIndex].modificationHistory || [])
+      ]
+    };
 
-      return { patients: updatedPatients };
-    } else {
-      // No patient is currently in treatment, proceed normally
-      const patientIndex = state.patients.findIndex(p => p.id === id);
-      if (patientIndex === -1) return state;
-
-      const updatedPatients = [...state.patients];
-      updatedPatients[patientIndex] = {
-        ...updatedPatients[patientIndex],
-        status: "En cours" as PatientStatus,
-        takenCareBy: nurse,
-        modificationHistory: [
-          {
-            field: "status",
-            oldValue: "En attente",
-            newValue: "En cours",
-            modifiedBy: nurse,
-            timestamp: new Date().toISOString()
-          },
-          ...(updatedPatients[patientIndex].modificationHistory || [])
-        ]
-      };
-
-      return { patients: updatedPatients };
-    }
+    return { patients: updatedPatients };
   }),
   setPatientCompleted: (id, caregiver) => set((state) => {
     const patientIndex = state.patients.findIndex(p => p.id === id);
@@ -250,7 +194,7 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
     const updatedPatients = [...state.patients];
     updatedPatients[patientIndex] = {
       ...updatedPatients[patientIndex],
-      status: "Terminé" as PatientStatus,
+      status: "Terminé",
       takenCareBy: caregiver,
       modificationHistory: [
         {
@@ -265,51 +209,5 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
     };
 
     return { patients: updatedPatients };
-  }),
-  assignServiceForDay: (id, service, assignedBy) => set((state) => {
-    const patientIndex = state.patients.findIndex(p => p.id === id);
-    if (patientIndex === -1) return state;
-
-    const currentPatient = state.patients[patientIndex];
-    const updatedPatients = [...state.patients];
-    
-    updatedPatients[patientIndex] = {
-      ...currentPatient,
-      service,
-      status: "En attente" as PatientStatus,
-      registeredAt: new Date().toISOString(),
-      modificationHistory: [
-        {
-          field: "service",
-          oldValue: currentPatient.service || '',
-          newValue: service,
-          modifiedBy: assignedBy,
-          timestamp: new Date().toISOString()
-        },
-        {
-          field: "status",
-          oldValue: currentPatient.status || '',
-          newValue: "En attente",
-          modifiedBy: assignedBy,
-          timestamp: new Date().toISOString()
-        },
-        ...(currentPatient.modificationHistory || [])
-      ]
-    };
-
-    return { patients: updatedPatients };
-  }),
-  getActivePatient: () => {
-    return get().patients.find(p => p.status === "En cours") || null;
-  },
-  resetPatientStatuses: () => set((state) => {
-    return {
-      patients: state.patients.map(patient => ({
-        ...patient,
-        status: "En attente" as PatientStatus,
-        service: patient.service,
-        takenCareBy: undefined
-      }))
-    };
   })
 }));

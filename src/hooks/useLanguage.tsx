@@ -1,298 +1,413 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'fr' | 'en' | 'de';
 
-interface LanguageContextType {
+type LanguageContextType = {
   language: Language;
-  setLanguage: (lang: Language) => void;
+  setLanguage: (language: Language) => void;
   t: (key: string) => string;
-}
+};
 
 const translations = {
   fr: {
-    // Existing translations
-    dashboard: 'Tableau de bord',
-    login: 'Connexion',
-    logout: 'Déconnexion',
-    username: 'Nom d\'utilisateur',
-    password: 'Mot de passe',
-    welcomeBack: 'Bienvenue',
-    enterCredentials: 'Entrez vos identifiants',
-    loginSuccess: 'Connexion réussie',
-    loginError: 'Identifiants incorrects',
-    users: 'Utilisateurs',
-    settings: 'Paramètres',
-    newPatient: 'Nouveau patient',
-    waitingLists: 'Listes d\'attente',
-    waitingPatients: 'Patients en attente',
-    medicalVisits: 'Visites médicales',
-    consultations: 'Consultations',
-    emergencies: 'Urgences',
-    pendingExams: 'Examens en attente',
-    examHistory: 'Historique des examens',
-    patientsToSee: 'Patients à voir',
-    medicalRecords: 'Dossiers médicaux',
-    yourAccount: 'Votre compte',
-    secretary: 'Secrétaire',
-    nurse: 'Infirmier(ère)',
-    lab: 'Laboratoire',
-    doctor: 'Médecin',
-    admin: 'Administrateur',
-    secretaryPortal: 'Portail Secrétaire',
-    nursePortal: 'Portail Infirmier',
-    labPortal: 'Portail Laboratoire',
-    doctorPortal: 'Portail Médecin',
-    adminPortal: 'Portail Administrateur',
-    takenCareBy: 'Pris en charge par',
-    darkMode: 'Mode sombre',
-    lightMode: 'Mode clair',
-
-    // New translations for daily activities
-    dailyActivities: 'Activités quotidiennes',
-    noActivitiesYet: 'Aucune activité enregistrée pour le moment',
-    activitiesFor: 'Activités du',
-    backToDailyActivities: 'Retour aux activités quotidiennes',
-    patients: 'Patients',
-    newPatients: 'nouveaux patients',
-    activityLog: 'Journal d\'activités',
-    time: 'Heure',
-    type: 'Type',
-    description: 'Description',
-    performedBy: 'Effectué par',
-    patient: 'Patient',
-    noActivitiesRecorded: 'Aucune activité enregistrée pour cette journée',
+    // Auth
+    'login': 'Se connecter',
+    'email': 'Adresse e-mail',
+    'password': 'Mot de passe',
+    'forgotPassword': 'Mot de passe oublié?',
+    'demoAccounts': 'Comptes de démonstration :',
     
-    // Activity types
-    patient_registration: 'Enregistrement patient',
-    service_assignment: 'Attribution service',
-    medical_visit: 'Visite médicale',
-    consultation: 'Consultation',
-    emergency: 'Urgence',
-    lab_exam: 'Examen labo',
-    status_change: 'Changement statut',
+    // Navigation
+    'dashboard': 'Tableau de bord',
+    'patients': 'Patients',
+    'newPatient': 'Nouveaux patients',
+    'waitingLists': 'Listes d\'attente',
+    'waitingPatients': 'Patients en attente',
+    'medicalVisits': 'Visites médicales',
+    'consultations': 'Consultations',
+    'emergencies': 'Urgences',
+    'users': 'Gestion utilisateurs',
+    'settings': 'Paramètres',
+    'yourAccount': 'Votre compte',
+    'logout': 'Déconnexion',
+    'secretary': 'Secrétaire',
+    'nurse': 'Infirmier(e)',
+    'lab': 'Laboratoire',
+    'doctor': 'Médecin',
+    'admin': 'Administrateur',
     
-    // Secretary dashboard updates
-    lastRegisteredPatients: 'Derniers patients enregistrés',
-    patientId: 'N° Patient',
-    name: 'Nom',
-    company: 'Entreprise',
-    service: 'Service',
-    status: 'Statut',
-    actions: 'Actions',
-    show: 'Afficher',
-    newService: 'Nouveau service',
-    noStatus: 'Pas de statut',
-    assignService: 'Assigner un service',
-    selectService: 'Sélectionner un service',
-    medicalVisit: 'Visite médicale',
-    cancel: 'Annuler',
-    confirm: 'Confirmer',
-    patientAssignedToService: 'Patient assigné au service',
-    assignedTo: 'assigné à'
+    // Patient info
+    'patientInfo': 'Informations du patient',
+    'serviceInfo': 'Informations du service',
+    'id': 'ID',
+    'employeeId': 'ID Employé',
+    'name': 'Nom',
+    'firstName': 'Prénom',
+    'lastName': 'Nom',
+    'birthDate': 'Date de naissance',
+    'gender': 'Genre',
+    'company': 'Entreprise',
+    'registeredAt': 'Enregistré le',
+    'status': 'Statut',
+    'service': 'Type de service',
+    'takenCareBy': 'Pris en charge par',
+    'notes': 'Notes',
+    'male': 'Masculin',
+    'female': 'Féminin',
+    'actions': 'Actions',
+    'edit': 'Modifier',
+    'show': 'Afficher',
+    'delete': 'Supprimer',
+    'confirm': 'Confirmer',
+    'cancel': 'Annuler',
+    
+    // Statuses
+    'pending': 'En attente',
+    'inProgress': 'En cours',
+    'completed': 'Terminé',
+    
+    // Services
+    'medicalVisit': 'Visite médicale',
+    'consultation': 'Consultation',
+    'emergency': 'Urgence',
+    
+    // Forms
+    'save': 'Enregistrer',
+    'next': 'Suivant',
+    'previous': 'Précédent',
+    'validate': 'Valider',
+    
+    // Modification history
+    'modificationHistory': 'Historique des modifications',
+    'showHistory': 'Afficher l\'historique',
+    'hideHistory': 'Masquer l\'historique',
+    'field': 'Champ',
+    'oldValue': 'Ancienne valeur',
+    'newValue': 'Nouvelle valeur',
+    'modifiedBy': 'Modifié par',
+    'dateTime': 'Date et heure',
+    
+    // Chatbot
+    'chatbot': 'Assistant virtuel',
+    'chatbotWelcome': 'Bonjour! Je suis votre assistant virtuel MedArch. Comment puis-je vous aider aujourd\'hui?',
+    'typeMessage': 'Tapez votre message...',
+    'send': 'Envoyer',
+    'thinking': 'Réflexion en cours',
+    
+    // Theme
+    'darkMode': 'Mode sombre',
+    'lightMode': 'Mode clair',
+    
+    // Language
+    'language': 'Langue',
+    'french': 'Français',
+    'english': 'Anglais',
+    'german': 'Allemand',
+    
+    // Dashboard sections
+    'recentPatients': 'Patients récents',
+    'statistics': 'Statistiques',
+    'quickActions': 'Actions rapides',
+    'upcomingAppointments': 'Rendez-vous à venir',
+    'patientBreakdown': 'Répartition des patients',
+    'activityLog': 'Journal d\'activité',
+    
+    // Medical terms
+    'bloodPressure': 'Pression artérielle',
+    'heartRate': 'Fréquence cardiaque',
+    'temperature': 'Température',
+    'respiratoryRate': 'Fréquence respiratoire',
+    'height': 'Taille',
+    'weight': 'Poids',
+    'bmi': 'IMC',
+    'allergies': 'Allergies',
+    'medications': 'Médicaments',
+    'diagnosis': 'Diagnostic',
+    'treatment': 'Traitement',
+    'labResults': 'Résultats de laboratoire',
+    'symptoms': 'Symptômes',
+    'medicalHistory': 'Antécédents médicaux',
   },
   en: {
-    // Existing translations
-    dashboard: 'Dashboard',
-    login: 'Login',
-    logout: 'Logout',
-    username: 'Username',
-    password: 'Password',
-    welcomeBack: 'Welcome Back',
-    enterCredentials: 'Enter your credentials',
-    loginSuccess: 'Login successful',
-    loginError: 'Invalid credentials',
-    users: 'Users',
-    settings: 'Settings',
-    newPatient: 'New Patient',
-    waitingLists: 'Waiting Lists',
-    waitingPatients: 'Waiting Patients',
-    medicalVisits: 'Medical Visits',
-    consultations: 'Consultations',
-    emergencies: 'Emergencies',
-    pendingExams: 'Pending Exams',
-    examHistory: 'Exam History',
-    patientsToSee: 'Patients to See',
-    medicalRecords: 'Medical Records',
-    yourAccount: 'Your Account',
-    secretary: 'Secretary',
-    nurse: 'Nurse',
-    lab: 'Laboratory',
-    doctor: 'Doctor',
-    admin: 'Administrator',
-    secretaryPortal: 'Secretary Portal',
-    nursePortal: 'Nurse Portal',
-    labPortal: 'Laboratory Portal',
-    doctorPortal: 'Doctor Portal',
-    adminPortal: 'Admin Portal',
-    takenCareBy: 'Taken care by',
-    darkMode: 'Dark Mode',
-    lightMode: 'Light Mode',
+    // Auth
+    'login': 'Login',
+    'email': 'Email address',
+    'password': 'Password',
+    'forgotPassword': 'Forgot password?',
+    'demoAccounts': 'Demo accounts:',
     
-    // New translations for daily activities
-    dailyActivities: 'Daily Activities',
-    noActivitiesYet: 'No activities recorded yet',
-    activitiesFor: 'Activities for',
-    backToDailyActivities: 'Back to Daily Activities',
-    patients: 'Patients',
-    newPatients: 'new patients',
-    activityLog: 'Activity Log',
-    time: 'Time',
-    type: 'Type',
-    description: 'Description',
-    performedBy: 'Performed By',
-    patient: 'Patient',
-    noActivitiesRecorded: 'No activities recorded for this day',
+    // Navigation
+    'dashboard': 'Dashboard',
+    'patients': 'Patients',
+    'newPatient': 'New patients',
+    'waitingLists': 'Waiting lists',
+    'waitingPatients': 'Waiting patients',
+    'medicalVisits': 'Medical visits',
+    'consultations': 'Consultations',
+    'emergencies': 'Emergencies',
+    'users': 'User management',
+    'settings': 'Settings',
+    'yourAccount': 'Your account',
+    'logout': 'Logout',
+    'secretary': 'Secretary',
+    'nurse': 'Nurse',
+    'lab': 'Laboratory',
+    'doctor': 'Doctor',
+    'admin': 'Administrator',
     
-    // Activity types
-    patient_registration: 'Patient Registration',
-    service_assignment: 'Service Assignment',
-    medical_visit: 'Medical Visit',
-    consultation: 'Consultation',
-    emergency: 'Emergency',
-    lab_exam: 'Lab Exam',
-    status_change: 'Status Change',
+    // Patient info
+    'patientInfo': 'Patient information',
+    'serviceInfo': 'Service information',
+    'id': 'ID',
+    'employeeId': 'Employee ID',
+    'name': 'Name',
+    'firstName': 'First name',
+    'lastName': 'Last name',
+    'birthDate': 'Date of birth',
+    'gender': 'Gender',
+    'company': 'Company',
+    'registeredAt': 'Registered on',
+    'status': 'Status',
+    'service': 'Service type',
+    'takenCareBy': 'Taken care by',
+    'notes': 'Notes',
+    'male': 'Male',
+    'female': 'Female',
+    'actions': 'Actions',
+    'edit': 'Edit',
+    'show': 'Show',
+    'delete': 'Delete',
+    'confirm': 'Confirm',
+    'cancel': 'Cancel',
     
-    // Secretary dashboard updates
-    lastRegisteredPatients: 'Last Registered Patients',
-    patientId: 'Patient ID',
-    name: 'Name',
-    company: 'Company',
-    service: 'Service',
-    status: 'Status',
-    actions: 'Actions',
-    show: 'Show',
-    newService: 'New Service',
-    noStatus: 'No Status',
-    assignService: 'Assign Service',
-    selectService: 'Select Service',
-    medicalVisit: 'Medical Visit',
-    cancel: 'Cancel',
-    confirm: 'Confirm',
-    patientAssignedToService: 'Patient assigned to service',
-    assignedTo: 'assigned to'
+    // Statuses
+    'pending': 'Pending',
+    'inProgress': 'In progress',
+    'completed': 'Completed',
+    
+    // Services
+    'medicalVisit': 'Medical visit',
+    'consultation': 'Consultation',
+    'emergency': 'Emergency',
+    
+    // Forms
+    'save': 'Save',
+    'next': 'Next',
+    'previous': 'Previous',
+    'validate': 'Validate',
+    
+    // Modification history
+    'modificationHistory': 'Modification history',
+    'showHistory': 'Show history',
+    'hideHistory': 'Hide history',
+    'field': 'Field',
+    'oldValue': 'Old value',
+    'newValue': 'New value',
+    'modifiedBy': 'Modified by',
+    'dateTime': 'Date and time',
+    
+    // Chatbot
+    'chatbot': 'Virtual assistant',
+    'chatbotWelcome': 'Hello! I am your MedArch virtual assistant. How can I help you today?',
+    'typeMessage': 'Type your message...',
+    'send': 'Send',
+    'thinking': 'Thinking',
+    
+    // Theme
+    'darkMode': 'Dark mode',
+    'lightMode': 'Light mode',
+    
+    // Language
+    'language': 'Language',
+    'french': 'French',
+    'english': 'English',
+    'german': 'German',
+    
+    // Dashboard sections
+    'recentPatients': 'Recent patients',
+    'statistics': 'Statistics',
+    'quickActions': 'Quick actions',
+    'upcomingAppointments': 'Upcoming appointments',
+    'patientBreakdown': 'Patient breakdown',
+    'activityLog': 'Activity log',
+    
+    // Medical terms
+    'bloodPressure': 'Blood pressure',
+    'heartRate': 'Heart rate',
+    'temperature': 'Temperature',
+    'respiratoryRate': 'Respiratory rate',
+    'height': 'Height',
+    'weight': 'Weight',
+    'bmi': 'BMI',
+    'allergies': 'Allergies',
+    'medications': 'Medications',
+    'diagnosis': 'Diagnosis',
+    'treatment': 'Treatment',
+    'labResults': 'Lab results',
+    'symptoms': 'Symptoms',
+    'medicalHistory': 'Medical history',
   },
   de: {
-    // German translations
-    dashboard: 'Dashboard',
-    login: 'Anmelden',
-    logout: 'Abmelden',
-    username: 'Benutzername',
-    password: 'Passwort',
-    welcomeBack: 'Willkommen zurück',
-    enterCredentials: 'Geben Sie Ihre Anmeldedaten ein',
-    loginSuccess: 'Anmeldung erfolgreich',
-    loginError: 'Ungültige Anmeldedaten',
-    users: 'Benutzer',
-    settings: 'Einstellungen',
-    newPatient: 'Neuer Patient',
-    waitingLists: 'Wartelisten',
-    waitingPatients: 'Wartende Patienten',
-    medicalVisits: 'Medizinische Besuche',
-    consultations: 'Konsultationen',
-    emergencies: 'Notfälle',
-    pendingExams: 'Ausstehende Untersuchungen',
-    examHistory: 'Untersuchungsverlauf',
-    patientsToSee: 'Zu sehende Patienten',
-    medicalRecords: 'Krankenakten',
-    yourAccount: 'Ihr Konto',
-    secretary: 'Sekretär(in)',
-    nurse: 'Krankenpfleger(in)',
-    lab: 'Labor',
-    doctor: 'Arzt',
-    admin: 'Administrator',
-    secretaryPortal: 'Sekretärsportal',
-    nursePortal: 'Krankenpflegerportal',
-    labPortal: 'Laborportal',
-    doctorPortal: 'Arztportal',
-    adminPortal: 'Administratorportal',
-    takenCareBy: 'Betreut von',
-    darkMode: 'Dunkelmodus',
-    lightMode: 'Hellmodus',
+    // Auth
+    'login': 'Anmelden',
+    'email': 'E-Mail-Adresse',
+    'password': 'Passwort',
+    'forgotPassword': 'Passwort vergessen?',
+    'demoAccounts': 'Demo-Konten:',
     
-    // Translations for daily activities
-    dailyActivities: 'Tägliche Aktivitäten',
-    noActivitiesYet: 'Noch keine Aktivitäten aufgezeichnet',
-    activitiesFor: 'Aktivitäten für',
-    backToDailyActivities: 'Zurück zu täglichen Aktivitäten',
-    patients: 'Patienten',
-    newPatients: 'neue Patienten',
-    activityLog: 'Aktivitätsprotokoll',
-    time: 'Zeit',
-    type: 'Typ',
-    description: 'Beschreibung',
-    performedBy: 'Durchgeführt von',
-    patient: 'Patient',
-    noActivitiesRecorded: 'Keine Aktivitäten für diesen Tag aufgezeichnet',
+    // Navigation
+    'dashboard': 'Dashboard',
+    'patients': 'Patienten',
+    'newPatient': 'Neue Patienten',
+    'waitingLists': 'Wartelisten',
+    'waitingPatients': 'Wartende Patienten',
+    'medicalVisits': 'Medizinische Besuche',
+    'consultations': 'Konsultationen',
+    'emergencies': 'Notfälle',
+    'users': 'Benutzerverwaltung',
+    'settings': 'Einstellungen',
+    'yourAccount': 'Ihr Konto',
+    'logout': 'Abmelden',
+    'secretary': 'Sekretär(in)',
+    'nurse': 'Krankenpfleger(in)',
+    'lab': 'Labor',
+    'doctor': 'Arzt/Ärztin',
+    'admin': 'Administrator',
     
-    // Activity types
-    patient_registration: 'Patientenregistrierung',
-    service_assignment: 'Servicezuweisung',
-    medical_visit: 'Medizinischer Besuch',
-    consultation: 'Beratung',
-    emergency: 'Notfall',
-    lab_exam: 'Laboruntersuchung',
-    status_change: 'Statusänderung',
+    // Patient info
+    'patientInfo': 'Patienteninformationen',
+    'serviceInfo': 'Serviceinformationen',
+    'id': 'ID',
+    'employeeId': 'Mitarbeiter-ID',
+    'name': 'Name',
+    'firstName': 'Vorname',
+    'lastName': 'Nachname',
+    'birthDate': 'Geburtsdatum',
+    'gender': 'Geschlecht',
+    'company': 'Unternehmen',
+    'registeredAt': 'Registriert am',
+    'status': 'Status',
+    'service': 'Serviceart',
+    'takenCareBy': 'Betreut von',
+    'notes': 'Notizen',
+    'male': 'Männlich',
+    'female': 'Weiblich',
+    'actions': 'Aktionen',
+    'edit': 'Bearbeiten',
+    'show': 'Anzeigen',
+    'delete': 'Löschen',
+    'confirm': 'Bestätigen',
+    'cancel': 'Abbrechen',
     
-    // Secretary dashboard updates
-    lastRegisteredPatients: 'Zuletzt registrierte Patienten',
-    patientId: 'Patienten-ID',
-    name: 'Name',
-    company: 'Unternehmen',
-    service: 'Service',
-    status: 'Status',
-    actions: 'Aktionen',
-    show: 'Anzeigen',
-    newService: 'Neuer Service',
-    noStatus: 'Kein Status',
-    assignService: 'Service zuweisen',
-    selectService: 'Service auswählen',
-    medicalVisit: 'Medizinischer Besuch',
-    cancel: 'Abbrechen',
-    confirm: 'Bestätigen',
-    patientAssignedToService: 'Patient dem Service zugewiesen',
-    assignedTo: 'zugewiesen zu',
+    // Statuses
+    'pending': 'Ausstehend',
+    'inProgress': 'In Bearbeitung',
+    'completed': 'Abgeschlossen',
     
-    // Language translations
-    french: 'Französisch',
-    english: 'Englisch',
-    german: 'Deutsch',
-    language: 'Sprache'
+    // Services
+    'medicalVisit': 'Medizinischer Besuch',
+    'consultation': 'Konsultation',
+    'emergency': 'Notfall',
+    
+    // Forms
+    'save': 'Speichern',
+    'next': 'Weiter',
+    'previous': 'Zurück',
+    'validate': 'Validieren',
+    
+    // Modification history
+    'modificationHistory': 'Änderungsverlauf',
+    'showHistory': 'Verlauf anzeigen',
+    'hideHistory': 'Verlauf ausblenden',
+    'field': 'Feld',
+    'oldValue': 'Alter Wert',
+    'newValue': 'Neuer Wert',
+    'modifiedBy': 'Geändert von',
+    'dateTime': 'Datum und Uhrzeit',
+    
+    // Chatbot
+    'chatbot': 'Virtueller Assistent',
+    'chatbotWelcome': 'Hallo! Ich bin Ihr MedArch virtueller Assistent. Wie kann ich Ihnen heute helfen?',
+    'typeMessage': 'Geben Sie Ihre Nachricht ein...',
+    'send': 'Senden',
+    'thinking': 'Nachdenken',
+    
+    // Theme
+    'darkMode': 'Dunkelmodus',
+    'lightMode': 'Hellmodus',
+    
+    // Language
+    'language': 'Sprache',
+    'french': 'Französisch',
+    'english': 'Englisch',
+    'german': 'Deutsch',
+    
+    // Dashboard sections
+    'recentPatients': 'Aktuelle Patienten',
+    'statistics': 'Statistiken',
+    'quickActions': 'Schnellaktionen',
+    'upcomingAppointments': 'Bevorstehende Termine',
+    'patientBreakdown': 'Patientenverteilung',
+    'activityLog': 'Aktivitätsprotokoll',
+    
+    // Medical terms
+    'bloodPressure': 'Blutdruck',
+    'heartRate': 'Herzfrequenz',
+    'temperature': 'Temperatur',
+    'respiratoryRate': 'Atemfrequenz',
+    'height': 'Größe',
+    'weight': 'Gewicht',
+    'bmi': 'BMI',
+    'allergies': 'Allergien',
+    'medications': 'Medikamente',
+    'diagnosis': 'Diagnose',
+    'treatment': 'Behandlung',
+    'labResults': 'Laborergebnisse',
+    'symptoms': 'Symptome',
+    'medicalHistory': 'Krankengeschichte',
   }
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('fr');
-
-  // Load language preference from localStorage on initial render
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('language');
-    if (savedLanguage && (savedLanguage === 'fr' || savedLanguage === 'en' || savedLanguage === 'de')) {
-      setLanguage(savedLanguage);
-    }
-  }, []);
-
-  // Save language preference to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('language', language);
-  }, [language]);
-
+export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
+  const [language, setLanguageState] = useState<Language>(
+    () => (localStorage.getItem('language') as Language) || 'fr'
+  );
+  
+  const setLanguage = (newLanguage: Language) => {
+    localStorage.setItem('language', newLanguage);
+    setLanguageState(newLanguage);
+    // Force HTML lang attribute update
+    document.documentElement.setAttribute('lang', newLanguage);
+  };
+  
+  // Translation function
   const t = (key: string): string => {
     return translations[language][key as keyof typeof translations[typeof language]] || key;
   };
-
+  
+  // Set HTML lang attribute on mount and language change
+  useEffect(() => {
+    document.documentElement.setAttribute('lang', language);
+  }, [language]);
+  
+  const value = { language, setLanguage, t };
+  
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );
 };
 
-export const useLanguage = (): LanguageContextType => {
+export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (context === undefined) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
 };
+
+export default useLanguage;
