@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, differenceInMinutes } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -11,8 +10,6 @@ import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/hooks/use-auth-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
-import BackButton from '@/components/shared/BackButton';
-
 const WaitingPatients = () => {
   const navigate = useNavigate();
   const {
@@ -67,12 +64,8 @@ const WaitingPatients = () => {
         break;
     }
   };
-  return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center gap-4">
-        <BackButton />
-        <h1 className="text-2xl font-bold">Patients en attente</h1>
-      </div>
+  return <div className="container mx-auto py-6">
+      <h1 className="text-2xl font-bold mb-6">Liste des patients en attente</h1>
       
       <div className="rounded-lg shadow p-6 bg-slate-950">
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -148,8 +141,6 @@ const WaitingPatients = () => {
           </TableBody>
         </Table>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default WaitingPatients;

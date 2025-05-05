@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, differenceInYears } from 'date-fns';
@@ -5,7 +6,6 @@ import { fr } from 'date-fns/locale';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { usePatientStore } from '@/stores/usePatientStore';
-import BackButton from '@/components/shared/BackButton';
 
 const WaitingLists = () => {
   const navigate = useNavigate();
@@ -23,11 +23,8 @@ const WaitingLists = () => {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center gap-4">
-        <BackButton />
-        <h1 className="text-2xl font-bold">Files d'attente</h1>
-      </div>
+    <div className="container mx-auto py-6">
+      <h1 className="text-2xl font-bold mb-6">Liste d'attente des patients</h1>
       
       <div className="bg-white rounded-lg shadow">
         <Table>
