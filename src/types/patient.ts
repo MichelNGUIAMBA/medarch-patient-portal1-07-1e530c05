@@ -23,4 +23,5 @@ export interface Patient {
     role: string;
   };
   modificationHistory?: ModificationRecord[];
+  originalPatientId?: string; // ID de référence au patient original pour les visites répétées
 }

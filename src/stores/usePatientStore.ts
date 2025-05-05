@@ -19,6 +19,7 @@ type PatientStore = {
   addPatientsFromCSV: (patientsData: Array<Omit<Patient, "id" | "status" | "registeredAt" | "name">>) => void;
   takeCharge: (id: string, nurse: { name: string; role: string }) => void;
   setPatientCompleted: (id: string, caregiver: { name: string; role: string }) => void;
+  addServiceToExistingPatient: (patientId: string, service: "VM" | "Cons" | "Ug") => void;
 };
 
 export const usePatientStore = create<PatientStore>((set) => ({
@@ -209,5 +210,32 @@ export const usePatientStore = create<PatientStore>((set) => ({
     };
 
     return { patients: updatedPatients };
+  }),
+  addServiceToExistingPatient: (patientId, service) => set((state) => {
+    const existingPatient = state.patients.find(p => p.id === patientId);
+    if (!existingPatient) return state;
+    
+    const patientWithNewService: Patient = {
+      id: `P-${Math.floor(Math.random() * 9000) + 1000}`,
+      name: existingPatient.name,
+      firstName: existingPatient.firstName,
+      lastName: existingPatient.lastName,
+      birthDate: existingPatient.birthDate,
+      gender: existingPatient.gender,
+      company: existingPatient.company,
+      service: service,
+      status: "En attente",
+      registeredAt: new Date().toISOString(),
+      idNumber: existingPatient.idNumber,
+      email: existingPatient.email,
+      phone: existingPatient.phone,
+      address: existingPatient.address,
+      employeeId: existingPatient.employeeId,
+      originalPatientId: existingPatient.id
+    };
+    
+    return {
+      patients: [patientWithNewService, ...state.patients]
+    };
   })
 }));

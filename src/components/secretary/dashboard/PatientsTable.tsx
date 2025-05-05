@@ -1,16 +1,21 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Patient } from '@/types/patient';
+
 interface PatientsTableProps {
   patients: Patient[];
 }
+
 const PatientsTable = ({
   patients
 }: PatientsTableProps) => {
   const navigate = useNavigate();
-  return <div className="rounded-lg shadow bg-inherit">
+  
+  return (
+    <div className="rounded-lg shadow bg-inherit">
       <div className="p-4 border-b bg- bg-inherit rounded px-[16px] py-[16px]">
         <h2 className="text-lg font-semibold flex items-center text-inherit">
           <ClipboardCheck className="h-5 w-5 mr-2" />
@@ -30,9 +35,17 @@ const PatientsTable = ({
             </tr>
           </thead>
           <tbody>
-            {patients.map(patient => <tr key={patient.id} className="border-b hover:bg-gray-50">
+            {patients.map(patient => (
+              <tr key={patient.id} className="border-b hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">{patient.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap font-medium uppercase">{patient.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap font-medium uppercase">
+                  {patient.name}
+                  {patient.originalPatientId && (
+                    <span className="ml-2 text-xs text-blue-600">
+                      (Visite répétée)
+                    </span>
+                  )}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">{patient.company}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${patient.service === "VM" ? "bg-blue-100 text-blue-800" : patient.service === "Ug" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"}`}>
@@ -49,10 +62,13 @@ const PatientsTable = ({
                     Afficher
                   </Button>
                 </td>
-              </tr>)}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default PatientsTable;

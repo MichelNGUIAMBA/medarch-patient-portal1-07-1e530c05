@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/sonner';
@@ -11,12 +10,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePatientStore } from '@/stores/usePatientStore';
 import CsvImport from '@/components/secretary/CsvImport';
+import { UserPlus } from 'lucide-react';
+import ExistingPatientDialog from '@/components/secretary/ExistingPatientDialog';
 
 const NewPatient = () => {
   const navigate = useNavigate();
   const addPatient = usePatientStore((state) => state.addPatient);
   const [step, setStep] = useState(1);
   const [activeTab, setActiveTab] = useState<string>('manual');
+  const [existingPatientDialogOpen, setExistingPatientDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -155,7 +157,17 @@ const NewPatient = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Enregistrement d'un nouveau patient</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Enregistrement d'un nouveau patient</h1>
+        <Button 
+          onClick={() => setExistingPatientDialogOpen(true)} 
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <UserPlus className="h-4 w-4" />
+          Patient existant
+        </Button>
+      </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
         <TabsList className="grid w-full grid-cols-2">
@@ -427,6 +439,11 @@ const NewPatient = () => {
           <CsvImport />
         </TabsContent>
       </Tabs>
+      
+      <ExistingPatientDialog 
+        open={existingPatientDialogOpen}
+        onOpenChange={setExistingPatientDialogOpen}
+      />
     </div>
   );
 };
