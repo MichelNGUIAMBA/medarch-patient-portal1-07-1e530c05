@@ -11,7 +11,7 @@ const PatientsTable = ({
 }: PatientsTableProps) => {
   const navigate = useNavigate();
   return <div className="bg-white rounded-lg shadow">
-      <div className="p-4 border-b rounded-none bg-inherit">
+      <div className="p-4 border-b rounded-none bg-transparent">
         <h2 className="text-lg font-semibold flex items-center">
           <ClipboardCheck className="h-5 w-5 mr-2" />
           Derniers patients enregistrés
