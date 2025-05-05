@@ -31,9 +31,9 @@ const Chatbot = () => {
   // Generate storage key based on user authentication status
   const getStorageKey = () => {
     if (isAuthenticated && user) {
-      return `chatbot_messages_${user.id}`;
+      return `chatbot_messages_${user.id}_${language}`;
     } else {
-      return 'chatbot_messages_guest';
+      return `chatbot_messages_guest_${language}`;
     }
   };
 
@@ -59,13 +59,20 @@ const Chatbot = () => {
       // Add welcome message if no previous messages found
       addWelcomeMessage();
     }
-  }, [user, isAuthenticated, language, t]);
+  }, [user, isAuthenticated, language]);
 
   // Welcome message function
   const addWelcomeMessage = () => {
+    let welcomeText = t('chatbotWelcome');
+    
+    // Add user-specific greeting if authenticated
+    if (isAuthenticated && user) {
+      welcomeText = `${t('hello')} ${user.name}! ${t('chatbotWelcomeUser')} ${t('chatbotRoleDescription')} ${user.role}.`;
+    }
+
     const welcomeMessage: Message = {
       id: Date.now().toString(),
-      text: t('chatbotWelcome'),
+      text: welcomeText,
       sender: 'bot',
       timestamp: new Date()
     };
@@ -78,7 +85,7 @@ const Chatbot = () => {
       const storageKey = getStorageKey();
       localStorage.setItem(storageKey, JSON.stringify(messages));
     }
-  }, [messages, user, isAuthenticated]);
+  }, [messages, user, isAuthenticated, language]);
 
   // Scroll to bottom of messages when new message is added
   useEffect(() => {
@@ -103,14 +110,21 @@ const Chatbot = () => {
       if (updatedMessages[0].text.includes('Hello') || 
           updatedMessages[0].text.includes('Bonjour') || 
           updatedMessages[0].text.includes('Hallo')) {
+        
+        // Create a new personalized welcome message based on user status
+        let welcomeText = t('chatbotWelcome');
+        if (isAuthenticated && user) {
+          welcomeText = `${t('hello')} ${user.name}! ${t('chatbotWelcomeUser')} ${t('chatbotRoleDescription')} ${user.role}.`;
+        }
+        
         updatedMessages[0] = {
           ...updatedMessages[0],
-          text: t('chatbotWelcome')
+          text: welcomeText
         };
         setMessages(updatedMessages);
       }
     }
-  }, [language, t]);
+  }, [language, t, isAuthenticated, user]);
 
   const toggleChatbot = () => {
     setIsOpen(!isOpen);
@@ -148,7 +162,7 @@ const Chatbot = () => {
       
       // Then start typing animation
       setTimeout(() => {
-        const botResponse = generateBotResponse(input.trim(), language);
+        const botResponse = generateBotResponse(input.trim(), language, user);
         const botMessage: Message = {
           id: (Date.now() + 1).toString(),
           text: botResponse,
@@ -162,35 +176,95 @@ const Chatbot = () => {
     }, 1200); // Thinking duration
   };
 
-  // Enhanced bot response generator with more domain knowledge
-  const generateBotResponse = (userInput: string, currentLanguage: string): string => {
+  // Enhanced bot response generator with more domain knowledge and user-awareness
+  const generateBotResponse = (userInput: string, currentLanguage: string, currentUser: any): string => {
     const userInputLower = userInput.toLowerCase();
+    
+    // User-specific responses
+    if (isAuthenticated && currentUser) {
+      // Role-specific responses
+      if (currentUser.role === 'secretary') {
+        if (userInputLower.includes('patient') || userInputLower.includes('enregistrer') || userInputLower.includes('register')) {
+          if (currentLanguage === 'fr') {
+            return `En tant que secrétaire, vous pouvez enregistrer un nouveau patient via le bouton "Nouveau patient" dans votre tableau de bord. Vous pouvez également assigner des services aux patients existants pour une nouvelle journée en cliquant sur "Nouvelle journée".`;
+          } else if (currentLanguage === 'de') {
+            return `Als Sekretär/in können Sie einen neuen Patienten über die Schaltfläche "Neuer Patient" in Ihrem Dashboard registrieren. Sie können auch bestehenden Patienten Dienste für einen neuen Tag zuweisen, indem Sie auf "Neuer Tag" klicken.`;
+          } else {
+            return `As a secretary, you can register a new patient via the "New patient" button in your dashboard. You can also assign services to existing patients for a new day by clicking on "New Day".`;
+          }
+        }
+        
+        if (userInputLower.includes('nouvelle journée') || userInputLower.includes('new day') || userInputLower.includes('neuer tag')) {
+          if (currentLanguage === 'fr') {
+            return `La fonction "Nouvelle journée" vous permet de réinitialiser les statuts des patients et de leur assigner de nouveaux services pour la journée. C'est utile pour gérer les visites quotidiennes. Vous trouverez ce bouton dans votre tableau de bord des actions rapides.`;
+          } else if (currentLanguage === 'de') {
+            return `Mit der Funktion "Neuer Tag" können Sie den Status der Patienten zurücksetzen und ihnen neue Dienste für den Tag zuweisen. Dies ist nützlich für die Verwaltung täglicher Besuche. Sie finden diese Schaltfläche in Ihrem Dashboard unter Schnellaktionen.`;
+          } else {
+            return `The "New Day" function allows you to reset patient statuses and assign them new services for the day. It's useful for managing daily visits. You'll find this button in your dashboard quick actions.`;
+          }
+        }
+      }
+      
+      else if (currentUser.role === 'nurse' || currentUser.role === 'doctor') {
+        if (userInputLower.includes('patient') || userInputLower.includes('traitement') || userInputLower.includes('behandlung') || userInputLower.includes('treatment')) {
+          if (currentLanguage === 'fr') {
+            return `En tant que ${currentUser.role === 'nurse' ? 'infirmier/ère' : 'médecin'}, vous ne pouvez traiter qu'un patient à la fois. Lorsque vous prenez en charge un nouveau patient, tout autre patient en cours de traitement sera automatiquement remis en attente. Vous pouvez consulter la liste des patients en attente dans votre tableau de bord.`;
+          } else if (currentLanguage === 'de') {
+            return `Als ${currentUser.role === 'nurse' ? 'Krankenpfleger/in' : 'Arzt/Ärztin'} können Sie nur einen Patienten gleichzeitig behandeln. Wenn Sie einen neuen Patienten übernehmen, wird jeder andere Patient, der gerade behandelt wird, automatisch wieder in die Warteschlange gestellt. Sie können die Liste der wartenden Patienten in Ihrem Dashboard einsehen.`;
+          } else {
+            return `As a ${currentUser.role === 'nurse' ? 'nurse' : 'doctor'}, you can only treat one patient at a time. When you take charge of a new patient, any other patient currently in treatment will automatically be put back on the waiting list. You can see the list of waiting patients in your dashboard.`;
+          }
+        }
+      }
+    }
     
     // Common greetings in different languages
     if (userInputLower.includes('bonjour') || userInputLower.includes('hello') || userInputLower.includes('hallo') || 
         userInputLower.includes('hi') || userInputLower.includes('salut') || userInputLower.includes('guten tag')) {
-      return t('chatbotWelcome');
+      if (isAuthenticated && currentUser) {
+        if (currentLanguage === 'fr') {
+          return `Bonjour ${currentUser.name} ! Comment puis-je vous aider aujourd'hui avec MedArch ?`;
+        } else if (currentLanguage === 'de') {
+          return `Hallo ${currentUser.name}! Wie kann ich Ihnen heute mit MedArch helfen?`;
+        } else {
+          return `Hello ${currentUser.name}! How can I help you with MedArch today?`;
+        }
+      } else {
+        return t('chatbotWelcome');
+      }
     } 
+    
+    // Daily activities-related questions
+    else if (userInputLower.includes('activité') || userInputLower.includes('activit') || userInputLower.includes('tätigkeiten') || 
+             userInputLower.includes('daily') || userInputLower.includes('journalière') || userInputLower.includes('täglich')) {
+      if (currentLanguage === 'fr') {
+        return `Les activités journalières sont enregistrées automatiquement dans le système. Vous pouvez consulter les statistiques et le journal des activités pour chaque jour en accédant à la section "Activités journalières". Chaque journée est représentée par une icône d'archive, et vous pouvez cliquer dessus pour voir les détails de cette journée, y compris les patients traités et toutes les activités enregistrées.`;
+      } else if (currentLanguage === 'de') {
+        return `Tägliche Aktivitäten werden automatisch im System erfasst. Sie können Statistiken und Aktivitätsprotokolle für jeden Tag einsehen, indem Sie auf den Bereich "Tägliche Aktivitäten" zugreifen. Jeder Tag wird durch ein Archiv-Symbol dargestellt, und Sie können darauf klicken, um die Details dieses Tages zu sehen, einschließlich behandelter Patienten und aller aufgezeichneten Aktivitäten.`;
+      } else {
+        return `Daily activities are automatically recorded in the system. You can view statistics and activity logs for each day by accessing the "Daily Activities" section. Each day is represented by an archive icon, and you can click on it to see the details of that day, including patients treated and all activities recorded.`;
+      }
+    }
     
     // System-related questions
     else if (userInputLower.includes('service') || userInputLower.includes('services')) {
       if (currentLanguage === 'fr') {
-        return 'Le système propose trois types de services: consultations, visites médicales et urgences. Chaque service a un formulaire spécifique adapté à ses besoins et peut être modifié après avoir été créé.';
+        return 'Le système propose trois types de services: consultations (Cons), visites médicales (VM) et urgences (Ug). Chaque service a un formulaire spécifique adapté à ses besoins et peut être modifié après avoir été créé.';
       } else if (currentLanguage === 'de') {
-        return 'Das System bietet drei Arten von Diensten: Konsultationen, medizinische Untersuchungen und Notfälle. Jeder Dienst hat ein spezifisches Formular, das an seine Anforderungen angepasst ist und nach der Erstellung bearbeitet werden kann.';
+        return 'Das System bietet drei Arten von Diensten: Konsultationen (Cons), medizinische Untersuchungen (VM) und Notfälle (Ug). Jeder Dienst hat ein spezifisches Formular, das an seine Anforderungen angepasst ist und nach der Erstellung bearbeitet werden kann.';
       } else {
-        return 'The system offers three types of services: consultations, medical visits, and emergencies. Each service has a specific form adapted to its needs and can be modified after being created.';
+        return 'The system offers three types of services: consultations (Cons), medical visits (VM), and emergencies (Ug). Each service has a specific form adapted to its needs and can be modified after being created.';
       }
     } 
     
     // Patient management
     else if (userInputLower.includes('patient') || userInputLower.includes('patients')) {
       if (currentLanguage === 'fr') {
-        return 'Vous pouvez gérer les patients en les ajoutant, modifiant leurs informations et suivant leur statut dans le système. Les patients peuvent être en attente, en cours de traitement ou terminés. L\'historique de toutes les modifications est conservé pour audit.';
+        return 'Vous pouvez gérer les patients en les ajoutant, modifiant leurs informations et suivant leur statut dans le système. Les patients peuvent être en attente, en cours de traitement ou terminés. Important: le système ne permet de traiter qu\'un seul patient à la fois. L\'historique de toutes les modifications est conservé pour audit.';
       } else if (currentLanguage === 'de') {
-        return 'Sie können Patienten verwalten, indem Sie sie hinzufügen, ihre Informationen bearbeiten und ihren Status im System verfolgen. Patienten können ausstehend, in Behandlung oder abgeschlossen sein. Die Historie aller Änderungen wird für Prüfungszwecke aufbewahrt.';
+        return 'Sie können Patienten verwalten, indem Sie sie hinzufügen, ihre Informationen bearbeiten und ihren Status im System verfolgen. Patienten können ausstehend, in Behandlung oder abgeschlossen sein. Wichtig: Das System erlaubt nur die Behandlung eines Patienten gleichzeitig. Die Historie aller Änderungen wird für Prüfungszwecke aufbewahrt.';
       } else {
-        return 'You can manage patients by adding them, modifying their information and tracking their status in the system. Patients can be pending, in treatment, or completed. The history of all modifications is kept for auditing.';
+        return 'You can manage patients by adding them, modifying their information and tracking their status in the system. Patients can be pending, in treatment, or completed. Important: the system only allows treating one patient at a time. The history of all modifications is kept for auditing.';
       }
     } 
     
@@ -251,36 +325,24 @@ const Chatbot = () => {
       }
     }
     
-    // Medication information
-    else if (userInputLower.includes('medicament') || userInputLower.includes('medication') || userInputLower.includes('medikament')) {
-      if (currentLanguage === 'fr') {
-        return 'Les médicaments doivent être administrés avec précaution, en vérifiant toujours la posologie, les contre-indications et les allergies du patient. Tous les médicaments administrés doivent être documentés précisément dans le dossier du patient, en incluant le nom, la dose, la voie d\'administration et l\'heure.';
-      } else if (currentLanguage === 'de') {
-        return 'Medikamente sollten mit Vorsicht verabreicht werden, wobei immer die Dosierung, Kontraindikationen und Allergien des Patienten überprüft werden müssen. Alle verabreichten Medikamente müssen genau in der Patientenakte dokumentiert werden, einschließlich Name, Dosis, Verabreichungsweg und Uhrzeit.';
-      } else {
-        return 'Medications should be administered with caution, always checking the dosage, contraindications, and patient allergies. All administered medications must be accurately documented in the patient\'s record, including the name, dose, route of administration, and time.';
-      }
-    }
-    
-    // General health advice
-    else if (userInputLower.includes('santé') || userInputLower.includes('health') || userInputLower.includes('gesundheit')) {
-      if (currentLanguage === 'fr') {
-        return 'Une bonne santé repose sur une alimentation équilibrée, une activité physique régulière, un sommeil adéquat et une gestion du stress. Les visites de contrôle régulières sont essentielles pour la détection précoce des problèmes de santé. Le système MedArch permet de suivre l\'évolution de la santé des patients sur la durée.';
-      } else if (currentLanguage === 'de') {
-        return 'Eine gute Gesundheit basiert auf ausgewogener Ernährung, regelmäßiger körperlicher Aktivität, ausreichendem Schlaf und Stressbewältigung. Regelmäßige Kontrolluntersuchungen sind für die Früherkennung von Gesundheitsproblemen unerlässlich. Das MedArch-System ermöglicht es, die Entwicklung der Gesundheit von Patienten im Laufe der Zeit zu verfolgen.';
-      } else {
-        return 'Good health is based on a balanced diet, regular physical activity, adequate sleep, and stress management. Regular check-ups are essential for early detection of health issues. The MedArch system allows tracking patients\' health evolution over time.';
-      }
-    }
-    
     // Default responses when no specific pattern is matched
     else {
-      if (currentLanguage === 'fr') {
-        return 'Je suis désolé, je n\'ai pas toutes les informations pour répondre à cette question spécifique. Pourriez-vous reformuler ou poser une question plus précise sur le système MedArch ou sur un sujet médical général ?';
-      } else if (currentLanguage === 'de') {
-        return 'Es tut mir leid, ich habe nicht alle Informationen, um diese spezifische Frage zu beantworten. Könnten Sie Ihre Frage umformulieren oder eine präzisere Frage zum MedArch-System oder zu einem allgemeinen medizinischen Thema stellen?';
+      if (isAuthenticated && currentUser) {
+        if (currentLanguage === 'fr') {
+          return `Je suis désolé, je n'ai pas toutes les informations pour répondre à cette question spécifique. Pourriez-vous reformuler ou poser une question plus précise sur le système MedArch ? En tant que ${currentUser.role === 'secretary' ? 'secrétaire' : currentUser.role === 'nurse' ? 'infirmier/ère' : 'médecin'}, vous pouvez me demander des informations sur vos fonctions principales.`;
+        } else if (currentLanguage === 'de') {
+          return `Es tut mir leid, ich habe nicht alle Informationen, um diese spezifische Frage zu beantworten. Könnten Sie Ihre Frage umformulieren oder eine präzisere Frage zum MedArch-System stellen? Als ${currentUser.role === 'secretary' ? 'Sekretär/in' : currentUser.role === 'nurse' ? 'Krankenpfleger/in' : 'Arzt/Ärztin'} können Sie mich nach Informationen zu Ihren Hauptaufgaben fragen.`;
+        } else {
+          return `I'm sorry, I don't have all the information to answer this specific question. Could you rephrase or ask a more precise question about the MedArch system? As a ${currentUser.role === 'secretary' ? 'secretary' : currentUser.role === 'nurse' ? 'nurse' : 'doctor'}, you can ask me about your main functions.`;
+        }
       } else {
-        return 'I\'m sorry, I don\'t have all the information to answer this specific question. Could you rephrase or ask a more precise question about the MedArch system or a general medical topic?';
+        if (currentLanguage === 'fr') {
+          return 'Je suis désolé, je n\'ai pas toutes les informations pour répondre à cette question spécifique. Pourriez-vous reformuler ou poser une question plus précise sur le système MedArch ou sur un sujet médical général ?';
+        } else if (currentLanguage === 'de') {
+          return 'Es tut mir leid, ich habe nicht alle Informationen, um diese spezifische Frage zu beantworten. Könnten Sie Ihre Frage umformulieren oder eine präzisere Frage zum MedArch-System oder zu einem allgemeinen medizinischen Thema stellen?';
+        } else {
+          return 'I\'m sorry, I don\'t have all the information to answer this specific question. Could you rephrase or ask a more precise question about the MedArch system or a general medical topic?';
+        }
       }
     }
   };
@@ -345,6 +407,15 @@ const Chatbot = () => {
     }
   };
 
+  // Store user's path to display contextual help
+  useEffect(() => {
+    const lastUrlSegment = window.location.pathname.split('/').pop();
+    
+    if (lastUrlSegment && lastUrlSegment !== 'dashboard') {
+      localStorage.setItem(`${getStorageKey()}_last_path`, lastUrlSegment);
+    }
+  }, [window.location.pathname]);
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {/* Chatbot button */}
@@ -399,7 +470,10 @@ const Chatbot = () => {
                   >
                     <Bot className={`mr-2 ${theme === 'dark' ? 'text-indigo-400' : 'text-primary'}`} size={20} />
                   </motion.div>
-                  {t('chatbot')}
+                  {t('chatbot')} 
+                  {isAuthenticated && user && (
+                    <span className="text-xs ml-2 opacity-75">- {user.role}</span>
+                  )}
                 </CardTitle>
                 <Button 
                   variant="ghost" 

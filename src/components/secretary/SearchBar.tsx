@@ -1,21 +1,27 @@
+
 import React from 'react';
 import { Search, ArrowUpAZ, ArrowDownAZ, Clock, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
+import { useLanguage } from '@/hooks/useLanguage';
+
 interface SearchBarProps {
   onSearch: (value: string) => void;
   onSortChange: (value: string) => void;
   onFilterChange: (filters: string[]) => void;
   activeFilters: string[];
 }
+
 const SearchBar = ({
   onSearch,
   onSortChange,
   onFilterChange,
   activeFilters
 }: SearchBarProps) => {
+  const { t } = useLanguage();
+  
   const handleFilterChange = (filter: string) => {
     if (activeFilters.includes(filter)) {
       onFilterChange(activeFilters.filter(f => f !== filter));
@@ -23,51 +29,59 @@ const SearchBar = ({
       onFilterChange([...activeFilters, filter]);
     }
   };
-  return <div className="p-4 rounded-lg shadow bg-inherit">
+  
+  return (
+    <div className="p-4 rounded-lg shadow bg-white dark:bg-gray-800">
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-          <Input placeholder="Rechercher un patient..." className="pl-10" onChange={e => onSearch(e.target.value)} />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400 dark:text-gray-500" />
+          <Input 
+            placeholder={t('searchPatient')} 
+            className="pl-10" 
+            onChange={e => onSearch(e.target.value)} 
+          />
         </div>
         
         <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="dark:border-gray-600 dark:hover:bg-gray-700">
                 <Filter className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuLabel>Filtrer par</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('filterBy')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem checked={activeFilters.includes('name')} onCheckedChange={() => handleFilterChange('name')}>
-                Nom
+                {t('name')}
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem checked={activeFilters.includes('company')} onCheckedChange={() => handleFilterChange('company')}>
-                Société
+                {t('company')}
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem checked={activeFilters.includes('age')} onCheckedChange={() => handleFilterChange('age')}>
-                Âge
+                {t('age')}
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem checked={activeFilters.includes('service')} onCheckedChange={() => handleFilterChange('service')}>
-                Service
+                {t('service')}
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ToggleGroup type="single" onValueChange={onSortChange}>
-            <ToggleGroupItem value="alpha-asc" aria-label="Trier par ordre alphabétique croissant">
+          <ToggleGroup type="single" onValueChange={onSortChange} className="dark:border-gray-600 dark:bg-gray-800">
+            <ToggleGroupItem value="alpha-asc" aria-label={t('sortByAlphabeticalAscending')} className="dark:hover:bg-gray-700 dark:data-[state=on]:bg-gray-700">
               <ArrowUpAZ className="h-4 w-4" />
             </ToggleGroupItem>
-            <ToggleGroupItem value="alpha-desc" aria-label="Trier par ordre alphabétique décroissant">
+            <ToggleGroupItem value="alpha-desc" aria-label={t('sortByAlphabeticalDescending')} className="dark:hover:bg-gray-700 dark:data-[state=on]:bg-gray-700">
               <ArrowDownAZ className="h-4 w-4" />
             </ToggleGroupItem>
-            <ToggleGroupItem value="time" aria-label="Trier par heure d'arrivée">
+            <ToggleGroupItem value="time" aria-label={t('sortByArrivalTime')} className="dark:hover:bg-gray-700 dark:data-[state=on]:bg-gray-700">
               <Clock className="h-4 w-4" />
             </ToggleGroupItem>
           </ToggleGroup>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default SearchBar;

@@ -20,9 +20,11 @@ type PatientStore = {
   takeCharge: (id: string, nurse: { name: string; role: string }) => void;
   setPatientCompleted: (id: string, caregiver: { name: string; role: string }) => void;
   assignServiceForDay: (id: string, service: "VM" | "Cons" | "Ug", assignedBy: { name: string; role: string }) => void;
+  getActivePatient: () => Patient | null;
+  resetPatientStatuses: () => void;
 };
 
-export const usePatientStore = create<PatientStore>((set) => ({
+export const usePatientStore = create<PatientStore>((set, get) => ({
   patients: [
     { 
       id: "P-1234", 
@@ -166,27 +168,76 @@ export const usePatientStore = create<PatientStore>((set) => ({
     ]
   })),
   takeCharge: (id, nurse) => set((state) => {
-    const patientIndex = state.patients.findIndex(p => p.id === id);
-    if (patientIndex === -1) return state;
+    // Check if there's already a patient in treatment
+    const patientInTreatment = state.patients.find(p => p.status === "En cours" && p.id !== id);
+    
+    if (patientInTreatment) {
+      // Set the current active patient to "En attente" before taking charge of the new one
+      const updatedPatients = state.patients.map(p => {
+        if (p.id === patientInTreatment.id) {
+          return {
+            ...p,
+            status: "En attente",
+            modificationHistory: [
+              {
+                field: "status",
+                oldValue: "En cours",
+                newValue: "En attente",
+                modifiedBy: nurse,
+                timestamp: new Date().toISOString()
+              },
+              ...(p.modificationHistory || [])
+            ]
+          };
+        }
+        return p;
+      });
+      
+      // Now take charge of the new patient
+      const patientIndex = updatedPatients.findIndex(p => p.id === id);
+      if (patientIndex === -1) return state;
 
-    const updatedPatients = [...state.patients];
-    updatedPatients[patientIndex] = {
-      ...updatedPatients[patientIndex],
-      status: "En cours",
-      takenCareBy: nurse,
-      modificationHistory: [
-        {
-          field: "status",
-          oldValue: "En attente",
-          newValue: "En cours",
-          modifiedBy: nurse,
-          timestamp: new Date().toISOString()
-        },
-        ...(updatedPatients[patientIndex].modificationHistory || [])
-      ]
-    };
+      updatedPatients[patientIndex] = {
+        ...updatedPatients[patientIndex],
+        status: "En cours",
+        takenCareBy: nurse,
+        modificationHistory: [
+          {
+            field: "status",
+            oldValue: "En attente",
+            newValue: "En cours",
+            modifiedBy: nurse,
+            timestamp: new Date().toISOString()
+          },
+          ...(updatedPatients[patientIndex].modificationHistory || [])
+        ]
+      };
 
-    return { patients: updatedPatients };
+      return { patients: updatedPatients };
+    } else {
+      // No patient is currently in treatment, proceed normally
+      const patientIndex = state.patients.findIndex(p => p.id === id);
+      if (patientIndex === -1) return state;
+
+      const updatedPatients = [...state.patients];
+      updatedPatients[patientIndex] = {
+        ...updatedPatients[patientIndex],
+        status: "En cours",
+        takenCareBy: nurse,
+        modificationHistory: [
+          {
+            field: "status",
+            oldValue: "En attente",
+            newValue: "En cours",
+            modifiedBy: nurse,
+            timestamp: new Date().toISOString()
+          },
+          ...(updatedPatients[patientIndex].modificationHistory || [])
+        ]
+      };
+
+      return { patients: updatedPatients };
+    }
   }),
   setPatientCompleted: (id, caregiver) => set((state) => {
     const patientIndex = state.patients.findIndex(p => p.id === id);
@@ -244,4 +295,17 @@ export const usePatientStore = create<PatientStore>((set) => ({
 
     return { patients: updatedPatients };
   }),
+  getActivePatient: () => {
+    return get().patients.find(p => p.status === "En cours") || null;
+  },
+  resetPatientStatuses: () => set((state) => {
+    return {
+      patients: state.patients.map(patient => ({
+        ...patient,
+        status: "En attente",
+        service: patient.service,
+        takenCareBy: undefined
+      }))
+    };
+  })
 }));
