@@ -68,19 +68,19 @@ const ServiceFormReadonlyViewer = ({
         
         <TabsContent value="history" className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
-            <div className="border rounded-md p-3 bg-gray-50">
+            <div className="border rounded-md p-3 bg-inherit">
               <p className="text-sm font-medium text-gray-500">Plainte principale</p>
               <p>{serviceData.mainComplaint || 'Non spécifié'}</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
+            <div className="border rounded-md p-3 bg-inherit">
               <p className="text-sm font-medium text-gray-500">Allergies</p>
               <p>{serviceData.allergies || 'Aucune connue'}</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
+            <div className="border rounded-md p-3 bg-inherit">
               <p className="text-sm font-medium text-gray-500">Antécédents médicaux</p>
               <p>{serviceData.medicalHistory || 'Aucun'}</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
+            <div className="border rounded-md p-3 bg-inherit">
               <p className="text-sm font-medium text-gray-500">Médicaments actuels</p>
               <p>{serviceData.currentMedications || 'Aucun'}</p>
             </div>
