@@ -142,7 +142,7 @@ const DashboardLayout = () => {
             </div>
           </header>
           
-          <main className="flex-1 overflow-y-auto p-6 dark:text-white rounded-3xl bg-inherit">
+          <main className="flex-1 overflow-y-auto p-6 dark:text rounded-none bg-inherit">
             <Outlet />
           </main>
         </div>

@@ -54,7 +54,7 @@ const NurseDashboard = () => {
       </div>
 
       <div className="rounded-lg shadow bg-inherit">
-        <div className="p-4 border-b rounded bg-slate-950">
+        <div className="p-4 border-b rounded-none bg-inherit">
           <h2 className="text-lg font-semibold">Patients à traiter</h2>
         </div>
         <div className="p-0">
