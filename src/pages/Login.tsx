@@ -33,6 +33,8 @@ const Login = () => {
     }
   };
 
+  const currentYear = new Date().getFullYear();
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-slate-900">
       <div className="fixed top-4 right-4 flex space-x-2">
@@ -95,14 +97,14 @@ const Login = () => {
           </form>
         </CardContent>
         <CardFooter className="text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} MedArch - Tous droits réservés
+          © {currentYear} MedArch - {t('allRightsReserved')}
         </CardFooter>
       </Card>
       
       {/* Message d'aide avec comptes de test */}
       <div className="fixed bottom-4 right-4">
         <Card className="p-4 shadow-md bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 dark:text-white">
-          <h3 className="font-medium mb-2">{t('demoAccounts')} :</h3>
+          <h3 className="font-medium mb-2">{t('demoAccounts')}:</h3>
           <ul className="text-sm space-y-1">
             <li>admin@medarch.com</li>
             <li>secretary@medarch.com</li>

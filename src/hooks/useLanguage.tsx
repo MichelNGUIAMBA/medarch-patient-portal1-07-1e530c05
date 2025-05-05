@@ -16,7 +16,7 @@ const translations = {
     'email': 'Adresse e-mail',
     'password': 'Mot de passe',
     'forgotPassword': 'Mot de passe oublié?',
-    'demoAccounts': 'Comptes de démonstration :',
+    'demoAccounts': 'Comptes de démonstration',
     
     // Navigation
     'dashboard': 'Tableau de bord',
@@ -36,6 +36,11 @@ const translations = {
     'lab': 'Laboratoire',
     'doctor': 'Médecin',
     'admin': 'Administrateur',
+    'secretaryPortal': 'Portail secrétariat',
+    'nursePortal': 'Portail infirmerie',
+    'doctorPortal': 'Portail médical',
+    'labPortal': 'Portail laboratoire',
+    'adminPortal': 'Portail administration',
     
     // Patient info
     'patientInfo': 'Informations du patient',
@@ -71,12 +76,24 @@ const translations = {
     'medicalVisit': 'Visite médicale',
     'consultation': 'Consultation',
     'emergency': 'Urgence',
+    'VM': 'Visite médicale',
+    'Cons': 'Consultation',
+    'Ug': 'Urgence',
     
     // Forms
     'save': 'Enregistrer',
     'next': 'Suivant',
     'previous': 'Précédent',
     'validate': 'Valider',
+    'addToWaitingList': 'Ajouter à la liste d\'attente',
+    'searchPatient': 'Rechercher un patient',
+    'searchPlaceholder': 'Rechercher par nom, prénom ou ID...',
+    'noResults': 'Aucun résultat trouvé',
+    'existingPatient': 'Patient existant',
+    'selectExistingPatient': 'Sélectionner un patient existant',
+    'addNewService': 'Ajouter un nouveau service',
+    'serviceType': 'Type de service',
+    'selectService': 'Sélectionner un service',
     
     // Modification history
     'modificationHistory': 'Historique des modifications',
@@ -128,6 +145,9 @@ const translations = {
     'labResults': 'Résultats de laboratoire',
     'symptoms': 'Symptômes',
     'medicalHistory': 'Antécédents médicaux',
+    
+    // Footer
+    'allRightsReserved': 'Tous droits réservés',
   },
   en: {
     // Auth
@@ -135,7 +155,7 @@ const translations = {
     'email': 'Email address',
     'password': 'Password',
     'forgotPassword': 'Forgot password?',
-    'demoAccounts': 'Demo accounts:',
+    'demoAccounts': 'Demo accounts',
     
     // Navigation
     'dashboard': 'Dashboard',
@@ -155,6 +175,11 @@ const translations = {
     'lab': 'Laboratory',
     'doctor': 'Doctor',
     'admin': 'Administrator',
+    'secretaryPortal': 'Secretary portal',
+    'nursePortal': 'Nurse portal',
+    'doctorPortal': 'Doctor portal',
+    'labPortal': 'Laboratory portal',
+    'adminPortal': 'Admin portal',
     
     // Patient info
     'patientInfo': 'Patient information',
@@ -190,12 +215,24 @@ const translations = {
     'medicalVisit': 'Medical visit',
     'consultation': 'Consultation',
     'emergency': 'Emergency',
+    'VM': 'Medical visit',
+    'Cons': 'Consultation',
+    'Ug': 'Emergency',
     
     // Forms
     'save': 'Save',
     'next': 'Next',
     'previous': 'Previous',
     'validate': 'Validate',
+    'addToWaitingList': 'Add to waiting list',
+    'searchPatient': 'Search patient',
+    'searchPlaceholder': 'Search by name, first name or ID...',
+    'noResults': 'No results found',
+    'existingPatient': 'Existing patient',
+    'selectExistingPatient': 'Select existing patient',
+    'addNewService': 'Add new service',
+    'serviceType': 'Service type',
+    'selectService': 'Select service',
     
     // Modification history
     'modificationHistory': 'Modification history',
@@ -247,6 +284,9 @@ const translations = {
     'labResults': 'Lab results',
     'symptoms': 'Symptoms',
     'medicalHistory': 'Medical history',
+    
+    // Footer
+    'allRightsReserved': 'All rights reserved',
   },
   de: {
     // Auth
@@ -254,7 +294,7 @@ const translations = {
     'email': 'E-Mail-Adresse',
     'password': 'Passwort',
     'forgotPassword': 'Passwort vergessen?',
-    'demoAccounts': 'Demo-Konten:',
+    'demoAccounts': 'Demo-Konten',
     
     // Navigation
     'dashboard': 'Dashboard',
@@ -274,6 +314,11 @@ const translations = {
     'lab': 'Labor',
     'doctor': 'Arzt/Ärztin',
     'admin': 'Administrator',
+    'secretaryPortal': 'Sekretariatsportal',
+    'nursePortal': 'Pflegeportal',
+    'doctorPortal': 'Ärzteportal',
+    'labPortal': 'Laborportal',
+    'adminPortal': 'Administrationsportal',
     
     // Patient info
     'patientInfo': 'Patienteninformationen',
@@ -309,12 +354,24 @@ const translations = {
     'medicalVisit': 'Medizinischer Besuch',
     'consultation': 'Konsultation',
     'emergency': 'Notfall',
+    'VM': 'Medizinischer Besuch',
+    'Cons': 'Konsultation',
+    'Ug': 'Notfall',
     
     // Forms
     'save': 'Speichern',
     'next': 'Weiter',
     'previous': 'Zurück',
     'validate': 'Validieren',
+    'addToWaitingList': 'Zur Warteliste hinzufügen',
+    'searchPatient': 'Patient suchen',
+    'searchPlaceholder': 'Suche nach Name, Vorname oder ID...',
+    'noResults': 'Keine Ergebnisse gefunden',
+    'existingPatient': 'Bestehender Patient',
+    'selectExistingPatient': 'Bestehenden Patienten auswählen',
+    'addNewService': 'Neuen Service hinzufügen',
+    'serviceType': 'Serviceart',
+    'selectService': 'Service auswählen',
     
     // Modification history
     'modificationHistory': 'Änderungsverlauf',
@@ -366,6 +423,9 @@ const translations = {
     'labResults': 'Laborergebnisse',
     'symptoms': 'Symptome',
     'medicalHistory': 'Krankengeschichte',
+    
+    // Footer
+    'allRightsReserved': 'Alle Rechte vorbehalten',
   }
 };
 
@@ -385,6 +445,10 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
   
   // Translation function
   const t = (key: string): string => {
+    if (!translations[language][key as keyof typeof translations[typeof language]]) {
+      console.warn(`Translation missing for key: ${key} in language: ${language}`);
+      return key;
+    }
     return translations[language][key as keyof typeof translations[typeof language]] || key;
   };
   
