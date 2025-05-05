@@ -1,11 +1,11 @@
-
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { usePatientStore } from '@/stores/usePatientStore';
+import BackButton from '@/components/shared/BackButton';
 import { format, differenceInYears } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { usePatientStore } from '@/stores/usePatientStore';
 import { useAuth } from '@/hooks/use-auth-context';
 import {
   Dialog,
@@ -120,26 +120,12 @@ const PatientDetails = () => {
   };
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex items-center gap-4">
+        <BackButton />
         <h1 className="text-2xl font-bold">Détails du patient</h1>
-        <div className="flex space-x-2">
-          <Button 
-            onClick={handleOpenEditDialog}
-            className="flex items-center gap-1"
-          >
-            <Pencil className="h-4 w-4" />
-            Modifier
-          </Button>
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/dashboard/waiting-lists')}
-          >
-            Retour à la liste
-          </Button>
-        </div>
       </div>
-
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <Card>
           <CardHeader>

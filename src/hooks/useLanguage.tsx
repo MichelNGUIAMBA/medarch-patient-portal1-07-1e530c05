@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'fr' | 'en' | 'de';
@@ -148,6 +147,19 @@ const translations = {
     
     // Footer
     'allRightsReserved': 'Tous droits réservés',
+    
+    // Translations for new language
+    back: "Retour",
+    potentialDuplicateFound: "Doublon potentiel détecté",
+    patientAlreadyExists: "Un patient avec ce nom et cette date de naissance existe déjà dans le système. ",
+    useExistingPatient: "Utiliser le patient existant",
+    newPatientRegistration: "Enregistrement d'un nouveau patient",
+    existingPatient: "Patient existant",
+    manualEntry: "Saisie manuelle",
+    csvImport: "Import CSV",
+    personalInformation: "Informations personnelles",
+    companyAndServices: "Entreprise et services",
+    fillPatientInfo: "Veuillez remplir les informations du patient pour l'enregistrer dans le système"
   },
   en: {
     // Auth
@@ -282,11 +294,24 @@ const translations = {
     'diagnosis': 'Diagnosis',
     'treatment': 'Treatment',
     'labResults': 'Lab results',
-    'symptoms': 'Symptoms',
+    'symptoms': 'Symptomes',
     'medicalHistory': 'Medical history',
     
     // Footer
     'allRightsReserved': 'All rights reserved',
+    
+    // Translations for new language
+    back: "Back",
+    potentialDuplicateFound: "Potential duplicate found",
+    patientAlreadyExists: "A patient with this name and birth date already exists in the system. ",
+    useExistingPatient: "Use existing patient",
+    newPatientRegistration: "New Patient Registration",
+    existingPatient: "Existing Patient",
+    manualEntry: "Manual Entry",
+    csvImport: "CSV Import",
+    personalInformation: "Personal Information",
+    companyAndServices: "Company & Services",
+    fillPatientInfo: "Please fill in the patient information to register them in the system"
   },
   de: {
     // Auth
@@ -426,6 +451,19 @@ const translations = {
     
     // Footer
     'allRightsReserved': 'Alle Rechte vorbehalten',
+    
+    // Translations for new language
+    back: "Back",
+    potentialDuplicateFound: "Potential duplicate found",
+    patientAlreadyExists: "A patient with this name and birth date already exists in the system. ",
+    useExistingPatient: "Use existing patient",
+    newPatientRegistration: "New Patient Registration",
+    existingPatient: "Existing Patient",
+    manualEntry: "Manual Entry",
+    csvImport: "CSV Import",
+    personalInformation: "Personal Information",
+    companyAndServices: "Company & Services",
+    fillPatientInfo: "Please fill in the patient information to register them in the system"
   }
 };
 

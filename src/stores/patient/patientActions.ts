@@ -1,4 +1,3 @@
-
 import { Patient } from '@/types/patient';
 import { ModificationRecord, PatientState } from './types';
 import { StateCreator } from 'zustand';
@@ -10,10 +9,27 @@ export interface PatientSlice extends PatientState {
   takeCharge: (id: string, nurse: { name: string; role: string }) => void;
   setPatientCompleted: (id: string, caregiver: { name: string; role: string }) => void;
   addServiceToExistingPatient: (patientId: string, service: "VM" | "Cons" | "Ug") => void;
+  checkPatientExists: (firstName: string, lastName: string, birthDate: string) => { exists: boolean; patients?: Patient[] };
 }
 
-export const createPatientSlice: StateCreator<PatientSlice> = (set) => ({
+export const createPatientSlice: StateCreator<PatientSlice> = (set, get) => ({
   patients: [],
+  
+  checkPatientExists: (firstName, lastName, birthDate) => {
+    const normalizedFirstName = firstName.trim().toLowerCase();
+    const normalizedLastName = lastName.trim().toLowerCase();
+    
+    const matchingPatients = get().patients.filter(p => 
+      p.firstName.toLowerCase() === normalizedFirstName &&
+      p.lastName.toLowerCase() === normalizedLastName &&
+      p.birthDate === birthDate
+    );
+    
+    return {
+      exists: matchingPatients.length > 0,
+      patients: matchingPatients.length > 0 ? matchingPatients : undefined
+    };
+  },
   
   addPatient: (patient) => set((state) => ({
     patients: [

@@ -1,10 +1,11 @@
-
-import React, { useState, useMemo } from 'react';
+import React from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import SearchBar from '@/components/secretary/SearchBar';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { differenceInYears } from 'date-fns';
+import BackButton from '@/components/shared/BackButton';
 
 const SearchPatient = () => {
   const navigate = useNavigate();
@@ -58,9 +59,12 @@ const SearchPatient = () => {
   }, [patients, searchTerm, sortOrder, activeFilters]);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Recherche de patients</h1>
-
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex items-center gap-4">
+        <BackButton />
+        <h1 className="text-2xl font-bold">Recherche de patient</h1>
+      </div>
+      
       {/* Barre de recherche avec filtres */}
       <SearchBar
         onSearch={setSearchTerm}
