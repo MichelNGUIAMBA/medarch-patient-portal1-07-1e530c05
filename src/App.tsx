@@ -30,6 +30,7 @@ import { LanguageProvider } from "./hooks/useLanguage";
 import Chatbot from "./components/chatbot/Chatbot";
 import DailyActivities from "./pages/DailyActivities";
 import DailyActivityDetail from "./pages/DailyActivityDetail";
+import NewDay from "./pages/secretary/NewDay";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const App = () => (
                   <Route path="waiting-lists" element={<WaitingLists />} />
                   <Route path="patient/:id" element={<PatientDetails />} />
                   <Route path="search-patient" element={<SearchPatient />} />
+                  <Route path="new-day" element={<NewDay />} />
                   
                   {/* Daily Activities routes */}
                   <Route path="daily-activities" element={<DailyActivities />} />

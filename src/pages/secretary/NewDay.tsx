@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/sonner';
+import { Patient } from '@/types/patient';
 
 const NewDay = () => {
   const navigate = useNavigate();
@@ -34,15 +35,15 @@ const NewDay = () => {
   const assignServiceForDay = usePatientStore(state => state.assignServiceForDay);
   const addActivity = useDailyActivityStore(state => state.addActivity);
   
-  const [selectedPatient, setSelectedPatient] = useState(null);
-  const [selectedService, setSelectedService] = useState("");
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [selectedService, setSelectedService] = useState<"VM" | "Cons" | "Ug" | "">("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const calculateAge = (birthDate) => {
+  const calculateAge = (birthDate: string) => {
     return differenceInYears(new Date(), new Date(birthDate));
   };
 
-  const handleOpenServiceDialog = (patient) => {
+  const handleOpenServiceDialog = (patient: Patient) => {
     setSelectedPatient(patient);
     setSelectedService("");
     setIsDialogOpen(true);
@@ -73,7 +74,7 @@ const NewDay = () => {
     
     assignServiceForDay(
       selectedPatient.id,
-      selectedService,
+      selectedService as "VM" | "Cons" | "Ug", // Ensure we cast to the correct type
       { name: user.name, role: user.role }
     );
     
@@ -202,7 +203,10 @@ const NewDay = () => {
           </DialogHeader>
           
           <div className="py-4">
-            <Select value={selectedService} onValueChange={(value) => setSelectedService(value)}>
+            <Select 
+              value={selectedService} 
+              onValueChange={(value: "VM" | "Cons" | "Ug") => setSelectedService(value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder={t('selectService')} />
               </SelectTrigger>

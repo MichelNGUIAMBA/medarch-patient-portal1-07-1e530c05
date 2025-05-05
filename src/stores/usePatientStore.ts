@@ -12,6 +12,8 @@ export type ModificationRecord = {
   timestamp: string;
 };
 
+type PatientStatus = "En attente" | "En cours" | "Terminé";
+
 type PatientStore = {
   patients: Patient[];
   addPatient: (patient: Omit<Patient, "id" | "status" | "registeredAt">) => void;
@@ -109,7 +111,7 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
       {
         ...patient,
         id: `P-${Math.floor(Math.random() * 9000) + 1000}`,
-        status: "En attente",
+        status: "En attente" as PatientStatus,
         registeredAt: new Date().toISOString(),
         name: `${patient.firstName} ${patient.lastName}`.toUpperCase()
       },
@@ -160,7 +162,7 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
       ...patientsData.map(patient => ({
         ...patient,
         id: `P-${Math.floor(Math.random() * 9000) + 1000}`,
-        status: "En attente" as const,
+        status: "En attente" as PatientStatus,
         registeredAt: new Date().toISOString(),
         name: `${patient.firstName} ${patient.lastName}`.toUpperCase()
       })),
@@ -177,7 +179,7 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
         if (p.id === patientInTreatment.id) {
           return {
             ...p,
-            status: "En attente",
+            status: "En attente" as PatientStatus,
             modificationHistory: [
               {
                 field: "status",
@@ -199,7 +201,7 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
 
       updatedPatients[patientIndex] = {
         ...updatedPatients[patientIndex],
-        status: "En cours",
+        status: "En cours" as PatientStatus,
         takenCareBy: nurse,
         modificationHistory: [
           {
@@ -222,7 +224,7 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
       const updatedPatients = [...state.patients];
       updatedPatients[patientIndex] = {
         ...updatedPatients[patientIndex],
-        status: "En cours",
+        status: "En cours" as PatientStatus,
         takenCareBy: nurse,
         modificationHistory: [
           {
@@ -246,7 +248,7 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
     const updatedPatients = [...state.patients];
     updatedPatients[patientIndex] = {
       ...updatedPatients[patientIndex],
-      status: "Terminé",
+      status: "Terminé" as PatientStatus,
       takenCareBy: caregiver,
       modificationHistory: [
         {
@@ -272,7 +274,7 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
     updatedPatients[patientIndex] = {
       ...currentPatient,
       service,
-      status: "En attente",
+      status: "En attente" as PatientStatus,
       registeredAt: new Date().toISOString(),
       modificationHistory: [
         {
@@ -302,7 +304,7 @@ export const usePatientStore = create<PatientStore>((set, get) => ({
     return {
       patients: state.patients.map(patient => ({
         ...patient,
-        status: "En attente",
+        status: "En attente" as PatientStatus,
         service: patient.service,
         takenCareBy: undefined
       }))
