@@ -1,6 +1,22 @@
 
 import { ModificationRecord } from '@/stores/patient';
 
+export interface LabExam {
+  type: string;
+  requestedAt: string;
+  requestedBy: {
+    name: string;
+    role: string;
+  };
+  completed?: boolean;
+  completedAt?: string;
+  results?: string;
+  completedBy?: {
+    name: string;
+    role: string;
+  };
+}
+
 export interface Patient {
   id: string;
   name: string;
@@ -24,4 +40,6 @@ export interface Patient {
   };
   modificationHistory?: ModificationRecord[];
   originalPatientId?: string; // ID de référence au patient original pour les visites répétées
+  pendingLabExams?: LabExam[];
+  completedLabExams?: LabExam[];
 }

@@ -1,29 +1,26 @@
 
-import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/hooks/useLanguage';
 
-type BackButtonProps = {
+interface BackButtonProps {
   className?: string;
-};
+}
 
-const BackButton = ({ className }: BackButtonProps) => {
+const BackButton = ({ className = '' }: BackButtonProps) => {
   const navigate = useNavigate();
-  
-  const handleBack = () => {
-    navigate(-1);
-  };
-  
+  const { t } = useLanguage();
+
   return (
     <Button 
       variant="outline" 
-      onClick={handleBack} 
-      className={className}
-      size="sm"
+      size="sm" 
+      className={`flex items-center gap-1 ${className}`}
+      onClick={() => navigate(-1)}
     >
-      <ArrowLeft className="h-4 w-4 mr-2" />
-      Retour
+      <ArrowLeft className="h-4 w-4" />
+      {t('back')}
     </Button>
   );
 };

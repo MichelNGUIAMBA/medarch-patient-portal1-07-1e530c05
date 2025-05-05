@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,6 +28,7 @@ import PatientDetailView from "./pages/nurse/PatientDetailView";
 import { ThemeProvider } from "./hooks/useTheme";
 import { LanguageProvider } from "./hooks/useLanguage";
 import Chatbot from "./components/chatbot/Chatbot";
+import PerformExams from "./pages/laboratory/PerformExams";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +85,7 @@ const App = () => (
                   
                   {/* Lab routes */}
                   <Route path="pending-exams" element={<LabExams />} />
+                  <Route path="perform-exams/:patientId" element={<PerformExams />} />
                   <Route path="exam-history" element={<UnderConstructionPage />} />
                   
                   {/* Admin routes */}
@@ -148,6 +151,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <PatientDetailView />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/perform-exams/:patientId" 
+                  element={
+                    <ProtectedRoute>
+                      <PerformExams />
                     </ProtectedRoute>
                   } 
                 />
