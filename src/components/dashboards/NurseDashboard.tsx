@@ -53,14 +53,14 @@ const NurseDashboard = () => {
         <StatsCard title="Patients en attente" value={patientStats.waiting} icon={Users} iconColor="text-purple-600" />
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-4 border-b bg-inherit">
+      <div className="rounded-lg shadow bg-inherit">
+        <div className="p-4 border-b rounded bg-slate-950">
           <h2 className="text-lg font-semibold">Patients à traiter</h2>
         </div>
         <div className="p-0">
           <table className="w-full">
             <thead>
-              <tr className="text-xs font-medium text-gray-500 bg-gray-50 border-b">
+              <tr className="text-xs font-medium text-gray-500 border-b bg-inherit">
                 <th className="px-6 py-3 text-left bg-inherit">ID</th>
                 <th className="px-6 py-3 text-left bg-inherit">Nom</th>
                 <th className="px-6 py-3 text-left">Service</th>
