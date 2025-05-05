@@ -1,5 +1,5 @@
 
-import { ModificationRecord } from '@/stores/usePatientStore';
+import { ModificationRecord } from '@/stores/patient';
 
 export interface Patient {
   id: string;
