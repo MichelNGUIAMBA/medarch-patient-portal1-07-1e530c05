@@ -48,7 +48,7 @@ const SecretaryDashboard = () => {
     cons: patients.filter(p => p.service === "Cons" && p.status === "En attente").length,
     urg: patients.filter(p => p.service === "Ug").length
   };
-  return <div className="space-y-6 bg-inherit">
+  return <div className="space-y-6 bg-inherit rounded-sm-">
       <StatsCards stats={waitingListData} />
       <QuickActions />
       <SearchBar onSearch={setSearchTerm} onSortChange={setSortOrder} onFilterChange={setActiveFilters} activeFilters={activeFilters} />
