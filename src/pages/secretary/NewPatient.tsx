@@ -1,323 +1,434 @@
 
 import React, { useState } from 'react';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { usePatientStore } from '@/stores/usePatientStore';
-import { toast } from '@/components/ui/sonner';
 import { useNavigate } from 'react-router-dom';
-import CsvImport from '@/components/secretary/CsvImport';
+import { toast } from '@/components/ui/sonner';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '@/hooks/use-auth-context';
-import ExistingPatientDialog from '@/components/secretary/ExistingPatientDialog';
+import { usePatientStore } from '@/stores/usePatientStore';
+import CsvImport from '@/components/secretary/CsvImport';
 
-const formSchema = z.object({
-  firstName: z.string().min(2, { message: 'Le prénom doit contenir au moins 2 caractères.' }),
-  lastName: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
-  gender: z.enum(['M', 'F'], { required_error: 'Veuillez sélectionner le genre.' }),
-  birthDate: z.string().min(1, { message: 'Veuillez entrer la date de naissance.' }),
-  company: z.string().min(1, { message: 'Veuillez sélectionner une entreprise.' }),
-  employeeId: z.string().optional(),
-  service: z.enum(['VM', 'Cons', 'Ug'], { required_error: 'Veuillez sélectionner un service.' }),
-  phone: z.string().optional(),
-  email: z.string().email({ message: 'Email invalide.' }).optional().or(z.literal('')),
-  address: z.string().optional(),
-  idNumber: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
-const NewPatientPage = () => {
+const NewPatient = () => {
   const navigate = useNavigate();
   const addPatient = usePatientStore((state) => state.addPatient);
-  const { user } = useAuth();
-  const [isExistingPatientDialogOpen, setIsExistingPatientDialogOpen] = useState(false);
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      gender: 'M',
-      birthDate: '',
-      company: '',
-      employeeId: '',
-      service: 'VM',
-      phone: '',
-      email: '',
-      address: '',
-      idNumber: '',
-    },
+  const [step, setStep] = useState(1);
+  const [activeTab, setActiveTab] = useState<string>('manual');
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    birthDate: '',
+    gender: '',
+    idNumber: '',
+    email: '',
+    phone: '',
+    address: '',
+    company: '',
+    employeeId: '',
+    services: {
+      vm: false,
+      cons: false,
+      urg: false
+    }
   });
 
-  const handleSubmit = (data: FormValues) => {
-    if (!user) {
-      toast.error("Vous devez être connecté pour ajouter un patient.");
-      return;
-    }
-
-    addPatient(data);
-    toast.success('Patient ajouté avec succès!');
-    navigate('/dashboard/waiting-lists');
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleServiceChange = (service: 'vm' | 'cons' | 'urg', checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      services: {
+        ...prev.services,
+        [service]: checked
+      }
+    }));
+  };
+
+  const validateStep1 = () => {
+    if (!formData.firstName || !formData.lastName || !formData.birthDate || !formData.gender) {
+      toast.error("Veuillez remplir tous les champs obligatoires");
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep2 = () => {
+    if (!formData.company) {
+      toast.error("Veuillez sélectionner une entreprise");
+      return false;
+    }
+    
+    // Check if at least one service is selected
+    if (!formData.services.vm && !formData.services.cons && !formData.services.urg) {
+      toast.error("Veuillez sélectionner au moins un service");
+      return false;
+    }
+    
+    // Company-specific service validation
+    if (formData.company === "Total SA" && formData.services.cons) {
+      toast.error("Total SA n'a pas accès aux consultations");
+      return false;
+    }
+    
+    if ((formData.company === "Autre" || formData.company === "Stagiaire") && formData.services.vm) {
+      toast.error("Les autres sociétés et stagiaires n'ont pas accès aux visites médicales");
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleNextStep = () => {
+    if (step === 1 && validateStep1()) {
+      setStep(2);
+    }
+  };
+
+  const handlePrevStep = () => {
+    setStep(step - 1);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateStep2()) {
+      // Ajout du patient au store
+      let serviceType: "VM" | "Cons" | "Ug" = "VM";
+      if (formData.services.urg) serviceType = "Ug";
+      else if (formData.services.cons) serviceType = "Cons";
+
+      // Make sure to pass all the required fields from the Patient type
+      addPatient({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        name: `${formData.firstName} ${formData.lastName}`,
+        birthDate: formData.birthDate,
+        gender: formData.gender,
+        company: formData.company,
+        service: serviceType,
+        idNumber: formData.idNumber || undefined,
+        email: formData.email || undefined,
+        phone: formData.phone || undefined,
+        address: formData.address || undefined,
+        employeeId: formData.employeeId || undefined
+      });
+
+      toast.success("Patient enregistré avec succès");
+      
+      setTimeout(() => {
+        navigate("/dashboard/waiting-lists");
+      }, 1500);
+    }
+  };
+
+  const getAvailableServices = () => {
+    switch (formData.company) {
+      case 'PERENCO':
+      case 'Dixstone':
+        return { vm: true, cons: true, urg: true };
+      case 'Total SA':
+        return { vm: true, cons: false, urg: true };
+      case 'Autre':
+      case 'Stagiaire':
+        return { vm: false, cons: true, urg: true };
+      default:
+        return { vm: false, cons: false, urg: false };
+    }
+  };
+
+  const availableServices = getAvailableServices();
+
   return (
-    <div className="container mx-auto py-6">
+    <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Enregistrement d'un nouveau patient</h1>
       
-      <div className="flex justify-between mb-6">
-        <Button onClick={() => setIsExistingPatientDialogOpen(true)}>
-          Patient existant
-        </Button>
-      </div>
-
-      <Tabs defaultValue="form" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="form">Formulaire manuel</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="manual">Saisie manuelle</TabsTrigger>
           <TabsTrigger value="import">Import CSV</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="form">
-          <Card>
+        <TabsContent value="manual">
+          <Card className="w-full">
             <CardHeader>
-              <CardTitle>Informations du patient</CardTitle>
+              <CardTitle>Nouveau patient</CardTitle>
+              <CardDescription>
+                Veuillez remplir les informations du patient pour l'enregistrer dans le système
+              </CardDescription>
             </CardHeader>
+            
             <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Prénom</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Prénom" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nom</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Nom" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="gender"
-                      render={({ field }) => (
-                        <FormItem className="space-y-3">
-                          <FormLabel>Genre</FormLabel>
-                          <FormControl>
-                            <RadioGroup
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                              className="flex space-x-4"
-                            >
-                              <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem value="M" />
-                                </FormControl>
-                                <FormLabel className="font-normal cursor-pointer">
-                                  Masculin
-                                </FormLabel>
-                              </FormItem>
-                              <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem value="F" />
-                                </FormControl>
-                                <FormLabel className="font-normal cursor-pointer">
-                                  Féminin
-                                </FormLabel>
-                              </FormItem>
-                            </RadioGroup>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="birthDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Date de naissance</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="company"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Entreprise</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Sélectionnez une entreprise" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
+              <Tabs defaultValue="step1" value={`step${step}`}>
+                <TabsList className="mb-6">
+                  <TabsTrigger value="step1" disabled={step !== 1}>
+                    1. Informations personnelles
+                  </TabsTrigger>
+                  <TabsTrigger value="step2" disabled={step !== 2}>
+                    2. Entreprise et services
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="step1">
+                  <form className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName">Nom <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="lastName"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          placeholder="Nom du patient"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName">Prénom <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="firstName"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          placeholder="Prénom du patient"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="birthDate">Date de naissance <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="birthDate"
+                          name="birthDate"
+                          type="date"
+                          value={formData.birthDate}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="gender">Genre <span className="text-red-500">*</span></Label>
+                        <Select 
+                          onValueChange={(value) => handleSelectChange('gender', value)} 
+                          value={formData.gender}
+                        >
+                          <SelectTrigger id="gender">
+                            <SelectValue placeholder="Sélectionner le genre" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="M">Masculin</SelectItem>
+                            <SelectItem value="F">Féminin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="idNumber">Numéro d'identité</Label>
+                        <Input
+                          id="idNumber"
+                          name="idNumber"
+                          value={formData.idNumber}
+                          onChange={handleInputChange}
+                          placeholder="Numéro de carte d'identité"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Téléphone</Label>
+                        <Input
+                          id="phone"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          placeholder="Numéro de téléphone"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="Adresse email"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="address">Adresse</Label>
+                        <Input
+                          id="address"
+                          name="address"
+                          value={formData.address}
+                          onChange={handleInputChange}
+                          placeholder="Adresse du patient"
+                        />
+                      </div>
+                    </div>
+                  </form>
+                </TabsContent>
+
+                <TabsContent value="step2">
+                  <form className="space-y-6" onSubmit={handleSubmit}>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="company">Entreprise <span className="text-red-500">*</span></Label>
+                        <Select 
+                          onValueChange={(value) => handleSelectChange('company', value)} 
+                          value={formData.company}
+                        >
+                          <SelectTrigger id="company">
+                            <SelectValue placeholder="Sélectionner l'entreprise" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Entreprises principales</SelectLabel>
                               <SelectItem value="PERENCO">PERENCO</SelectItem>
                               <SelectItem value="Total SA">Total SA</SelectItem>
                               <SelectItem value="Dixstone">Dixstone</SelectItem>
+                            </SelectGroup>
+                            <SelectGroup>
+                              <SelectLabel>Autres</SelectLabel>
                               <SelectItem value="Autre">Autre société</SelectItem>
                               <SelectItem value="Stagiaire">Stagiaire</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="employeeId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Numéro d'employé</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Numéro d'employé" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="service"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Service requis</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Sélectionnez un service" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="VM">Visite Médicale (VM)</SelectItem>
-                              <SelectItem value="Cons">Consultation (Cons)</SelectItem>
-                              <SelectItem value="Ug">Urgence (Ug)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Téléphone</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Numéro de téléphone" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="Email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Adresse</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Adresse" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="idNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Numéro d'identité</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Numéro d'identité" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
-                  <div className="flex justify-end space-x-2">
-                    <Button type="button" variant="outline" onClick={() => navigate('/dashboard')}>
-                      Annuler
-                    </Button>
-                    <Button type="submit">Enregistrer le patient</Button>
-                  </div>
-                </form>
-              </Form>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="employeeId">Numéro d'employé</Label>
+                        <Input
+                          id="employeeId"
+                          name="employeeId"
+                          value={formData.employeeId}
+                          onChange={handleInputChange}
+                          placeholder="Numéro d'employé (si applicable)"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label>Services requis <span className="text-red-500">*</span></Label>
+                        <Card className="p-4 border-dashed">
+                          <div className="space-y-4">
+                            <div className="flex items-center space-x-2">
+                              <Checkbox 
+                                id="vm" 
+                                checked={formData.services.vm}
+                                onCheckedChange={(checked) => handleServiceChange('vm', checked as boolean)}
+                                disabled={!availableServices.vm}
+                              />
+                              <Label 
+                                htmlFor="vm" 
+                                className={!availableServices.vm ? "text-gray-400" : ""}
+                              >
+                                Visite Médicale (VM)
+                                {!availableServices.vm && 
+                                  <span className="ml-2 text-xs text-red-500">
+                                    Non disponible pour cette entreprise
+                                  </span>
+                                }
+                              </Label>
+                            </div>
+                            
+                            <div className="flex items-center space-x-2">
+                              <Checkbox 
+                                id="cons" 
+                                checked={formData.services.cons}
+                                onCheckedChange={(checked) => handleServiceChange('cons', checked as boolean)}
+                                disabled={!availableServices.cons}
+                              />
+                              <Label
+                                htmlFor="cons"
+                                className={!availableServices.cons ? "text-gray-400" : ""}
+                              >
+                                Consultation (Cons)
+                                {!availableServices.cons && 
+                                  <span className="ml-2 text-xs text-red-500">
+                                    Non disponible pour cette entreprise
+                                  </span>
+                                }
+                              </Label>
+                            </div>
+                            
+                            <div className="flex items-center space-x-2">
+                              <Checkbox 
+                                id="urg" 
+                                checked={formData.services.urg}
+                                onCheckedChange={(checked) => handleServiceChange('urg', checked as boolean)}
+                                disabled={!availableServices.urg}
+                              />
+                              <Label 
+                                htmlFor="urg"
+                                className={!availableServices.urg ? "text-gray-400" : ""}
+                              >
+                                Urgence (Urg)
+                                {!availableServices.urg && 
+                                  <span className="ml-2 text-xs text-red-500">
+                                    Non disponible pour cette entreprise
+                                  </span>
+                                }
+                              </Label>
+                            </div>
+                          </div>
+                        </Card>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Note: Les services disponibles varient selon l'entreprise
+                        </p>
+                      </div>
+                    </div>
+                  </form>
+                </TabsContent>
+              </Tabs>
             </CardContent>
+            
+            <CardFooter className="flex justify-between">
+              {step === 2 ? (
+                <Button 
+                  variant="outline" 
+                  onClick={handlePrevStep}
+                >
+                  Précédent
+                </Button>
+              ) : (
+                <div></div> // Empty div for space
+              )}
+              
+              {step === 1 ? (
+                <Button onClick={handleNextStep}>Suivant</Button>
+              ) : (
+                <Button onClick={handleSubmit} className="bg-green-600 hover:bg-green-700">
+                  Enregistrer le patient
+                </Button>
+              )}
+            </CardFooter>
           </Card>
         </TabsContent>
         
         <TabsContent value="import">
-          <Card>
-            <CardHeader>
-              <CardTitle>Import CSV de patients</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CsvImport />
-            </CardContent>
-          </Card>
+          <CsvImport />
         </TabsContent>
       </Tabs>
-      
-      {/* Dialog pour ajouter un patient existant */}
-      <ExistingPatientDialog 
-        isOpen={isExistingPatientDialogOpen}
-        onClose={() => setIsExistingPatientDialogOpen(false)}
-      />
     </div>
   );
 };
 
-export default NewPatientPage;
+export default NewPatient;
