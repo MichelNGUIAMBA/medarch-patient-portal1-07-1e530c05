@@ -12,7 +12,7 @@ const QuickActions = () => {
           <span className="font-medium">Nouveau patient</span>
         </Button>
 
-        <Button variant="outline" className="h-auto py-6 flex flex-col items-center justify-center hover:bg-green-50 hover:border-green-200 transition-colors" onClick={() => navigate('/dashboard/search-patient')}>
+        <Button variant="outline" onClick={() => navigate('/dashboard/search-patient')} className="h-auto py-6 flex flex-col items-center justify-center hover:bg-green-50hover:border-green-200 transition-colors">
           <Users className="h-8 w-8 text-green-600 mb-2" />
           <span className="font-medium">Rechercher un patient</span>
         </Button>
