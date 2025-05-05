@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/sonner';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,13 +13,21 @@ import { usePatientStore } from '@/stores/usePatientStore';
 import CsvImport from '@/components/secretary/CsvImport';
 import { UserPlus } from 'lucide-react';
 import ExistingPatientDialog from '@/components/secretary/ExistingPatientDialog';
+import BackButton from '@/components/shared/BackButton';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 
 const NewPatient = () => {
   const navigate = useNavigate();
   const addPatient = usePatientStore((state) => state.addPatient);
+  const patients = usePatientStore((state) => state.patients);
   const [step, setStep] = useState(1);
   const [activeTab, setActiveTab] = useState<string>('manual');
   const [existingPatientDialogOpen, setExistingPatientDialogOpen] = useState(false);
+  const [duplicatePatients, setDuplicatePatients] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -36,6 +45,29 @@ const NewPatient = () => {
       urg: false
     }
   });
+
+  // Vérification des patients similaires lors des changements de prénom, nom et date de naissance
+  useEffect(() => {
+    if (formData.firstName && formData.lastName) {
+      const potentialDuplicates = patients.filter(patient => {
+        const nameMatch = (
+          patient.firstName.toLowerCase() === formData.firstName.toLowerCase() &&
+          patient.lastName.toLowerCase() === formData.lastName.toLowerCase()
+        );
+        
+        // Si la date de naissance est fournie, l'ajouter à la vérification
+        if (formData.birthDate && patient.birthDate) {
+          return nameMatch && patient.birthDate === formData.birthDate;
+        }
+        
+        return nameMatch;
+      });
+      
+      setDuplicatePatients(potentialDuplicates);
+    } else {
+      setDuplicatePatients([]);
+    }
+  }, [formData.firstName, formData.lastName, formData.birthDate, patients]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -138,6 +170,10 @@ const NewPatient = () => {
     }
   };
 
+  const viewExistingPatient = (patientId: string) => {
+    navigate(`/dashboard/patient/${patientId}`);
+  };
+
   const getAvailableServices = () => {
     switch (formData.company) {
       case 'PERENCO':
@@ -158,7 +194,10 @@ const NewPatient = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Enregistrement d'un nouveau patient</h1>
+        <div className="flex items-center gap-4">
+          <BackButton />
+          <h1 className="text-2xl font-bold">Enregistrement d'un nouveau patient</h1>
+        </div>
         <Button 
           onClick={() => setExistingPatientDialogOpen(true)} 
           variant="outline"
@@ -168,6 +207,33 @@ const NewPatient = () => {
           Patient existant
         </Button>
       </div>
+      
+      {duplicatePatients.length > 0 && (
+        <Alert className="mb-6 border-amber-500 bg-amber-50">
+          <AlertTitle className="text-amber-800">Patient potentiellement existant détecté</AlertTitle>
+          <AlertDescription className="text-amber-700">
+            <p>Un ou plusieurs patients avec des informations similaires existent déjà dans le système:</p>
+            <ul className="list-disc pl-5 mt-2">
+              {duplicatePatients.slice(0, 3).map(patient => (
+                <li key={patient.id} className="mb-1">
+                  {patient.name} (né le: {new Date(patient.birthDate).toLocaleDateString()})
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="ml-2 p-0 h-auto underline text-blue-600"
+                    onClick={() => viewExistingPatient(patient.id)}
+                  >
+                    Voir la fiche
+                  </Button>
+                </li>
+              ))}
+              {duplicatePatients.length > 3 && (
+                <li>...et {duplicatePatients.length - 3} autre(s)</li>
+              )}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
         <TabsList className="grid w-full grid-cols-2">

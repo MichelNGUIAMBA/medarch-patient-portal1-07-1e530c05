@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format, differenceInYears } from 'date-fns';
@@ -19,6 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/sonner';
 import { Pencil } from 'lucide-react';
+import BackButton from '@/components/shared/BackButton';
 
 const PatientDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -48,9 +48,7 @@ const PatientDetails = () => {
     return (
       <div className="container mx-auto py-6">
         <h1 className="text-2xl font-bold mb-6">Patient non trouvé</h1>
-        <Button onClick={() => navigate('/dashboard/waiting-lists')}>
-          Retour à la liste
-        </Button>
+        <BackButton />
       </div>
     );
   }
@@ -122,7 +120,10 @@ const PatientDetails = () => {
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Détails du patient</h1>
+        <div className="flex items-center gap-4">
+          <BackButton />
+          <h1 className="text-2xl font-bold">Détails du patient</h1>
+        </div>
         <div className="flex space-x-2">
           <Button 
             onClick={handleOpenEditDialog}
@@ -130,12 +131,6 @@ const PatientDetails = () => {
           >
             <Pencil className="h-4 w-4" />
             Modifier
-          </Button>
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/dashboard/waiting-lists')}
-          >
-            Retour à la liste
           </Button>
         </div>
       </div>

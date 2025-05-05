@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import SearchBar from '@/components/secretary/SearchBar';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { differenceInYears } from 'date-fns';
+import BackButton from '@/components/shared/BackButton';
 
 const SearchPatient = () => {
   const navigate = useNavigate();
@@ -59,7 +60,10 @@ const SearchPatient = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Recherche de patients</h1>
+      <div className="flex items-center gap-4">
+        <BackButton />
+        <h1 className="text-2xl font-bold">Recherche de patients</h1>
+      </div>
 
       {/* Barre de recherche avec filtres */}
       <SearchBar
