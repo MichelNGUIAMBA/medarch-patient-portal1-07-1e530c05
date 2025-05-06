@@ -2,14 +2,14 @@ import React from 'react';
 import { Users, Calendar, Hospital } from 'lucide-react';
 import StatsCard from '@/components/shared/StatsCard';
 const DoctorDashboard = () => {
-  return <div className="space-y-6 bg-slate-900">
+  return <div className="space-y-6 bg-inherit">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatsCard title="Patients en attente" value={5} icon={Users} iconColor="text-blue-600" />
         <StatsCard title="Consultations aujourd'hui" value={12} icon={Calendar} iconColor="text-green-600" />
         <StatsCard title="Urgences" value={2} icon={Hospital} iconColor="text-red-600" />
       </div>
 
-      <div className="rounded-lg shadow bg-slate-950">
+      <div className="rounded-lg shadow bg-inherit">
         <div className="p-4 border-b">
           <h2 className="text-lg font-semibold">Patients en attente de consultation</h2>
         </div>
