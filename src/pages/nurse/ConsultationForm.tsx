@@ -4,6 +4,8 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/hooks/use-auth-context';
+import { useLanguage } from '@/hooks/useLanguage';
+import BackButton from '@/components/shared/BackButton';
 
 // Import refactored components
 import PatientInfoCard from '@/components/consultations/PatientInfoCard';
@@ -14,6 +16,7 @@ const ConsultationForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const isEditMode = location.pathname.includes('/edit');
   const [initialData, setInitialData] = useState({});
   
@@ -51,12 +54,12 @@ const ConsultationForm = () => {
   }, [isEditMode, patient]);
 
   if (!patient) {
-    return <div className="container mx-auto py-6">Patient non trouvé</div>;
+    return <div className="container mx-auto py-6">{t('noPatientFound')}</div>;
   }
 
   const handleFormSubmit = (formData: any) => {
     if (!user) {
-      toast.error("Vous devez être connecté pour cette action");
+      toast.error(t('mustBeLoggedIn'));
       return;
     }
 
@@ -68,12 +71,12 @@ const ConsultationForm = () => {
       updatePatient(
         patient.id,
         {
-          notes: `Consultation: ${formData.mainComplaint || 'Non spécifié'} - ${formData.diagnosis || 'Aucun diagnostic'}`
+          notes: `${t('consultation')}: ${formData.mainComplaint || t('notSpecified')} - ${formData.diagnosis || t('noDiagnosis')}`
         },
         { name: user.name, role: user.role }
       );
       
-      toast.success("Consultation mise à jour avec succès");
+      toast.success(t('consultationUpdated'));
       
       // Nettoyer le stockage temporaire
       sessionStorage.removeItem(`edit-${patient.id}`);
@@ -82,7 +85,7 @@ const ConsultationForm = () => {
       updatePatient(
         patient.id,
         {
-          notes: `Consultation: ${formData.mainComplaint || 'Non spécifié'} - ${formData.diagnosis || 'Aucun diagnostic'}`
+          notes: `${t('consultation')}: ${formData.mainComplaint || t('notSpecified')} - ${formData.diagnosis || t('noDiagnosis')}`
         },
         { name: user.name, role: user.role }
       );
@@ -90,7 +93,7 @@ const ConsultationForm = () => {
       // Marquer le patient comme terminé
       setPatientCompleted(patient.id, { name: user.name, role: user.role });
       
-      toast.success("Consultation enregistrée avec succès");
+      toast.success(t('consultationSaved'));
     }
     
     // Redirection vers la page de détails du patient
@@ -101,9 +104,12 @@ const ConsultationForm = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">
-        {isEditMode ? "Modification de consultation" : "Consultation"} - {patient.name}
-      </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">
+          {isEditMode ? t('modifyingConsultation') : t('consultation')} - {patient.name}
+        </h1>
+        <BackButton />
+      </div>
       
       {/* Patient Information Card */}
       <PatientInfoCard patient={patient} />

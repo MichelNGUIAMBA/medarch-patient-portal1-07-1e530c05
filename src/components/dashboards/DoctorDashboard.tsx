@@ -1,28 +1,34 @@
+
 import React from 'react';
 import { Users, Calendar, Hospital } from 'lucide-react';
 import StatsCard from '@/components/shared/StatsCard';
+import { useLanguage } from '@/hooks/useLanguage';
+
 const DoctorDashboard = () => {
-  return <div className="space-y-6 bg-inherit">
+  const { t } = useLanguage();
+  
+  return (
+    <div className="space-y-6 bg-inherit">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatsCard title="Patients en attente" value={5} icon={Users} iconColor="text-blue-600" />
-        <StatsCard title="Consultations aujourd'hui" value={12} icon={Calendar} iconColor="text-green-600" />
-        <StatsCard title="Urgences" value={2} icon={Hospital} iconColor="text-red-600" />
+        <StatsCard title={t('waitingPatients')} value={5} icon={Users} iconColor="text-blue-600" />
+        <StatsCard title={t('consultationsToday')} value={12} icon={Calendar} iconColor="text-green-600" />
+        <StatsCard title={t('emergencies')} value={2} icon={Hospital} iconColor="text-red-600" />
       </div>
 
       <div className="rounded-lg shadow bg-inherit">
         <div className="p-4 border-b">
-          <h2 className="text-lg font-semibold">Patients en attente de consultation</h2>
+          <h2 className="text-lg font-semibold">{t('waitingPatientsForConsultation')}</h2>
         </div>
         <div className="p-0">
           <table className="w-full">
             <thead>
               <tr className="text-xs font-medium text-gray-500 bg-gray-50 border-b">
-                <th className="px-6 py-3 text-left">ID</th>
-                <th className="px-6 py-3 text-left">Nom</th>
-                <th className="px-6 py-3 text-left">Type</th>
-                <th className="px-6 py-3 text-left">Entreprise</th>
-                <th className="px-6 py-3 text-left">Temps d'attente</th>
-                <th className="px-6 py-3 text-left">Actions</th>
+                <th className="px-6 py-3 text-left">{t('id')}</th>
+                <th className="px-6 py-3 text-left">{t('name')}</th>
+                <th className="px-6 py-3 text-left">{t('type')}</th>
+                <th className="px-6 py-3 text-left">{t('company')}</th>
+                <th className="px-6 py-3 text-left">{t('waitTime')}</th>
+                <th className="px-6 py-3 text-left">{t('actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -44,7 +50,8 @@ const DoctorDashboard = () => {
               type: "Cons",
               company: "Dixstone",
               waitTime: "20 min"
-            }].map(patient => <tr key={patient.id} className="border-b hover:bg-gray-50">
+            }].map(patient => (
+                <tr key={patient.id} className="border-b hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">{patient.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{patient.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -56,14 +63,17 @@ const DoctorDashboard = () => {
                   <td className="px-6 py-4 whitespace-nowrap">{patient.waitTime}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <a href="#" className={`text-white px-3 py-1 rounded text-xs font-medium ${patient.type === "Ug" ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700"}`}>
-                      Consulter
+                      {t('consult')}
                     </a>
                   </td>
-                </tr>)}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default DoctorDashboard;

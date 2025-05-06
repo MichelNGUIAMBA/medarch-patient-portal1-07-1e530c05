@@ -4,6 +4,8 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/hooks/use-auth-context';
+import { useLanguage } from '@/hooks/useLanguage';
+import BackButton from '@/components/shared/BackButton';
 
 // Import components
 import PatientInfoCard from '@/components/consultations/PatientInfoCard';
@@ -14,6 +16,7 @@ const MedicalVisitForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const isEditMode = location.pathname.includes('/edit');
   const [initialData, setInitialData] = useState({});
   
@@ -51,12 +54,12 @@ const MedicalVisitForm = () => {
   }, [isEditMode, patient]);
 
   if (!patient) {
-    return <div className="container mx-auto py-6">Patient non trouvé</div>;
+    return <div className="container mx-auto py-6">{t('noPatientFound')}</div>;
   }
 
   const handleFormSubmit = (formData: any) => {
     if (!user) {
-      toast.error("Vous devez être connecté pour cette action");
+      toast.error(t('mustBeLoggedIn'));
       return;
     }
 
@@ -68,12 +71,12 @@ const MedicalVisitForm = () => {
       updatePatient(
         patient.id,
         {
-          notes: `Visite médicale: ${formData.workstation || 'Non spécifié'} - ${formData.recommendations || 'Aucune recommandation'}`
+          notes: `${t('medicalVisit')}: ${formData.workstation || t('notSpecified')} - ${formData.recommendations || t('noRecommendations')}`
         },
         { name: user.name, role: user.role }
       );
       
-      toast.success("Visite médicale mise à jour avec succès");
+      toast.success(t('medicalVisitUpdated'));
       
       // Nettoyer le stockage temporaire
       sessionStorage.removeItem(`edit-${patient.id}`);
@@ -82,7 +85,7 @@ const MedicalVisitForm = () => {
       updatePatient(
         patient.id,
         {
-          notes: `Visite médicale: ${formData.workstation || 'Non spécifié'} - ${formData.recommendations || 'Aucune recommandation'}`
+          notes: `${t('medicalVisit')}: ${formData.workstation || t('notSpecified')} - ${formData.recommendations || t('noRecommendations')}`
         },
         { name: user.name, role: user.role }
       );
@@ -90,7 +93,7 @@ const MedicalVisitForm = () => {
       // Marquer le patient comme terminé
       setPatientCompleted(patient.id, { name: user.name, role: user.role });
       
-      toast.success("Visite médicale enregistrée avec succès");
+      toast.success(t('medicalVisitSaved'));
     }
     
     // Redirection vers la page de détails du patient
@@ -101,9 +104,12 @@ const MedicalVisitForm = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-blue-600 dark:text-blue-400">
-        {isEditMode ? "Modification de visite médicale" : "Visite médicale"} - {patient.name}
-      </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          {isEditMode ? t('modifyingMedicalVisit') : t('medicalVisit')} - {patient.name}
+        </h1>
+        <BackButton />
+      </div>
       
       {/* Patient Information Card */}
       <PatientInfoCard patient={patient} />

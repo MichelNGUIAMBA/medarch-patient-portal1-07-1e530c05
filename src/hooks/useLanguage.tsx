@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'fr' | 'en' | 'de';
@@ -183,6 +182,38 @@ const translations = {
     'allRightsReserved': 'Tous droits réservés',
     'back': 'Retour',
     'goBack': 'Retour',
+
+    // Doctor dashboard
+    'consultationsToday': 'Consultations aujourd\'hui',
+    'waitingPatientsForConsultation': 'Patients en attente de consultation',
+    'consult': 'Consulter',
+    'type': 'Type',
+    'waitTime': 'Temps d\'attente',
+    'patientsToSee': 'Patients à voir',
+    'medicalRecords': 'Dossiers médicaux',
+    
+    // Additional translations
+    'noPatientFound': 'Patient non trouvé',
+    'mustBeLoggedIn': 'Vous devez être connecté pour cette action',
+    'modifyingMedicalVisit': 'Modification de visite médicale',
+    'modifyingConsultation': 'Modification de consultation',
+    'modifyingEmergencyTreatment': 'Modification du traitement d\'urgence',
+    'emergencyTreatment': 'Traitement d\'urgence',
+    'notSpecified': 'Non spécifié',
+    'noRecommendations': 'Aucune recommandation',
+    'medicalVisitUpdated': 'Visite médicale mise à jour avec succès',
+    'medicalVisitSaved': 'Visite médicale enregistrée avec succès',
+    'noDiagnosis': 'Aucun diagnostic',
+    'consultationUpdated': 'Consultation mise à jour avec succès',
+    'consultationSaved': 'Consultation enregistrée avec succès',
+    'noImmediateActions': 'Aucune action immédiate',
+    'emergencyTreatmentUpdated': 'Traitement d\'urgence mis à jour avec succès',
+    'emergencyTreatmentSaved': 'Traitement d\'urgence enregistré avec succès',
+    'waitingPatientsForConsultation': 'Patients en attente de consultation',
+    'consultationsToday': 'Consultations aujourd\'hui',
+    'waitTime': 'Temps d\'attente',
+    'consult': 'Consulter',
+    'type': 'Type'
   },
   en: {
     // Auth
@@ -357,6 +388,38 @@ const translations = {
     'allRightsReserved': 'All rights reserved',
     'back': 'Back',
     'goBack': 'Go Back',
+
+    // Doctor dashboard
+    'consultationsToday': 'Consultations today',
+    'waitingPatientsForConsultation': 'Patients waiting for consultation',
+    'consult': 'Consult',
+    'type': 'Type',
+    'waitTime': 'Wait time',
+    'patientsToSee': 'Patients to see',
+    'medicalRecords': 'Medical records',
+    
+    // Additional translations
+    'noPatientFound': 'Patient not found',
+    'mustBeLoggedIn': 'You must be logged in for this action',
+    'modifyingMedicalVisit': 'Modifying medical visit',
+    'modifyingConsultation': 'Modifying consultation',
+    'modifyingEmergencyTreatment': 'Modifying emergency treatment',
+    'emergencyTreatment': 'Emergency treatment',
+    'notSpecified': 'Not specified',
+    'noRecommendations': 'No recommendations',
+    'medicalVisitUpdated': 'Medical visit updated successfully',
+    'medicalVisitSaved': 'Medical visit saved successfully',
+    'noDiagnosis': 'No diagnosis',
+    'consultationUpdated': 'Consultation updated successfully',
+    'consultationSaved': 'Consultation saved successfully',
+    'noImmediateActions': 'No immediate actions',
+    'emergencyTreatmentUpdated': 'Emergency treatment updated successfully',
+    'emergencyTreatmentSaved': 'Emergency treatment saved successfully',
+    'waitingPatientsForConsultation': 'Patients waiting for consultation',
+    'consultationsToday': 'Consultations today',
+    'waitTime': 'Wait time',
+    'consult': 'Consult',
+    'type': 'Type'
   },
   de: {
     // Auth
@@ -531,6 +594,38 @@ const translations = {
     'allRightsReserved': 'Alle Rechte vorbehalten',
     'back': 'Zurück',
     'goBack': 'Zurück',
+
+    // Doctor dashboard
+    'consultationsToday': 'Konsultationen heute',
+    'waitingPatientsForConsultation': 'Patienten warten auf Konsultation',
+    'consult': 'Konsultieren',
+    'type': 'Typ',
+    'waitTime': 'Wartezeit',
+    'patientsToSee': 'Zu behandelnde Patienten',
+    'medicalRecords': 'Patientenakten',
+    
+    // Additional translations
+    'noPatientFound': 'Patient nicht gefunden',
+    'mustBeLoggedIn': 'Sie müssen angemeldet sein für diese Aktion',
+    'modifyingMedicalVisit': 'Bearbeitung des medizinischen Besuchs',
+    'modifyingConsultation': 'Bearbeitung der Konsultation',
+    'modifyingEmergencyTreatment': 'Bearbeitung der Notfallbehandlung',
+    'emergencyTreatment': 'Notfallbehandlung',
+    'notSpecified': 'Nicht angegeben',
+    'noRecommendations': 'Keine Empfehlungen',
+    'medicalVisitUpdated': 'Medizinischer Besuch erfolgreich aktualisiert',
+    'medicalVisitSaved': 'Medizinischer Besuch erfolgreich gespeichert',
+    'noDiagnosis': 'Keine Diagnose',
+    'consultationUpdated': 'Konsultation erfolgreich aktualisiert',
+    'consultationSaved': 'Konsultation erfolgreich gespeichert',
+    'noImmediateActions': 'Keine Sofortmaßnahmen',
+    'emergencyTreatmentUpdated': 'Notfallbehandlung erfolgreich aktualisiert',
+    'emergencyTreatmentSaved': 'Notfallbehandlung erfolgreich gespeichert',
+    'waitingPatientsForConsultation': 'Patienten warten auf Konsultation',
+    'consultationsToday': 'Konsultationen heute',
+    'waitTime': 'Wartezeit',
+    'consult': 'Konsultieren',
+    'type': 'Typ'
   }
 };
 
