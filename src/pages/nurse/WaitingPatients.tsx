@@ -67,7 +67,7 @@ const WaitingPatients = () => {
   return <div className="container mx-auto py-6">
       <h1 className="text-2xl font-bold mb-6">Liste des patients en attente</h1>
       
-      <div className="rounded-lg shadow p-6 bg-slate-950">
+      <div className="rounded-lg shadow p-6 bg-inherit">
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           {/* Recherche */}
           <div className="relative flex-grow">
