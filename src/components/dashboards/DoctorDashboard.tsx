@@ -56,7 +56,7 @@ const DoctorDashboard = () => {
                   <td className="px-6 py-4 whitespace-nowrap">{patient.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${patient.type === "Ug" ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800"}`}>
-                      {patient.type}
+                      {t(patient.type)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">{patient.company}</td>

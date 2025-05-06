@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'fr' | 'en' | 'de';
@@ -209,11 +210,7 @@ const translations = {
     'noImmediateActions': 'Aucune action immédiate',
     'emergencyTreatmentUpdated': 'Traitement d\'urgence mis à jour avec succès',
     'emergencyTreatmentSaved': 'Traitement d\'urgence enregistré avec succès',
-    'waitingPatientsForConsultation': 'Patients en attente de consultation',
-    'consultationsToday': 'Consultations aujourd\'hui',
-    'waitTime': 'Temps d\'attente',
-    'consult': 'Consulter',
-    'type': 'Type'
+    'min': 'min'
   },
   en: {
     // Auth
@@ -415,11 +412,7 @@ const translations = {
     'noImmediateActions': 'No immediate actions',
     'emergencyTreatmentUpdated': 'Emergency treatment updated successfully',
     'emergencyTreatmentSaved': 'Emergency treatment saved successfully',
-    'waitingPatientsForConsultation': 'Patients waiting for consultation',
-    'consultationsToday': 'Consultations today',
-    'waitTime': 'Wait time',
-    'consult': 'Consult',
-    'type': 'Type'
+    'min': 'min'
   },
   de: {
     // Auth
@@ -621,11 +614,7 @@ const translations = {
     'noImmediateActions': 'Keine Sofortmaßnahmen',
     'emergencyTreatmentUpdated': 'Notfallbehandlung erfolgreich aktualisiert',
     'emergencyTreatmentSaved': 'Notfallbehandlung erfolgreich gespeichert',
-    'waitingPatientsForConsultation': 'Patienten warten auf Konsultation',
-    'consultationsToday': 'Konsultationen heute',
-    'waitTime': 'Wartezeit',
-    'consult': 'Konsultieren',
-    'type': 'Typ'
+    'min': 'min'
   }
 };
 
