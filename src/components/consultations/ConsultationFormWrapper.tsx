@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,17 +10,15 @@ import StepVitalSigns from './StepVitalSigns';
 import StepMedicalHistory from './StepMedicalHistory';
 import StepClinicalExam from './StepClinicalExam';
 import StepDiagnosisTreatment from './StepDiagnosisTreatment';
-
 interface ConsultationFormWrapperProps {
   patient: Patient;
   onSubmit: (formData: any) => void;
   isEditMode?: boolean;
   initialData?: any;
 }
-
-const ConsultationFormWrapper = ({ 
-  patient, 
-  onSubmit, 
+const ConsultationFormWrapper = ({
+  patient,
+  onSubmit,
   isEditMode = false,
   initialData = {}
 }: ConsultationFormWrapperProps) => {
@@ -33,13 +30,11 @@ const ConsultationFormWrapper = ({
     bloodPressureDia: '',
     heartRate: '',
     oxygenSaturation: '',
-    
     // Consultation
     mainComplaint: '',
     medicalHistory: '',
     allergies: '',
     currentMedications: '',
-    
     // Examen clinique
     generalAppearance: '',
     skinExam: '',
@@ -48,7 +43,6 @@ const ConsultationFormWrapper = ({
     cardiovascularExam: '',
     abdomenExam: '',
     neurologicalExam: '',
-    
     // Diagnostic et traitement
     diagnosis: '',
     treatment: '',
@@ -57,50 +51,45 @@ const ConsultationFormWrapper = ({
     imaging: false,
     followUp: '',
     notes: '',
-    
     ...initialData // Remplir avec les données initiales si fournies
   });
 
   // Determine if it's an emergency consultation
   const isEmergency = patient.service === "Ug";
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const {
+      name,
+      value
+    } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
-
   const handleCheckboxChange = (field: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: checked
     }));
   };
-
   const validateStep1 = () => {
     const requiredFields = ['temperature', 'bloodPressureSys', 'bloodPressureDia', 'heartRate'];
     const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
-    
     if (missingFields.length > 0) {
       toast.error("Veuillez remplir tous les champs obligatoires");
       return false;
     }
     return true;
   };
-
   const validateStep2 = () => {
     const requiredFields = ['mainComplaint'];
     const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
-    
     if (missingFields.length > 0) {
       toast.error("Veuillez remplir tous les champs obligatoires");
       return false;
     }
     return true;
   };
-
   const handleNextStep = () => {
     if (step === 1 && validateStep1()) {
       setStep(2);
@@ -110,32 +99,20 @@ const ConsultationFormWrapper = ({
       setStep(4);
     }
   };
-
   const handlePrevStep = () => {
     setStep(step - 1);
   };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
   };
-
-  return (
-    <Card className="w-full">
+  return <Card className="w-full">
       <CardHeader>
-        <CardTitle>
-          {isEditMode 
-            ? "Modification de consultation" 
-            : isEmergency 
-              ? "Formulaire de consultation d'urgence" 
-              : "Formulaire de consultation"
-          }
+        <CardTitle className="text-green-600">
+          {isEditMode ? "Modification de consultation" : isEmergency ? "Formulaire de consultation d'urgence" : "Formulaire de consultation"}
         </CardTitle>
         <CardDescription>
-          {isEditMode 
-            ? "Modifiez les informations de la consultation"
-            : "Veuillez renseigner les informations concernant la consultation"
-          }
+          {isEditMode ? "Modifiez les informations de la consultation" : "Veuillez renseigner les informations concernant la consultation"}
         </CardDescription>
       </CardHeader>
       
@@ -169,45 +146,21 @@ const ConsultationFormWrapper = ({
           </TabsContent>
 
           <TabsContent value="step4">
-            <StepDiagnosisTreatment 
-              formData={formData} 
-              handleInputChange={handleInputChange}
-              handleCheckboxChange={handleCheckboxChange}
-            />
+            <StepDiagnosisTreatment formData={formData} handleInputChange={handleInputChange} handleCheckboxChange={handleCheckboxChange} />
           </TabsContent>
         </Tabs>
       </CardContent>
       
       <CardFooter className="flex justify-between">
-        {step > 1 ? (
-          <Button 
-            variant="outline" 
-            onClick={handlePrevStep}
-          >
+        {step > 1 ? <Button variant="outline" onClick={handlePrevStep}>
             Précédent
-          </Button>
-        ) : (
-          <div></div> // Div vide pour l'espacement
-        )}
+          </Button> : <div></div> // Div vide pour l'espacement
+      }
         
-        {step < 4 ? (
-          <Button onClick={handleNextStep}>Suivant</Button>
-        ) : (
-          <Button 
-            onClick={handleSubmit} 
-            className={isEmergency ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}
-          >
-            {isEditMode 
-              ? "Valider les modifications" 
-              : isEmergency 
-                ? "Valider la consultation d'urgence" 
-                : "Valider la consultation"
-            }
-          </Button>
-        )}
+        {step < 4 ? <Button onClick={handleNextStep}>Suivant</Button> : <Button onClick={handleSubmit} className={isEmergency ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}>
+            {isEditMode ? "Valider les modifications" : isEmergency ? "Valider la consultation d'urgence" : "Valider la consultation"}
+          </Button>}
       </CardFooter>
-    </Card>
-  );
+    </Card>;
 };
-
 export default ConsultationFormWrapper;
