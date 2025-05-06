@@ -24,10 +24,10 @@ const Login = () => {
     setIsLoading(true);
     try {
       await login(email, password);
-      toast.success("Connexion réussie");
+      toast.success(t('loginSuccess'));
       navigate("/dashboard");
     } catch (error) {
-      toast.error("Échec de la connexion. Vérifiez vos identifiants.");
+      toast.error(t('loginError'));
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +49,7 @@ const Login = () => {
           </div>
           <CardTitle className="text-2xl font-bold text-blue-800 dark:text-blue-400">MedArch</CardTitle>
           <CardDescription className="text-inherit text-sm font-light dark:text-gray-300">
-            Système d'archivage des dossiers médicaux
+            {t('appDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -92,7 +92,7 @@ const Login = () => {
               disabled={isLoading} 
               className="w-full bg-blue-600 hover:bg-blue-700 text-white text-base font-medium"
             >
-              {isLoading ? "Connexion..." : t('login')}
+              {isLoading ? t('loggingIn') : t('login')}
             </Button>
           </form>
         </CardContent>
@@ -111,7 +111,7 @@ const Login = () => {
             <li>nurse@medarch.com</li>
             <li>lab@medarch.com</li>
             <li>doctor@medarch.com</li>
-            <li className="font-medium mt-1">Mot de passe: password</li>
+            <li className="font-medium mt-1">{t('password')}: password</li>
           </ul>
         </Card>
       </div>

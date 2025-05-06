@@ -9,6 +9,7 @@ type LanguageContextType = {
   t: (key: string) => string;
 };
 
+// Mise à jour des traductions avec toutes les clés nécessaires
 const translations = {
   fr: {
     // Auth
@@ -17,6 +18,10 @@ const translations = {
     'password': 'Mot de passe',
     'forgotPassword': 'Mot de passe oublié?',
     'demoAccounts': 'Comptes de démonstration',
+    'loginSuccess': 'Connexion réussie',
+    'loginError': 'Échec de la connexion. Vérifiez vos identifiants.',
+    'loggingIn': 'Connexion en cours...',
+    'appDescription': 'Système d\'archivage des dossiers médicaux',
     
     // Navigation
     'dashboard': 'Tableau de bord',
@@ -66,6 +71,8 @@ const translations = {
     'delete': 'Supprimer',
     'confirm': 'Confirmer',
     'cancel': 'Annuler',
+    'close': 'Fermer',
+    'activated': 'activée',
     
     // Statuses
     'pending': 'En attente',
@@ -192,25 +199,48 @@ const translations = {
     'waitTime': 'Temps d\'attente',
     'patientsToSee': 'Patients à voir',
     'medicalRecords': 'Dossiers médicaux',
+    'takeInCharge': 'Prendre en charge',
+    'patientTakenInCharge': 'Patient pris en charge',
+    'patientsToTreat': 'Patients à traiter',
+    'min': 'min',
     
-    // Additional translations
-    'noPatientFound': 'Patient non trouvé',
-    'mustBeLoggedIn': 'Vous devez être connecté pour cette action',
-    'modifyingMedicalVisit': 'Modification de visite médicale',
-    'modifyingConsultation': 'Modification de consultation',
-    'modifyingEmergencyTreatment': 'Modification du traitement d\'urgence',
-    'emergencyTreatment': 'Traitement d\'urgence',
-    'notSpecified': 'Non spécifié',
-    'noRecommendations': 'Aucune recommandation',
-    'medicalVisitUpdated': 'Visite médicale mise à jour avec succès',
-    'medicalVisitSaved': 'Visite médicale enregistrée avec succès',
-    'noDiagnosis': 'Aucun diagnostic',
-    'consultationUpdated': 'Consultation mise à jour avec succès',
-    'consultationSaved': 'Consultation enregistrée avec succès',
-    'noImmediateActions': 'Aucune action immédiate',
-    'emergencyTreatmentUpdated': 'Traitement d\'urgence mis à jour avec succès',
-    'emergencyTreatmentSaved': 'Traitement d\'urgence enregistré avec succès',
-    'min': 'min'
+    // Nurse dashboard
+    'patientList': 'Liste des patients',
+    'searchForPatient': 'Rechercher un patient',
+    'filterBy': 'Filtrer par',
+    'sortBy': 'Trier par',
+    'urgencyFirst': 'Urgences d\'abord',
+    'arrivalOrder': 'Ordre d\'arrivée',
+    'allServices': 'Tous les services',
+    'noWaitingPatients': 'Aucun patient en attente',
+    
+    // AI Assistant
+    'aiAssistant': 'Assistant IA',
+    'aiDiagnosticHelper': 'Assistant diagnostic',
+    'aiRiskPrediction': 'Prédiction de risques',
+    'aiSuggestedTreatment': 'Traitement suggéré',
+    'askAIAssistant': 'Demander à l\'assistant IA',
+    'aiIsThinking': 'L\'IA réfléchit...',
+    'aiResponseReady': 'Réponse prête',
+    'aiSuggestions': 'Suggestions de l\'IA',
+    'generateReport': 'Générer un rapport',
+    'analyzeSymptoms': 'Analyser les symptômes',
+    'searchMedicalLiterature': 'Rechercher dans la littérature médicale',
+    'patientRiskLevel': 'Niveau de risque du patient',
+    'medicalHistorySummary': 'Résumé de l\'historique médical',
+    'similarCases': 'Cas similaires',
+    
+    // Medical record
+    'patientHistory': 'Historique du patient',
+    'vitals': 'Signes vitaux',
+    'clinicalFindings': 'Résultats cliniques',
+    'previousVisits': 'Visites précédentes',
+    'prescribedMedication': 'Médicaments prescrits',
+    'followUpDate': 'Date de suivi',
+    'lastExamResults': 'Derniers résultats d\'examens',
+    'medicalReport': 'Rapport médical',
+    'generateAIInsights': 'Générer des insights IA',
+    'completeVisit': 'Terminer la visite'
   },
   en: {
     // Auth
@@ -219,6 +249,10 @@ const translations = {
     'password': 'Password',
     'forgotPassword': 'Forgot password?',
     'demoAccounts': 'Demo accounts',
+    'loginSuccess': 'Login successful',
+    'loginError': 'Login failed. Check your credentials.',
+    'loggingIn': 'Logging in...',
+    'appDescription': 'Medical Records Archiving System',
     
     // Navigation
     'dashboard': 'Dashboard',
@@ -268,6 +302,8 @@ const translations = {
     'delete': 'Delete',
     'confirm': 'Confirm',
     'cancel': 'Cancel',
+    'close': 'Close',
+    'activated': 'activated',
     
     // Statuses
     'pending': 'Pending',
@@ -394,25 +430,48 @@ const translations = {
     'waitTime': 'Wait time',
     'patientsToSee': 'Patients to see',
     'medicalRecords': 'Medical records',
+    'takeInCharge': 'Take in charge',
+    'patientTakenInCharge': 'Patient taken in charge',
+    'patientsToTreat': 'Patients to treat',
+    'min': 'min',
     
-    // Additional translations
-    'noPatientFound': 'Patient not found',
-    'mustBeLoggedIn': 'You must be logged in for this action',
-    'modifyingMedicalVisit': 'Modifying medical visit',
-    'modifyingConsultation': 'Modifying consultation',
-    'modifyingEmergencyTreatment': 'Modifying emergency treatment',
-    'emergencyTreatment': 'Emergency treatment',
-    'notSpecified': 'Not specified',
-    'noRecommendations': 'No recommendations',
-    'medicalVisitUpdated': 'Medical visit updated successfully',
-    'medicalVisitSaved': 'Medical visit saved successfully',
-    'noDiagnosis': 'No diagnosis',
-    'consultationUpdated': 'Consultation updated successfully',
-    'consultationSaved': 'Consultation saved successfully',
-    'noImmediateActions': 'No immediate actions',
-    'emergencyTreatmentUpdated': 'Emergency treatment updated successfully',
-    'emergencyTreatmentSaved': 'Emergency treatment saved successfully',
-    'min': 'min'
+    // Nurse dashboard
+    'patientList': 'Patient list',
+    'searchForPatient': 'Search for patient',
+    'filterBy': 'Filter by',
+    'sortBy': 'Sort by',
+    'urgencyFirst': 'Urgency first',
+    'arrivalOrder': 'Arrival order',
+    'allServices': 'All services',
+    'noWaitingPatients': 'No waiting patients',
+    
+    // AI Assistant
+    'aiAssistant': 'AI Assistant',
+    'aiDiagnosticHelper': 'AI Diagnostic Helper',
+    'aiRiskPrediction': 'Risk Prediction',
+    'aiSuggestedTreatment': 'Suggested Treatment',
+    'askAIAssistant': 'Ask AI Assistant',
+    'aiIsThinking': 'AI is thinking...',
+    'aiResponseReady': 'Response ready',
+    'aiSuggestions': 'AI Suggestions',
+    'generateReport': 'Generate Report',
+    'analyzeSymptoms': 'Analyze Symptoms',
+    'searchMedicalLiterature': 'Search Medical Literature',
+    'patientRiskLevel': 'Patient Risk Level',
+    'medicalHistorySummary': 'Medical History Summary',
+    'similarCases': 'Similar Cases',
+    
+    // Medical record
+    'patientHistory': 'Patient History',
+    'vitals': 'Vitals',
+    'clinicalFindings': 'Clinical Findings',
+    'previousVisits': 'Previous Visits',
+    'prescribedMedication': 'Prescribed Medication',
+    'followUpDate': 'Follow-up Date',
+    'lastExamResults': 'Last Exam Results',
+    'medicalReport': 'Medical Report',
+    'generateAIInsights': 'Generate AI Insights',
+    'completeVisit': 'Complete Visit'
   },
   de: {
     // Auth
@@ -421,6 +480,10 @@ const translations = {
     'password': 'Passwort',
     'forgotPassword': 'Passwort vergessen?',
     'demoAccounts': 'Demo-Konten',
+    'loginSuccess': 'Anmeldung erfolgreich',
+    'loginError': 'Anmeldung fehlgeschlagen. Überprüfen Sie Ihre Anmeldedaten.',
+    'loggingIn': 'Anmeldung läuft...',
+    'appDescription': 'System zur Archivierung medizinischer Aufzeichnungen',
     
     // Navigation
     'dashboard': 'Dashboard',
@@ -470,6 +533,8 @@ const translations = {
     'delete': 'Löschen',
     'confirm': 'Bestätigen',
     'cancel': 'Abbrechen',
+    'close': 'Schließen',
+    'activated': 'aktiviert',
     
     // Statuses
     'pending': 'Ausstehend',
@@ -596,25 +661,48 @@ const translations = {
     'waitTime': 'Wartezeit',
     'patientsToSee': 'Zu behandelnde Patienten',
     'medicalRecords': 'Patientenakten',
+    'takeInCharge': 'Übernehmen',
+    'patientTakenInCharge': 'Patient übernommen',
+    'patientsToTreat': 'Zu behandelnde Patienten',
+    'min': 'min',
     
-    // Additional translations
-    'noPatientFound': 'Patient nicht gefunden',
-    'mustBeLoggedIn': 'Sie müssen angemeldet sein für diese Aktion',
-    'modifyingMedicalVisit': 'Bearbeitung des medizinischen Besuchs',
-    'modifyingConsultation': 'Bearbeitung der Konsultation',
-    'modifyingEmergencyTreatment': 'Bearbeitung der Notfallbehandlung',
-    'emergencyTreatment': 'Notfallbehandlung',
-    'notSpecified': 'Nicht angegeben',
-    'noRecommendations': 'Keine Empfehlungen',
-    'medicalVisitUpdated': 'Medizinischer Besuch erfolgreich aktualisiert',
-    'medicalVisitSaved': 'Medizinischer Besuch erfolgreich gespeichert',
-    'noDiagnosis': 'Keine Diagnose',
-    'consultationUpdated': 'Konsultation erfolgreich aktualisiert',
-    'consultationSaved': 'Konsultation erfolgreich gespeichert',
-    'noImmediateActions': 'Keine Sofortmaßnahmen',
-    'emergencyTreatmentUpdated': 'Notfallbehandlung erfolgreich aktualisiert',
-    'emergencyTreatmentSaved': 'Notfallbehandlung erfolgreich gespeichert',
-    'min': 'min'
+    // Nurse dashboard
+    'patientList': 'Patientenliste',
+    'searchForPatient': 'Patient suchen',
+    'filterBy': 'Filtern nach',
+    'sortBy': 'Sortieren nach',
+    'urgencyFirst': 'Notfälle zuerst',
+    'arrivalOrder': 'Ankunftsreihenfolge',
+    'allServices': 'Alle Dienste',
+    'noWaitingPatients': 'Keine wartenden Patienten',
+    
+    // AI Assistant
+    'aiAssistant': 'KI-Assistent',
+    'aiDiagnosticHelper': 'KI-Diagnosehelfer',
+    'aiRiskPrediction': 'Risikovorhersage',
+    'aiSuggestedTreatment': 'Vorgeschlagene Behandlung',
+    'askAIAssistant': 'KI-Assistent fragen',
+    'aiIsThinking': 'KI denkt nach...',
+    'aiResponseReady': 'Antwort bereit',
+    'aiSuggestions': 'KI-Vorschläge',
+    'generateReport': 'Bericht generieren',
+    'analyzeSymptoms': 'Symptome analysieren',
+    'searchMedicalLiterature': 'Medizinische Literatur durchsuchen',
+    'patientRiskLevel': 'Patientenrisikoniveau',
+    'medicalHistorySummary': 'Zusammenfassung der Krankengeschichte',
+    'similarCases': 'Ähnliche Fälle',
+    
+    // Medical record
+    'patientHistory': 'Patientengeschichte',
+    'vitals': 'Vitalwerte',
+    'clinicalFindings': 'Klinische Befunde',
+    'previousVisits': 'Frühere Besuche',
+    'prescribedMedication': 'Verschriebene Medikamente',
+    'followUpDate': 'Folgetermin',
+    'lastExamResults': 'Letzte Untersuchungsergebnisse',
+    'medicalReport': 'Medizinischer Bericht',
+    'generateAIInsights': 'KI-Erkenntnisse generieren',
+    'completeVisit': 'Besuch abschließen'
   }
 };
 
@@ -634,11 +722,12 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
   
   // Translation function
   const t = (key: string): string => {
-    if (!translations[language][key as keyof typeof translations[typeof language]]) {
+    const currentTranslations = translations[language];
+    if (!currentTranslations || !currentTranslations[key as keyof typeof currentTranslations]) {
       console.warn(`Translation missing for key: ${key} in language: ${language}`);
       return key;
     }
-    return translations[language][key as keyof typeof translations[typeof language]] || key;
+    return currentTranslations[key as keyof typeof currentTranslations];
   };
   
   // Set HTML lang attribute on mount and language change
