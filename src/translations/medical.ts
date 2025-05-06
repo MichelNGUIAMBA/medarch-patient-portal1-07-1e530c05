@@ -1,0 +1,53 @@
+
+import { TranslationRecord } from './types';
+
+export const medicalTranslations: Record<string, TranslationRecord> = {
+  fr: {
+    'bloodPressure': 'Pression artérielle',
+    'heartRate': 'Fréquence cardiaque',
+    'temperature': 'Température',
+    'respiratoryRate': 'Fréquence respiratoire',
+    'height': 'Taille',
+    'weight': 'Poids',
+    'bmi': 'IMC',
+    'allergies': 'Allergies',
+    'medications': 'Médicaments',
+    'diagnosis': 'Diagnostic',
+    'treatment': 'Traitement',
+    'labResults': 'Résultats de laboratoire',
+    'symptoms': 'Symptômes',
+    'medicalHistory': 'Antécédents médicaux',
+  },
+  en: {
+    'bloodPressure': 'Blood pressure',
+    'heartRate': 'Heart rate',
+    'temperature': 'Temperature',
+    'respiratoryRate': 'Respiratory rate',
+    'height': 'Height',
+    'weight': 'Weight',
+    'bmi': 'BMI',
+    'allergies': 'Allergies',
+    'medications': 'Medications',
+    'diagnosis': 'Diagnosis',
+    'treatment': 'Treatment',
+    'labResults': 'Lab results',
+    'symptoms': 'Symptoms',
+    'medicalHistory': 'Medical history',
+  },
+  de: {
+    'bloodPressure': 'Blutdruck',
+    'heartRate': 'Herzfrequenz',
+    'temperature': 'Temperatur',
+    'respiratoryRate': 'Atemfrequenz',
+    'height': 'Größe',
+    'weight': 'Gewicht',
+    'bmi': 'BMI',
+    'allergies': 'Allergien',
+    'medications': 'Medikamente',
+    'diagnosis': 'Diagnose',
+    'treatment': 'Behandlung',
+    'labResults': 'Laborergebnisse',
+    'symptoms': 'Symptome',
+    'medicalHistory': 'Krankengeschichte',
+  }
+};

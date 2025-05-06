@@ -1,0 +1,50 @@
+
+import { TranslationRecord } from './types';
+
+export const formTranslations: Record<string, TranslationRecord> = {
+  fr: {
+    'save': 'Enregistrer',
+    'next': 'Suivant',
+    'previous': 'Précédent',
+    'validate': 'Valider',
+    'addToWaitingList': 'Ajouter à la liste d\'attente',
+    'searchPatient': 'Rechercher un patient',
+    'searchPlaceholder': 'Rechercher par nom, prénom ou ID...',
+    'noResults': 'Aucun résultat trouvé',
+    'existingPatient': 'Patient existant',
+    'selectExistingPatient': 'Sélectionner un patient existant',
+    'addNewService': 'Ajouter un nouveau service',
+    'serviceType': 'Type de service',
+    'selectService': 'Sélectionner un service',
+  },
+  en: {
+    'save': 'Save',
+    'next': 'Next',
+    'previous': 'Previous',
+    'validate': 'Validate',
+    'addToWaitingList': 'Add to waiting list',
+    'searchPatient': 'Search patient',
+    'searchPlaceholder': 'Search by name, first name or ID...',
+    'noResults': 'No results found',
+    'existingPatient': 'Existing patient',
+    'selectExistingPatient': 'Select existing patient',
+    'addNewService': 'Add new service',
+    'serviceType': 'Service type',
+    'selectService': 'Select service',
+  },
+  de: {
+    'save': 'Speichern',
+    'next': 'Weiter',
+    'previous': 'Zurück',
+    'validate': 'Validieren',
+    'addToWaitingList': 'Zur Warteliste hinzufügen',
+    'searchPatient': 'Patient suchen',
+    'searchPlaceholder': 'Suche nach Name, Vorname oder ID...',
+    'noResults': 'Keine Ergebnisse gefunden',
+    'existingPatient': 'Bestehender Patient',
+    'selectExistingPatient': 'Bestehenden Patienten auswählen',
+    'addNewService': 'Neuen Service hinzufügen',
+    'serviceType': 'Serviceart',
+    'selectService': 'Service auswählen',
+  }
+};

@@ -1,0 +1,53 @@
+
+import { TranslationRecord } from './types';
+
+export const aiTranslations: Record<string, TranslationRecord> = {
+  fr: {
+    'aiAssistant': 'Assistant IA',
+    'aiDiagnosticHelper': 'Assistant diagnostic',
+    'aiRiskPrediction': 'Prédiction de risques',
+    'aiSuggestedTreatment': 'Traitement suggéré',
+    'askAIAssistant': 'Demander à l\'assistant IA',
+    'aiIsThinking': 'L\'IA réfléchit...',
+    'aiResponseReady': 'Réponse prête',
+    'aiSuggestions': 'Suggestions de l\'IA',
+    'generateReport': 'Générer un rapport',
+    'analyzeSymptoms': 'Analyser les symptômes',
+    'searchMedicalLiterature': 'Rechercher dans la littérature médicale',
+    'patientRiskLevel': 'Niveau de risque du patient',
+    'medicalHistorySummary': 'Résumé de l\'historique médical',
+    'similarCases': 'Cas similaires',
+  },
+  en: {
+    'aiAssistant': 'AI Assistant',
+    'aiDiagnosticHelper': 'AI Diagnostic Helper',
+    'aiRiskPrediction': 'Risk Prediction',
+    'aiSuggestedTreatment': 'Suggested Treatment',
+    'askAIAssistant': 'Ask AI Assistant',
+    'aiIsThinking': 'AI is thinking...',
+    'aiResponseReady': 'Response ready',
+    'aiSuggestions': 'AI Suggestions',
+    'generateReport': 'Generate Report',
+    'analyzeSymptoms': 'Analyze Symptoms',
+    'searchMedicalLiterature': 'Search Medical Literature',
+    'patientRiskLevel': 'Patient Risk Level',
+    'medicalHistorySummary': 'Medical History Summary',
+    'similarCases': 'Similar Cases',
+  },
+  de: {
+    'aiAssistant': 'KI-Assistent',
+    'aiDiagnosticHelper': 'KI-Diagnosehelfer',
+    'aiRiskPrediction': 'Risikovorhersage',
+    'aiSuggestedTreatment': 'Vorgeschlagene Behandlung',
+    'askAIAssistant': 'KI-Assistent fragen',
+    'aiIsThinking': 'KI denkt nach...',
+    'aiResponseReady': 'Antwort bereit',
+    'aiSuggestions': 'KI-Vorschläge',
+    'generateReport': 'Bericht generieren',
+    'analyzeSymptoms': 'Symptome analysieren',
+    'searchMedicalLiterature': 'Medizinische Literatur durchsuchen',
+    'patientRiskLevel': 'Patientenrisikoniveau',
+    'medicalHistorySummary': 'Zusammenfassung der Krankengeschichte',
+    'similarCases': 'Ähnliche Fälle',
+  }
+};
