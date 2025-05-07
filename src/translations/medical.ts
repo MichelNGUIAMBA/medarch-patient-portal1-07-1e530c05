@@ -3,51 +3,138 @@ import { TranslationRecord } from './types';
 
 export const medicalTranslations: Record<string, TranslationRecord> = {
   fr: {
-    'bloodPressure': 'Pression artérielle',
-    'heartRate': 'Fréquence cardiaque',
+    // Clinical signs and measurements
     'temperature': 'Température',
-    'respiratoryRate': 'Fréquence respiratoire',
-    'height': 'Taille',
+    'bloodPressure': 'TA',
+    'pulse': 'Pouls',
     'weight': 'Poids',
+    'height': 'Taille',
     'bmi': 'IMC',
-    'allergies': 'Allergies',
-    'medications': 'Médicaments',
+    
+    // Examinations
+    'ecg': 'ECG',
+    'lab': 'Labo',
+    'xray': 'RX',
+    
+    // Consultation form
+    'consultationForm': 'Formulaire de consultation',
+    'emergencyConsultationForm': 'Formulaire de consultation d\'urgence',
+    'editConsultation': 'Modification de consultation',
+    'consultationFormDescription': 'Veuillez renseigner les informations concernant la consultation',
+    'editConsultationDescription': 'Modifiez les informations de la consultation',
+    'consultationReason': 'Motif consultation',
+    'enterConsultationReason': 'Décrivez le motif de la consultation...',
     'diagnosis': 'Diagnostic',
+    'enterDiagnosis': 'Entrez le diagnostic...',
     'treatment': 'Traitement',
-    'labResults': 'Résultats de laboratoire',
-    'symptoms': 'Symptômes',
-    'medicalHistory': 'Antécédents médicaux',
+    'enterTreatment': 'Entrez le traitement recommandé...',
+    'signature': 'Signature',
+    'enterSignature': 'Entrez votre signature...',
+    
+    // Buttons and actions
+    'validateConsultation': 'Valider la consultation',
+    'validateEmergencyConsultation': 'Valider la consultation d\'urgence',
+    'validateModifications': 'Valider les modifications',
+    
+    // Messages
+    'pleaseCompleteRequiredFields': 'Veuillez remplir tous les champs obligatoires',
+    'consultationSaved': 'Consultation enregistrée avec succès',
+    'consultationUpdated': 'Consultation mise à jour avec succès',
+    'errorParsingData': 'Erreur lors du parsing des données',
+    'errorParsingServiceData': 'Erreur lors du parsing des données de service',
+    'notSpecified': 'non spécifié',
+    'noDiagnosis': 'pas de diagnostic',
+    'mustBeLoggedIn': 'Vous devez être connecté pour enregistrer une consultation',
+    'noPatientFound': 'Aucun patient trouvé'
   },
   en: {
-    'bloodPressure': 'Blood pressure',
-    'heartRate': 'Heart rate',
+    // Clinical signs and measurements
     'temperature': 'Temperature',
-    'respiratoryRate': 'Respiratory rate',
-    'height': 'Height',
+    'bloodPressure': 'BP',
+    'pulse': 'Pulse',
     'weight': 'Weight',
+    'height': 'Height',
     'bmi': 'BMI',
-    'allergies': 'Allergies',
-    'medications': 'Medications',
+    
+    // Examinations
+    'ecg': 'ECG',
+    'lab': 'Lab',
+    'xray': 'X-Ray',
+    
+    // Consultation form
+    'consultationForm': 'Consultation Form',
+    'emergencyConsultationForm': 'Emergency Consultation Form',
+    'editConsultation': 'Edit Consultation',
+    'consultationFormDescription': 'Please enter information about the consultation',
+    'editConsultationDescription': 'Modify consultation information',
+    'consultationReason': 'Consultation reason',
+    'enterConsultationReason': 'Describe the reason for consultation...',
     'diagnosis': 'Diagnosis',
+    'enterDiagnosis': 'Enter diagnosis...',
     'treatment': 'Treatment',
-    'labResults': 'Lab results',
-    'symptoms': 'Symptoms',
-    'medicalHistory': 'Medical history',
+    'enterTreatment': 'Enter recommended treatment...',
+    'signature': 'Signature',
+    'enterSignature': 'Enter your signature...',
+    
+    // Buttons and actions
+    'validateConsultation': 'Validate consultation',
+    'validateEmergencyConsultation': 'Validate emergency consultation',
+    'validateModifications': 'Validate modifications',
+    
+    // Messages
+    'pleaseCompleteRequiredFields': 'Please complete all required fields',
+    'consultationSaved': 'Consultation saved successfully',
+    'consultationUpdated': 'Consultation updated successfully',
+    'errorParsingData': 'Error parsing data',
+    'errorParsingServiceData': 'Error parsing service data',
+    'notSpecified': 'not specified',
+    'noDiagnosis': 'no diagnosis',
+    'mustBeLoggedIn': 'You must be logged in to save a consultation',
+    'noPatientFound': 'No patient found'
   },
   de: {
-    'bloodPressure': 'Blutdruck',
-    'heartRate': 'Herzfrequenz',
+    // Clinical signs and measurements
     'temperature': 'Temperatur',
-    'respiratoryRate': 'Atemfrequenz',
-    'height': 'Größe',
+    'bloodPressure': 'Blutdruck',
+    'pulse': 'Puls',
     'weight': 'Gewicht',
+    'height': 'Größe',
     'bmi': 'BMI',
-    'allergies': 'Allergien',
-    'medications': 'Medikamente',
+    
+    // Examinations
+    'ecg': 'EKG',
+    'lab': 'Labor',
+    'xray': 'Röntgen',
+    
+    // Consultation form
+    'consultationForm': 'Konsultationsformular',
+    'emergencyConsultationForm': 'Notfallkonsultationsformular',
+    'editConsultation': 'Konsultation bearbeiten',
+    'consultationFormDescription': 'Bitte geben Sie Informationen zur Konsultation ein',
+    'editConsultationDescription': 'Ändern Sie die Konsultationsinformationen',
+    'consultationReason': 'Konsultationsgrund',
+    'enterConsultationReason': 'Beschreiben Sie den Grund für die Konsultation...',
     'diagnosis': 'Diagnose',
+    'enterDiagnosis': 'Diagnose eingeben...',
     'treatment': 'Behandlung',
-    'labResults': 'Laborergebnisse',
-    'symptoms': 'Symptome',
-    'medicalHistory': 'Krankengeschichte',
+    'enterTreatment': 'Empfohlene Behandlung eingeben...',
+    'signature': 'Unterschrift',
+    'enterSignature': 'Geben Sie Ihre Unterschrift ein...',
+    
+    // Buttons and actions
+    'validateConsultation': 'Konsultation validieren',
+    'validateEmergencyConsultation': 'Notfallkonsultation validieren',
+    'validateModifications': 'Änderungen validieren',
+    
+    // Messages
+    'pleaseCompleteRequiredFields': 'Bitte füllen Sie alle Pflichtfelder aus',
+    'consultationSaved': 'Konsultation erfolgreich gespeichert',
+    'consultationUpdated': 'Konsultation erfolgreich aktualisiert',
+    'errorParsingData': 'Fehler beim Parsen der Daten',
+    'errorParsingServiceData': 'Fehler beim Parsen der Servicedaten',
+    'notSpecified': 'nicht angegeben',
+    'noDiagnosis': 'keine Diagnose',
+    'mustBeLoggedIn': 'Sie müssen angemeldet sein, um eine Konsultation zu speichern',
+    'noPatientFound': 'Kein Patient gefunden'
   }
 };

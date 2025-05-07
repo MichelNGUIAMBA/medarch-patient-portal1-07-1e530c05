@@ -36,7 +36,7 @@ const ConsultationForm = () => {
           const { formData } = JSON.parse(storedData);
           setInitialData(formData);
         } catch (e) {
-          console.error("Erreur lors du parsing des données:", e);
+          console.error(t('errorParsingData'), e);
         }
       } else {
         // Essayer d'obtenir les données de service générales
@@ -46,12 +46,12 @@ const ConsultationForm = () => {
             const parsedData = JSON.parse(serviceData);
             setInitialData(parsedData);
           } catch (e) {
-            console.error("Erreur lors du parsing des données de service:", e);
+            console.error(t('errorParsingServiceData'), e);
           }
         }
       }
     }
-  }, [isEditMode, patient]);
+  }, [isEditMode, patient, t]);
 
   if (!patient) {
     return <div className="container mx-auto py-6">{t('noPatientFound')}</div>;
@@ -66,12 +66,15 @@ const ConsultationForm = () => {
     // Sauvegarder les données du formulaire pour pouvoir les retrouver plus tard
     sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(formData));
 
+    // Format notes for patient records
+    const patientNotes = `${t('consultation')}: ${formData.consultationReason || t('notSpecified')} - ${formData.diagnosis || t('noDiagnosis')}`;
+    
     if (isEditMode) {
       // Mettre à jour le patient avec les nouvelles données
       updatePatient(
         patient.id,
         {
-          notes: `${t('consultation')}: ${formData.mainComplaint || t('notSpecified')} - ${formData.diagnosis || t('noDiagnosis')}`
+          notes: patientNotes
         },
         { name: user.name, role: user.role }
       );
@@ -85,7 +88,7 @@ const ConsultationForm = () => {
       updatePatient(
         patient.id,
         {
-          notes: `${t('consultation')}: ${formData.mainComplaint || t('notSpecified')} - ${formData.diagnosis || t('noDiagnosis')}`
+          notes: patientNotes
         },
         { name: user.name, role: user.role }
       );
