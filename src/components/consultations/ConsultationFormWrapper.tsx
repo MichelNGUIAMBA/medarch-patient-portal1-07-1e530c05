@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/components/ui/sonner';
 import { Patient } from '@/types/patient';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -35,9 +34,9 @@ const ConsultationFormWrapper = ({
     
     // Infos consultation
     consultationReason: '',
-    ecg: false,
-    lab: false,
-    xray: false,
+    ecg: '',
+    lab: '',
+    xray: '',
     
     // Diagnostic et traitement
     diagnosis: '',
@@ -55,13 +54,6 @@ const ConsultationFormWrapper = ({
     setFormData(prev => ({
       ...prev,
       [name]: value
-    }));
-  };
-  
-  const handleCheckboxChange = (field: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: checked
     }));
   };
   
@@ -180,31 +172,37 @@ const ConsultationFormWrapper = ({
               />
             </div>
             
-            {/* Medical Tests */}
+            {/* Medical Tests - Now as text inputs */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="ecg" 
-                  checked={formData.ecg}
-                  onCheckedChange={(checked) => handleCheckboxChange('ecg', checked === true)}
-                />
+              <div>
                 <Label htmlFor="ecg">{t('ecg')}</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="lab" 
-                  checked={formData.lab}
-                  onCheckedChange={(checked) => handleCheckboxChange('lab', checked === true)}
+                <Input
+                  id="ecg"
+                  name="ecg"
+                  value={formData.ecg}
+                  onChange={handleInputChange}
+                  placeholder={t('ecg')}
                 />
+              </div>
+              <div>
                 <Label htmlFor="lab">{t('lab')}</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="xray" 
-                  checked={formData.xray}
-                  onCheckedChange={(checked) => handleCheckboxChange('xray', checked === true)}
+                <Input
+                  id="lab"
+                  name="lab"
+                  value={formData.lab}
+                  onChange={handleInputChange}
+                  placeholder={t('lab')}
                 />
+              </div>
+              <div>
                 <Label htmlFor="xray">{t('xray')}</Label>
+                <Input
+                  id="xray"
+                  name="xray"
+                  value={formData.xray}
+                  onChange={handleInputChange}
+                  placeholder={t('xray')}
+                />
               </div>
             </div>
           </div>
