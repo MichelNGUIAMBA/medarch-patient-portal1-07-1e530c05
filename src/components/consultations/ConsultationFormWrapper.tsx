@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,21 +8,21 @@ import { toast } from '@/components/ui/sonner';
 import { Patient } from '@/types/patient';
 import { useLanguage } from '@/hooks/useLanguage';
 import { format } from 'date-fns';
-
 interface ConsultationFormWrapperProps {
   patient: Patient;
   onSubmit: (formData: any) => void;
   isEditMode?: boolean;
   initialData?: any;
 }
-
 const ConsultationFormWrapper = ({
   patient,
   onSubmit,
   isEditMode = false,
   initialData = {}
 }: ConsultationFormWrapperProps) => {
-  const { t } = useLanguage();
+  const {
+    t
+  } = useLanguage();
   const [formData, setFormData] = useState({
     // Date et infos vitaux
     date: format(new Date(), 'yyyy-MM-dd'),
@@ -31,53 +30,46 @@ const ConsultationFormWrapper = ({
     pulse: '',
     temperature: '',
     weight: '',
-    
     // Infos consultation
     consultationReason: '',
     ecg: '',
     lab: '',
     xray: '',
-    
     // Diagnostic et traitement
     diagnosis: '',
     treatment: '',
     signature: '',
-    
     ...initialData
   });
 
   // Determine if it's an emergency consultation
   const isEmergency = patient.service === "Ug";
-  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const {
+      name,
+      value
+    } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
-  
   const validateForm = () => {
     const requiredFields = ['bloodPressure', 'pulse', 'temperature', 'consultationReason', 'diagnosis'];
     const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
-    
     if (missingFields.length > 0) {
       toast.error(t('pleaseCompleteRequiredFields'));
       return false;
     }
     return true;
   };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (validateForm()) {
       onSubmit(formData);
     }
   };
-
-  return (
-    <Card className="w-full">
+  return <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-green-600">
           {isEditMode ? t('editConsultation') : isEmergency ? t('emergencyConsultationForm') : t('consultationForm')}
@@ -90,7 +82,7 @@ const ConsultationFormWrapper = ({
       <CardContent>
         <form onSubmit={handleSubmit}>
           {/* Patient info - read-only */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-md">
+          <div className="mb-6 p-4 rounded-md bg-inherit">
             <h3 className="text-md font-medium mb-2">{t('patientInfo')}</h3>
             <p>{patient.lastName} {patient.firstName}</p>
           </div>
@@ -100,57 +92,23 @@ const ConsultationFormWrapper = ({
             <div className="grid grid-cols-5 gap-4 mb-4">
               <div>
                 <Label htmlFor="date">{t('date')} <span className="text-red-500">*</span></Label>
-                <Input
-                  id="date"
-                  name="date"
-                  type="date"
-                  value={formData.date}
-                  onChange={handleInputChange}
-                  required
-                />
+                <Input id="date" name="date" type="date" value={formData.date} onChange={handleInputChange} required />
               </div>
               <div>
                 <Label htmlFor="bloodPressure">{t('bloodPressure')} <span className="text-red-500">*</span></Label>
-                <Input
-                  id="bloodPressure"
-                  name="bloodPressure"
-                  placeholder="120/80"
-                  value={formData.bloodPressure}
-                  onChange={handleInputChange}
-                  required
-                />
+                <Input id="bloodPressure" name="bloodPressure" placeholder="120/80" value={formData.bloodPressure} onChange={handleInputChange} required />
               </div>
               <div>
                 <Label htmlFor="pulse">{t('pulse')} <span className="text-red-500">*</span></Label>
-                <Input
-                  id="pulse"
-                  name="pulse"
-                  placeholder="75"
-                  value={formData.pulse}
-                  onChange={handleInputChange}
-                  required
-                />
+                <Input id="pulse" name="pulse" placeholder="75" value={formData.pulse} onChange={handleInputChange} required />
               </div>
               <div>
                 <Label htmlFor="temperature">{t('temperature')} <span className="text-red-500">*</span></Label>
-                <Input
-                  id="temperature"
-                  name="temperature"
-                  placeholder="37.0"
-                  value={formData.temperature}
-                  onChange={handleInputChange}
-                  required
-                />
+                <Input id="temperature" name="temperature" placeholder="37.0" value={formData.temperature} onChange={handleInputChange} required />
               </div>
               <div>
                 <Label htmlFor="weight">{t('weight')}</Label>
-                <Input
-                  id="weight"
-                  name="weight"
-                  placeholder="70"
-                  value={formData.weight}
-                  onChange={handleInputChange}
-                />
+                <Input id="weight" name="weight" placeholder="70" value={formData.weight} onChange={handleInputChange} />
               </div>
             </div>
           </div>
@@ -161,48 +119,22 @@ const ConsultationFormWrapper = ({
               <Label htmlFor="consultationReason">
                 {t('consultationReason')} <span className="text-red-500">*</span>
               </Label>
-              <Textarea
-                id="consultationReason"
-                name="consultationReason"
-                value={formData.consultationReason}
-                onChange={handleInputChange}
-                placeholder={t('enterConsultationReason')}
-                rows={3}
-                required
-              />
+              <Textarea id="consultationReason" name="consultationReason" value={formData.consultationReason} onChange={handleInputChange} placeholder={t('enterConsultationReason')} rows={3} required />
             </div>
             
             {/* Medical Tests - Now as text inputs */}
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="ecg">{t('ecg')}</Label>
-                <Input
-                  id="ecg"
-                  name="ecg"
-                  value={formData.ecg}
-                  onChange={handleInputChange}
-                  placeholder={t('ecg')}
-                />
+                <Input id="ecg" name="ecg" value={formData.ecg} onChange={handleInputChange} placeholder={t('ecg')} />
               </div>
               <div>
                 <Label htmlFor="lab">{t('lab')}</Label>
-                <Input
-                  id="lab"
-                  name="lab"
-                  value={formData.lab}
-                  onChange={handleInputChange}
-                  placeholder={t('lab')}
-                />
+                <Input id="lab" name="lab" value={formData.lab} onChange={handleInputChange} placeholder={t('lab')} />
               </div>
               <div>
                 <Label htmlFor="xray">{t('xray')}</Label>
-                <Input
-                  id="xray"
-                  name="xray"
-                  value={formData.xray}
-                  onChange={handleInputChange}
-                  placeholder={t('xray')}
-                />
+                <Input id="xray" name="xray" value={formData.xray} onChange={handleInputChange} placeholder={t('xray')} />
               </div>
             </div>
           </div>
@@ -213,39 +145,18 @@ const ConsultationFormWrapper = ({
               <Label htmlFor="diagnosis">
                 {t('diagnosis')} <span className="text-red-500">*</span>
               </Label>
-              <Textarea
-                id="diagnosis"
-                name="diagnosis"
-                value={formData.diagnosis}
-                onChange={handleInputChange}
-                placeholder={t('enterDiagnosis')}
-                rows={3}
-                required
-              />
+              <Textarea id="diagnosis" name="diagnosis" value={formData.diagnosis} onChange={handleInputChange} placeholder={t('enterDiagnosis')} rows={3} required />
             </div>
             <div>
               <Label htmlFor="treatment">
                 {t('treatment')}
               </Label>
-              <Textarea
-                id="treatment"
-                name="treatment"
-                value={formData.treatment}
-                onChange={handleInputChange}
-                placeholder={t('enterTreatment')}
-                rows={4}
-              />
+              <Textarea id="treatment" name="treatment" value={formData.treatment} onChange={handleInputChange} placeholder={t('enterTreatment')} rows={4} />
             </div>
             <div className="flex justify-end">
               <div className="w-1/3">
                 <Label htmlFor="signature">{t('signature')}</Label>
-                <Input
-                  id="signature"
-                  name="signature"
-                  value={formData.signature}
-                  onChange={handleInputChange}
-                  placeholder={t('enterSignature')}
-                />
+                <Input id="signature" name="signature" value={formData.signature} onChange={handleInputChange} placeholder={t('enterSignature')} />
               </div>
             </div>
           </div>
@@ -257,8 +168,6 @@ const ConsultationFormWrapper = ({
           {isEditMode ? t('validateModifications') : isEmergency ? t('validateEmergencyConsultation') : t('validateConsultation')}
         </Button>
       </CardFooter>
-    </Card>
-  );
+    </Card>;
 };
-
 export default ConsultationFormWrapper;
