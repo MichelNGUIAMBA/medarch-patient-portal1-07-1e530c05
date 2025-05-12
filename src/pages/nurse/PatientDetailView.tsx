@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { usePatientStore } from '@/stores/usePatientStore';
@@ -43,6 +42,7 @@ const PatientDetailView = () => {
         try {
           const parsedData = JSON.parse(storedServiceData);
           setServiceData(parsedData);
+          console.log("Service data loaded:", parsedData);
         } catch (e) {
           console.error("Erreur lors du parsing des données de service:", e);
         }

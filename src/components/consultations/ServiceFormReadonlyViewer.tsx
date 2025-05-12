@@ -2,10 +2,12 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Patient } from '@/types/patient';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 interface ServiceFormReadonlyViewerProps {
   patient: Patient;
   serviceData: any;
 }
+
 const ServiceFormReadonlyViewer = ({
   patient,
   serviceData
@@ -22,6 +24,7 @@ const ServiceFormReadonlyViewer = ({
         return service;
     }
   };
+
   const getServiceColor = (service: string) => {
     switch (service) {
       case 'Ug':
@@ -53,15 +56,19 @@ const ServiceFormReadonlyViewer = ({
             </div>
             <div className="border rounded-md p-3 bg-inherit">
               <p className="text-sm font-medium text-gray-500">Pression artérielle</p>
-              <p className="text-lg">{serviceData.bloodPressureSys}/{serviceData.bloodPressureDia} mmHg</p>
+              <p className="text-lg">{serviceData.bloodPressure} mmHg</p>
             </div>
             <div className="border rounded-md p-3 bg-inherit">
               <p className="text-sm font-medium text-gray-500">Fréquence cardiaque</p>
-              <p className="text-lg">{serviceData.heartRate} bpm</p>
+              <p className="text-lg">{serviceData.pulse} bpm</p>
             </div>
             <div className="border rounded-md p-3 bg-inherit">
-              <p className="text-sm font-medium text-gray-500">Saturation en oxygène</p>
-              <p className="text-lg">{serviceData.oxygenSaturation} %</p>
+              <p className="text-sm font-medium text-gray-500">Poids</p>
+              <p className="text-lg">{serviceData.weight || 'Non spécifié'} kg</p>
+            </div>
+            <div className="border rounded-md p-3 bg-inherit">
+              <p className="text-sm font-medium text-gray-500">Date</p>
+              <p className="text-lg">{serviceData.date || 'Non spécifié'}</p>
             </div>
           </div>
         </TabsContent>
@@ -69,20 +76,8 @@ const ServiceFormReadonlyViewer = ({
         <TabsContent value="history" className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
             <div className="border rounded-md p-3 bg-inherit">
-              <p className="text-sm font-medium text-gray-500">Plainte principale</p>
-              <p>{serviceData.mainComplaint || 'Non spécifié'}</p>
-            </div>
-            <div className="border rounded-md p-3 bg-inherit">
-              <p className="text-sm font-medium text-gray-500">Allergies</p>
-              <p>{serviceData.allergies || 'Aucune connue'}</p>
-            </div>
-            <div className="border rounded-md p-3 bg-inherit">
-              <p className="text-sm font-medium text-gray-500">Antécédents médicaux</p>
-              <p>{serviceData.medicalHistory || 'Aucun'}</p>
-            </div>
-            <div className="border rounded-md p-3 bg-inherit">
-              <p className="text-sm font-medium text-gray-500">Médicaments actuels</p>
-              <p>{serviceData.currentMedications || 'Aucun'}</p>
+              <p className="text-sm font-medium text-gray-500">Motif de consultation</p>
+              <p>{serviceData.consultationReason || 'Non spécifié'}</p>
             </div>
           </div>
         </TabsContent>
@@ -90,20 +85,16 @@ const ServiceFormReadonlyViewer = ({
         <TabsContent value="exam" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="border rounded-md p-3 bg-inherit">
-              <p className="text-sm font-medium text-gray-500">Apparence générale</p>
-              <p>{serviceData.generalAppearance || 'Non évalué'}</p>
+              <p className="text-sm font-medium text-gray-500">ECG</p>
+              <p>{serviceData.ecg || 'Non évalué'}</p>
             </div>
             <div className="border rounded-md p-3 bg-inherit">
-              <p className="text-sm font-medium text-gray-500">Peau</p>
-              <p>{serviceData.skin || 'Non évalué'}</p>
+              <p className="text-sm font-medium text-gray-500">Laboratoire</p>
+              <p>{serviceData.lab || 'Non évalué'}</p>
             </div>
             <div className="border rounded-md p-3 bg-inherit">
-              <p className="text-sm font-medium text-gray-500">Système cardiovasculaire</p>
-              <p>{serviceData.cardiovascular || 'Non évalué'}</p>
-            </div>
-            <div className="border rounded-md p-3 bg-inherit">
-              <p className="text-sm font-medium text-gray-500">Système respiratoire</p>
-              <p>{serviceData.respiratory || 'Non évalué'}</p>
+              <p className="text-sm font-medium text-gray-500">Radiographie</p>
+              <p>{serviceData.xray || 'Non évalué'}</p>
             </div>
           </div>
         </TabsContent>
@@ -119,13 +110,14 @@ const ServiceFormReadonlyViewer = ({
               <p>{serviceData.treatment || 'Aucun traitement prescrit'}</p>
             </div>
             <div className="border rounded-md p-3 bg-inherit">
-              <p className="text-sm font-medium text-gray-500">Suivi</p>
-              <p>{serviceData.followUp || 'Aucun suivi planifié'}</p>
+              <p className="text-sm font-medium text-gray-500">Signature</p>
+              <p>{serviceData.signature || 'Non signé'}</p>
             </div>
           </div>
         </TabsContent>
       </Tabs>;
   };
+
   const renderMedicalVisitData = () => {
     return <Tabs defaultValue="vitalSigns" className="w-full">
         <TabsList className="mb-4">
@@ -202,6 +194,7 @@ const ServiceFormReadonlyViewer = ({
         </TabsContent>
       </Tabs>;
   };
+
   const renderEmergencyData = () => {
     return <Tabs defaultValue="assessment" className="w-full">
         <TabsList className="mb-4">
@@ -268,6 +261,7 @@ const ServiceFormReadonlyViewer = ({
         </TabsContent>
       </Tabs>;
   };
+
   return <Card className="w-full mb-6">
       <CardHeader className="">
         <CardTitle className={getServiceColor(patient.service)}>
@@ -281,4 +275,5 @@ const ServiceFormReadonlyViewer = ({
       </CardContent>
     </Card>;
 };
+
 export default ServiceFormReadonlyViewer;

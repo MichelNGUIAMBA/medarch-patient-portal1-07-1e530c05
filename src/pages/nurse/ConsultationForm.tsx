@@ -63,7 +63,7 @@ const ConsultationForm = () => {
       return;
     }
 
-    // Sauvegarder les données du formulaire pour pouvoir les retrouver plus tard
+    // Sauvegarder les données du formulaire complètes dans sessionStorage
     sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(formData));
 
     // Format notes for patient records
