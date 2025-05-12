@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -90,7 +89,8 @@ const ConsultationFormWrapper = ({
       .filter(([_, selected]) => selected)
       .map(([examId]) => ({
         type: examId,
-        status: 'pending'
+        status: 'pending',
+        requestedBy: { name: user.name, role: user.role }
       }));
     
     // Envoyer la demande d'examens
