@@ -1,68 +1,74 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface ConsultationDataViewerProps {
   serviceData: any;
 }
 
 const ConsultationDataViewer = ({ serviceData }: ConsultationDataViewerProps) => {
+  const { t } = useLanguage();
+  
+  // Formater la date si elle existe
+  const formattedDate = serviceData.date 
+    ? format(new Date(serviceData.date), 'd MMMM yyyy', { locale: fr })
+    : t('notSpecified');
+
   return (
     <Tabs defaultValue="vitalSigns" className="w-full">
       <TabsList className="mb-4">
-        <TabsTrigger value="vitalSigns">Signes vitaux</TabsTrigger>
-        <TabsTrigger value="history">Antécédents</TabsTrigger>
-        <TabsTrigger value="exam">Examen clinique</TabsTrigger>
-        <TabsTrigger value="diagnosis">Diagnostic & traitement</TabsTrigger>
+        <TabsTrigger value="vitalSigns">{t('vitalSigns')}</TabsTrigger>
+        <TabsTrigger value="consultation">{t('consultationDetails')}</TabsTrigger>
+        <TabsTrigger value="diagnosis">{t('diagnosisTreatment')}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="vitalSigns" className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">Température</p>
-            <p className="text-lg">{serviceData.temperature} °C</p>
+            <p className="text-sm font-medium text-gray-500">{t('date')}</p>
+            <p className="text-lg">{formattedDate}</p>
           </div>
           <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">Pression artérielle</p>
-            <p className="text-lg">{serviceData.bloodPressure} mmHg</p>
+            <p className="text-sm font-medium text-gray-500">{t('bloodPressure')}</p>
+            <p className="text-lg">{serviceData.bloodPressure || t('notSpecified')}</p>
           </div>
           <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">Fréquence cardiaque</p>
-            <p className="text-lg">{serviceData.pulse} bpm</p>
+            <p className="text-sm font-medium text-gray-500">{t('pulse')}</p>
+            <p className="text-lg">{serviceData.pulse || t('notSpecified')} bpm</p>
           </div>
           <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">Poids</p>
-            <p className="text-lg">{serviceData.weight || 'Non spécifié'} kg</p>
+            <p className="text-sm font-medium text-gray-500">{t('temperature')}</p>
+            <p className="text-lg">{serviceData.temperature || t('notSpecified')} °C</p>
           </div>
           <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">Date</p>
-            <p className="text-lg">{serviceData.date || 'Non spécifié'}</p>
+            <p className="text-sm font-medium text-gray-500">{t('weight')}</p>
+            <p className="text-lg">{serviceData.weight || t('notSpecified')} kg</p>
           </div>
         </div>
       </TabsContent>
       
-      <TabsContent value="history" className="space-y-4">
+      <TabsContent value="consultation" className="space-y-4">
         <div className="grid grid-cols-1 gap-4">
           <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">Motif de consultation</p>
-            <p>{serviceData.consultationReason || 'Non spécifié'}</p>
+            <p className="text-sm font-medium text-gray-500">{t('consultationReason')}</p>
+            <p>{serviceData.consultationReason || t('notSpecified')}</p>
           </div>
-        </div>
-      </TabsContent>
-      
-      <TabsContent value="exam" className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">ECG</p>
-            <p>{serviceData.ecg || 'Non évalué'}</p>
-          </div>
-          <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">Laboratoire</p>
-            <p>{serviceData.lab || 'Non évalué'}</p>
-          </div>
-          <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">Radiographie</p>
-            <p>{serviceData.xray || 'Non évalué'}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="border rounded-md p-3 bg-inherit">
+              <p className="text-sm font-medium text-gray-500">{t('ecg')}</p>
+              <p>{serviceData.ecg || t('notEvaluated')}</p>
+            </div>
+            <div className="border rounded-md p-3 bg-inherit">
+              <p className="text-sm font-medium text-gray-500">{t('lab')}</p>
+              <p>{serviceData.lab || t('notEvaluated')}</p>
+            </div>
+            <div className="border rounded-md p-3 bg-inherit">
+              <p className="text-sm font-medium text-gray-500">{t('xray')}</p>
+              <p>{serviceData.xray || t('notEvaluated')}</p>
+            </div>
           </div>
         </div>
       </TabsContent>
@@ -70,16 +76,16 @@ const ConsultationDataViewer = ({ serviceData }: ConsultationDataViewerProps) =>
       <TabsContent value="diagnosis" className="space-y-4">
         <div className="grid grid-cols-1 gap-4">
           <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">Diagnostic</p>
-            <p>{serviceData.diagnosis || 'Non spécifié'}</p>
+            <p className="text-sm font-medium text-gray-500">{t('diagnosis')}</p>
+            <p>{serviceData.diagnosis || t('notSpecified')}</p>
           </div>
           <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">Traitement</p>
-            <p>{serviceData.treatment || 'Aucun traitement prescrit'}</p>
+            <p className="text-sm font-medium text-gray-500">{t('treatment')}</p>
+            <p className="whitespace-pre-wrap">{serviceData.treatment || t('noTreatmentPrescribed')}</p>
           </div>
           <div className="border rounded-md p-3 bg-inherit">
-            <p className="text-sm font-medium text-gray-500">Signature</p>
-            <p>{serviceData.signature || 'Non signé'}</p>
+            <p className="text-sm font-medium text-gray-500">{t('signature')}</p>
+            <p>{serviceData.signature || t('notSigned')}</p>
           </div>
         </div>
       </TabsContent>
