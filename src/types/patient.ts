@@ -15,6 +15,7 @@ export interface LabExam {
     name: string;
     role: string;
   };
+  status?: 'pending' | 'completed';
 }
 
 export interface Patient {
