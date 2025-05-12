@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,13 +14,30 @@ import { useLanguage } from '@/hooks/useLanguage';
 interface LabExamRequestFormProps {
   onSubmit: (selectedExams: Record<string, boolean>, signature: string) => void;
   onCancel: () => void;
+  initialData?: Record<string, boolean>;
+  initialSignature?: string;
 }
 
-const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCancel }) => {
+const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ 
+  onSubmit, 
+  onCancel, 
+  initialData = {},
+  initialSignature = ''
+}) => {
   const { t } = useLanguage();
-  const [signature, setSignature] = useState('');
-  const [selectedExams, setSelectedExams] = useState<Record<string, boolean>>({});
+  const [signature, setSignature] = useState(initialSignature);
+  const [selectedExams, setSelectedExams] = useState<Record<string, boolean>>(initialData);
   const currentDate = format(new Date(), 'yyyy-MM-dd');
+
+  // Initialiser les examens sélectionnés avec les données initiales
+  useEffect(() => {
+    if (Object.keys(initialData).length > 0) {
+      setSelectedExams(initialData);
+    }
+    if (initialSignature) {
+      setSignature(initialSignature);
+    }
+  }, [initialData, initialSignature]);
 
   const handleExamChange = (examId: string, checked: boolean) => {
     setSelectedExams(prev => ({ ...prev, [examId]: checked }));
@@ -67,6 +84,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="hemogramme" 
+                    checked={selectedExams.hemogramme}
                     onCheckedChange={(checked) => handleExamChange('hemogramme', checked as boolean)}
                   />
                   <Label htmlFor="hemogramme">{t('hemogram')}</Label>
@@ -75,6 +93,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="vs" 
+                    checked={selectedExams.vs}
                     onCheckedChange={(checked) => handleExamChange('vs', checked as boolean)}
                   />
                   <Label htmlFor="vs">{t('sedimentationRate')}</Label>
@@ -83,6 +102,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="groupeSanguin" 
+                    checked={selectedExams.groupeSanguin}
                     onCheckedChange={(checked) => handleExamChange('groupeSanguin', checked as boolean)}
                   />
                   <Label htmlFor="groupeSanguin">{t('bloodType')}</Label>
@@ -100,6 +120,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="tp" 
+                    checked={selectedExams.tp}
                     onCheckedChange={(checked) => handleExamChange('tp', checked as boolean)}
                   />
                   <Label htmlFor="tp">TP</Label>
@@ -108,6 +129,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="tck" 
+                    checked={selectedExams.tck}
                     onCheckedChange={(checked) => handleExamChange('tck', checked as boolean)}
                   />
                   <Label htmlFor="tck">TCK</Label>
@@ -126,6 +148,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="albumineGlucose" 
+                    checked={selectedExams.albumineGlucose}
                     onCheckedChange={(checked) => handleExamChange('albumineGlucose', checked as boolean)}
                   />
                   <Label htmlFor="albumineGlucose">{t('albumineGlucose')}</Label>
@@ -134,6 +157,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="leucocytesBiluribine" 
+                    checked={selectedExams.leucocytesBiluribine}
                     onCheckedChange={(checked) => handleExamChange('leucocytesBiluribine', checked as boolean)}
                   />
                   <Label htmlFor="leucocytesBiluribine">{t('leucocytesBiluribine')}</Label>
@@ -142,6 +166,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="cetonesNitritesSang" 
+                    checked={selectedExams.cetonesNitritesSang}
                     onCheckedChange={(checked) => handleExamChange('cetonesNitritesSang', checked as boolean)}
                   />
                   <Label htmlFor="cetonesNitritesSang">{t('cetonesNitritesSang')}</Label>
@@ -150,6 +175,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="ecbu" 
+                    checked={selectedExams.ecbu}
                     onCheckedChange={(checked) => handleExamChange('ecbu', checked as boolean)}
                   />
                   <Label htmlFor="ecbu">E.C.B.U.</Label>
@@ -158,6 +184,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="antibiogramme" 
+                    checked={selectedExams.antibiogramme}
                     onCheckedChange={(checked) => handleExamChange('antibiogramme', checked as boolean)}
                   />
                   <Label htmlFor="antibiogramme">{t('antibiogram')}</Label>
@@ -176,6 +203,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="paludismeQbc" 
+                    checked={selectedExams.paludismeQbc}
                     onCheckedChange={(checked) => handleExamChange('paludismeQbc', checked as boolean)}
                   />
                   <Label htmlFor="paludismeQbc">{t('malariaQbc')}</Label>
@@ -184,6 +212,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="microfilaires" 
+                    checked={selectedExams.microfilaires}
                     onCheckedChange={(checked) => handleExamChange('microfilaires', checked as boolean)}
                   />
                   <Label htmlFor="microfilaires">{t('microfilaria')}</Label>
@@ -192,6 +221,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="kaop" 
+                    checked={selectedExams.kaop}
                     onCheckedChange={(checked) => handleExamChange('kaop', checked as boolean)}
                   />
                   <Label htmlFor="kaop">K.A.O.P.</Label>
@@ -200,6 +230,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="amibiase" 
+                    checked={selectedExams.amibiase}
                     onCheckedChange={(checked) => handleExamChange('amibiase', checked as boolean)}
                   />
                   <Label htmlFor="amibiase">{t('amebiasis')}</Label>
@@ -208,6 +239,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="widalFelix" 
+                    checked={selectedExams.widalFelix}
                     onCheckedChange={(checked) => handleExamChange('widalFelix', checked as boolean)}
                   />
                   <Label htmlFor="widalFelix">WIDAL-FELIX</Label>
@@ -225,6 +257,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="glycemie" 
+                    checked={selectedExams.glycemie}
                     onCheckedChange={(checked) => handleExamChange('glycemie', checked as boolean)}
                   />
                   <Label htmlFor="glycemie">{t('glycemia')}</Label>
@@ -233,6 +266,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="acideUriqueCalcium" 
+                    checked={selectedExams.acideUriqueCalcium}
                     onCheckedChange={(checked) => handleExamChange('acideUriqueCalcium', checked as boolean)}
                   />
                   <Label htmlFor="acideUriqueCalcium">{t('uricAcidCalcium')}</Label>
@@ -241,6 +275,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="calcium" 
+                    checked={selectedExams.calcium}
                     onCheckedChange={(checked) => handleExamChange('calcium', checked as boolean)}
                   />
                   <Label htmlFor="calcium">{t('calcium')}</Label>
@@ -249,6 +284,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="magnesium" 
+                    checked={selectedExams.magnesium}
                     onCheckedChange={(checked) => handleExamChange('magnesium', checked as boolean)}
                   />
                   <Label htmlFor="magnesium">{t('magnesium')}</Label>
@@ -257,6 +293,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="amylasemie" 
+                    checked={selectedExams.amylasemie}
                     onCheckedChange={(checked) => handleExamChange('amylasemie', checked as boolean)}
                   />
                   <Label htmlFor="amylasemie">{t('amylasemia')}</Label>
@@ -274,6 +311,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="uree" 
+                    checked={selectedExams.uree}
                     onCheckedChange={(checked) => handleExamChange('uree', checked as boolean)}
                   />
                   <Label htmlFor="uree">{t('urea')}</Label>
@@ -282,6 +320,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="creatine" 
+                    checked={selectedExams.creatine}
                     onCheckedChange={(checked) => handleExamChange('creatine', checked as boolean)}
                   />
                   <Label htmlFor="creatine">{t('creatine')}</Label>
@@ -290,6 +329,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="proteinesSériques" 
+                    checked={selectedExams.proteinesSériques}
                     onCheckedChange={(checked) => handleExamChange('proteinesSériques', checked as boolean)}
                   />
                   <Label htmlFor="proteinesSériques">{t('serumProteins')}</Label>
@@ -298,6 +338,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="ionoSangNaK" 
+                    checked={selectedExams.ionoSangNaK}
                     onCheckedChange={(checked) => handleExamChange('ionoSangNaK', checked as boolean)}
                   />
                   <Label htmlFor="ionoSangNaK">{t('bloodIonogram')}</Label>
@@ -306,6 +347,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="ionoUrines" 
+                    checked={selectedExams.ionoUrines}
                     onCheckedChange={(checked) => handleExamChange('ionoUrines', checked as boolean)}
                   />
                   <Label htmlFor="ionoUrines">{t('urinaryIonogram')}</Label>
@@ -323,6 +365,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="gotGpt" 
+                    checked={selectedExams.gotGpt}
                     onCheckedChange={(checked) => handleExamChange('gotGpt', checked as boolean)}
                   />
                   <Label htmlFor="gotGpt">GOT / GPT</Label>
@@ -331,6 +374,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="ggt" 
+                    checked={selectedExams.ggt}
                     onCheckedChange={(checked) => handleExamChange('ggt', checked as boolean)}
                   />
                   <Label htmlFor="ggt">GGT</Label>
@@ -339,6 +383,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="proteinesSériquesHepatic" 
+                    checked={selectedExams.proteinesSériquesHepatic}
                     onCheckedChange={(checked) => handleExamChange('proteinesSériquesHepatic', checked as boolean)}
                   />
                   <Label htmlFor="proteinesSériquesHepatic">{t('serumProteins')}</Label>
@@ -347,6 +392,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="phosphatasesAlcalines" 
+                    checked={selectedExams.phosphatasesAlcalines}
                     onCheckedChange={(checked) => handleExamChange('phosphatasesAlcalines', checked as boolean)}
                   />
                   <Label htmlFor="phosphatasesAlcalines">{t('alkalinePhosphatase')}</Label>
@@ -355,6 +401,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="bilirubineTotale" 
+                    checked={selectedExams.bilirubineTotale}
                     onCheckedChange={(checked) => handleExamChange('bilirubineTotale', checked as boolean)}
                   />
                   <Label htmlFor="bilirubineTotale">{t('totalBilirubin')}</Label>
@@ -372,6 +419,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="cholesterol" 
+                    checked={selectedExams.cholesterol}
                     onCheckedChange={(checked) => handleExamChange('cholesterol', checked as boolean)}
                   />
                   <Label htmlFor="cholesterol">{t('cholesterol')}</Label>
@@ -380,6 +428,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="triglycerides" 
+                    checked={selectedExams.triglycerides}
                     onCheckedChange={(checked) => handleExamChange('triglycerides', checked as boolean)}
                   />
                   <Label htmlFor="triglycerides">{t('triglycerides')}</Label>
@@ -388,6 +437,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="hdlLdlCholesterol" 
+                    checked={selectedExams.hdlLdlCholesterol}
                     onCheckedChange={(checked) => handleExamChange('hdlLdlCholesterol', checked as boolean)}
                   />
                   <Label htmlFor="hdlLdlCholesterol">HDL/LDL {t('cholesterol')}</Label>
@@ -406,6 +456,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="tphaVdrl" 
+                    checked={selectedExams.tphaVdrl}
                     onCheckedChange={(checked) => handleExamChange('tphaVdrl', checked as boolean)}
                   />
                   <Label htmlFor="tphaVdrl">TPHA/VDRL</Label>
@@ -416,6 +467,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                   <div className="flex items-center space-x-2">
                     <Checkbox 
                       id="antigeneHbs" 
+                      checked={selectedExams.antigeneHbs}
                       onCheckedChange={(checked) => handleExamChange('antigeneHbs', checked as boolean)}
                     />
                     <Label htmlFor="antigeneHbs">{t('hbsAntigen')}</Label>
@@ -424,6 +476,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                   <div className="flex items-center space-x-2">
                     <Checkbox 
                       id="anticorpsHbs" 
+                      checked={selectedExams.anticorpsHbs}
                       onCheckedChange={(checked) => handleExamChange('anticorpsHbs', checked as boolean)}
                     />
                     <Label htmlFor="anticorpsHbs">{t('hbsAntibody')}</Label>
@@ -432,6 +485,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                   <div className="flex items-center space-x-2">
                     <Checkbox 
                       id="anticorpsHbc" 
+                      checked={selectedExams.anticorpsHbc}
                       onCheckedChange={(checked) => handleExamChange('anticorpsHbc', checked as boolean)}
                     />
                     <Label htmlFor="anticorpsHbc">{t('hbcAntibody')}</Label>
@@ -442,6 +496,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="anticorpsAntiCmv" 
+                    checked={selectedExams.anticorpsAntiCmv}
                     onCheckedChange={(checked) => handleExamChange('anticorpsAntiCmv', checked as boolean)}
                   />
                   <Label htmlFor="anticorpsAntiCmv">{t('cmvAntibody')}</Label>
@@ -451,6 +506,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="anticorpsAntiHc" 
+                    checked={selectedExams.anticorpsAntiHc}
                     onCheckedChange={(checked) => handleExamChange('anticorpsAntiHc', checked as boolean)}
                   />
                   <Label htmlFor="anticorpsAntiHc">{t('hcvAntibody')}</Label>
@@ -460,6 +516,7 @@ const LabExamRequestForm: React.FC<LabExamRequestFormProps> = ({ onSubmit, onCan
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="anticorpsAntiHiv" 
+                    checked={selectedExams.anticorpsAntiHiv}
                     onCheckedChange={(checked) => handleExamChange('anticorpsAntiHiv', checked as boolean)}
                   />
                   <Label htmlFor="anticorpsAntiHiv">{t('hivAntibody')}</Label>

@@ -65,6 +65,7 @@ const ConsultationForm = () => {
 
     // Sauvegarder les données du formulaire complètes dans sessionStorage
     sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(formData));
+    console.log("Saving complete form data:", formData);
 
     // Format notes for patient records
     const patientNotes = `${t('consultation')}: ${formData.consultationReason || t('notSpecified')} - ${formData.diagnosis || t('noDiagnosis')}`;

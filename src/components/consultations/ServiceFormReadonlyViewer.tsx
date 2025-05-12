@@ -27,6 +27,7 @@ const ServiceFormReadonlyViewer = ({
     // Si on a déjà reçu des données via props, utilisons-les
     if (Object.keys(serviceData).length > 0) {
       setData(serviceData);
+      console.log("Using service data from props:", serviceData);
       return;
     }
     
@@ -65,7 +66,7 @@ const ServiceFormReadonlyViewer = ({
 
   return (
     <Card className="w-full mb-6">
-      <CardHeader className="">
+      <CardHeader>
         <CardTitle className={getServiceColor(patient.service)}>
           {t('dataOf')} {getServiceName(patient.service)}
         </CardTitle>

@@ -33,7 +33,9 @@ const ConsultationFormWrapper = ({
   const { user } = useAuth();
   const requestLabExams = usePatientStore(state => state.requestLabExams);
   const [showLabForm, setShowLabForm] = useState(false);
-  const [requestLabExamsChecked, setRequestLabExamsChecked] = useState(false);
+  const [requestLabExamsChecked, setRequestLabExamsChecked] = useState(initialData.requestLabExamsChecked || false);
+  const [selectedExams, setSelectedExams] = useState<Record<string, boolean>>(initialData.selectedExams || {});
+  const [labSignature, setLabSignature] = useState(initialData.labSignature || '');
 
   const [formData, setFormData] = useState({
     // Date et infos vitaux
@@ -51,6 +53,10 @@ const ConsultationFormWrapper = ({
     diagnosis: '',
     treatment: '',
     signature: '',
+    // Informations sur les examens de laboratoire
+    requestLabExamsChecked: false,
+    selectedExams: {},
+    labSignature: '',
     ...initialData
   });
 
@@ -75,7 +81,14 @@ const ConsultationFormWrapper = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      onSubmit(formData);
+      // Inclure les données des examens de laboratoire dans les données du formulaire
+      const completeFormData = {
+        ...formData,
+        requestLabExamsChecked,
+        selectedExams,
+        labSignature
+      };
+      onSubmit(completeFormData);
     }
   };
 
@@ -85,7 +98,11 @@ const ConsultationFormWrapper = ({
       return;
     }
     
-    // Créer un tableau d'examens demandés
+    // Sauvegarder les examens sélectionnés
+    setSelectedExams(selectedExams);
+    setLabSignature(signature);
+    
+    // Créer un tableau d'examens demandés pour le store
     const exams = Object.entries(selectedExams)
       .filter(([_, selected]) => selected)
       .map(([examId]) => ({
@@ -94,8 +111,8 @@ const ConsultationFormWrapper = ({
         requestedBy: { name: user.name, role: user.role }
       }));
     
-    // Envoyer la demande d'examens
-    if (exams.length > 0) {
+    // Envoyer la demande d'examens au store si nécessaire
+    if (exams.length > 0 && !isEditMode) {
       requestLabExams(
         patient.id,
         exams,
@@ -103,10 +120,9 @@ const ConsultationFormWrapper = ({
       );
       
       toast.success(t('labExamsRequested'));
-      setShowLabForm(false);
-    } else {
-      toast.error(t('selectAtLeastOneExam'));
     }
+    
+    setShowLabForm(false);
   };
 
   return (
@@ -200,7 +216,9 @@ const ConsultationFormWrapper = ({
                   onClick={() => setShowLabForm(true)}
                 >
                   <ClipboardList className="h-4 w-4 mr-2" />
-                  {t('openLabRequestForm')}
+                  {Object.keys(selectedExams).length > 0 
+                    ? t('editLabRequest') 
+                    : t('openLabRequestForm')}
                 </Button>
               )}
             </div>
@@ -242,6 +260,8 @@ const ConsultationFormWrapper = ({
           <LabExamRequestForm
             onSubmit={handleLabExamSubmit}
             onCancel={() => setShowLabForm(false)}
+            initialData={selectedExams}
+            initialSignature={labSignature}
           />
         </DialogContent>
       </Dialog>
