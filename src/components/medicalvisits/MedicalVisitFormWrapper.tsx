@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -137,7 +138,7 @@ const MedicalVisitFormWrapper = ({
       .filter(([_, selected]) => selected)
       .map(([examId]) => ({
         type: examId,
-        status: 'pending',
+        status: 'pending' as 'pending' | 'completed',
         requestedBy: { name: user.name, role: user.role }
       }));
     
