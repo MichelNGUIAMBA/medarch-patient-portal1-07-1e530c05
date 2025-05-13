@@ -24,6 +24,7 @@ const ConsultationForm = () => {
   const patients = usePatientStore((state) => state.patients);
   const updatePatient = usePatientStore((state) => state.updatePatient);
   const setPatientCompleted = usePatientStore((state) => state.setPatientCompleted);
+  const addServiceRecord = usePatientStore((state) => state.addServiceRecord);
 
   const patient = patients.find(p => p.id === patientId);
 
@@ -63,9 +64,15 @@ const ConsultationForm = () => {
       return;
     }
 
+    // Ajouter la date et l'heure actuelles aux données du formulaire
+    const updatedFormData = {
+      ...formData,
+      serviceDateTime: new Date().toISOString()
+    };
+
     // Sauvegarder les données du formulaire complètes dans sessionStorage
-    sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(formData));
-    console.log("Saving complete form data:", formData);
+    sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(updatedFormData));
+    console.log("Saving complete form data:", updatedFormData);
 
     // Format notes for patient records
     const patientNotes = `${t('consultation')}: ${formData.consultationReason || t('notSpecified')} - ${formData.diagnosis || t('noDiagnosis')}`;
@@ -90,6 +97,16 @@ const ConsultationForm = () => {
         patient.id,
         {
           notes: patientNotes
+        },
+        { name: user.name, role: user.role }
+      );
+      
+      // Ajouter l'enregistrement de service à l'historique du patient
+      addServiceRecord(
+        patient.id,
+        {
+          serviceType: "Cons",
+          serviceData: updatedFormData
         },
         { name: user.name, role: user.role }
       );

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { usePatientStore } from '@/stores/usePatientStore';
@@ -5,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, FileEdit } from 'lucide-react';
+import { Edit, FileEdit, History } from 'lucide-react';
 import PatientEditDialog from '@/components/nurse/PatientEditDialog';
 import CompletePatientEditDialog from '@/components/nurse/CompletePatientEditDialog';
 import ModificationHistory from '@/components/nurse/ModificationHistory';
@@ -13,6 +14,7 @@ import { toast } from '@/components/ui/sonner';
 import { Patient } from '@/types/patient';
 import PatientInfoCard from '@/components/consultations/PatientInfoCard';
 import ServiceFormReadonlyViewer from '@/components/consultations/ServiceFormReadonlyViewer';
+import ServicesHistoryViewer from '@/components/consultations/ServicesHistoryViewer';
 import { useLanguage } from '@/hooks/useLanguage';
 
 const PatientDetailView = () => {
@@ -29,6 +31,7 @@ const PatientDetailView = () => {
                   patients.find(p => p.id === patientId);
   
   const [showHistory, setShowHistory] = useState(false);
+  const [showServiceHistory, setShowServiceHistory] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCompleteEditOpen, setIsCompleteEditOpen] = useState(false);
   const [serviceData, setServiceData] = useState<any>({});
@@ -74,6 +77,10 @@ const PatientDetailView = () => {
   
   const toggleHistory = () => {
     setShowHistory(!showHistory);
+  };
+  
+  const toggleServiceHistory = () => {
+    setShowServiceHistory(!showServiceHistory);
   };
   
   // Détermine la couleur du service
@@ -190,7 +197,16 @@ const PatientDetailView = () => {
       
       {/* Service Data Viewer - Only show if service data exists */}
       {Object.keys(serviceData).length > 0 && (
-        <ServiceFormReadonlyViewer patient={patient} serviceData={serviceData} />
+        <ServiceFormReadonlyViewer 
+          patient={patient} 
+          serviceData={serviceData} 
+          displayDateTime 
+        />
+      )}
+      
+      {/* Afficher l'historique des services du patient si disponible */}
+      {showServiceHistory && patient.serviceHistory && patient.serviceHistory.length > 0 && (
+        <ServicesHistoryViewer patient={patient} />
       )}
       
       <div className="flex flex-col lg:flex-row gap-4 mb-6">
@@ -214,6 +230,14 @@ const PatientDetailView = () => {
         <Button variant="secondary" onClick={toggleHistory}>
           {showHistory ? t('hideHistory') : t('showHistory')}
         </Button>
+        
+        {/* Bouton pour afficher l'historique des services */}
+        {patient.serviceHistory && patient.serviceHistory.length > 0 && (
+          <Button variant="secondary" onClick={toggleServiceHistory}>
+            <History className="h-4 w-4 mr-2" />
+            {showServiceHistory ? t('hideServiceHistory') : t('showServiceHistory')}
+          </Button>
+        )}
       </div>
       
       {showHistory && (

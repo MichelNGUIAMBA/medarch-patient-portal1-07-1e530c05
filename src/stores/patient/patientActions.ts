@@ -1,5 +1,4 @@
-
-import { Patient, LabExam } from '@/types/patient';
+import { Patient, LabExam, ServiceRecord } from '@/types/patient';
 import { ModificationRecord, PatientState } from './types';
 import { StateCreator } from 'zustand';
 
@@ -12,6 +11,7 @@ export interface PatientSlice extends PatientState {
   addServiceToExistingPatient: (patientId: string, service: "VM" | "Cons" | "Ug") => void;
   requestLabExams: (patientId: string, exams: Omit<LabExam, "requestedAt">[], requestedBy: { name: string; role: string }) => void;
   completeLabExams: (patientId: string, examResults: { index: number; results: string }[], completedBy: { name: string; role: string }) => void;
+  addServiceRecord: (patientId: string, serviceRecord: Omit<ServiceRecord, "date">, modifiedBy: { name: string; role: string }) => void;
 }
 
 export const createPatientSlice: StateCreator<PatientSlice> = (set) => ({
@@ -234,6 +234,40 @@ export const createPatientSlice: StateCreator<PatientSlice> = (set) => ({
           newValue: `${(currentPatient.completedLabExams?.length || 0) + newCompletedExams.length} exams`,
           modifiedBy: completedBy,
           timestamp: completedAt
+        },
+        ...(currentPatient.modificationHistory || [])
+      ]
+    };
+    
+    return { patients: updatedPatients };
+  }),
+  
+  addServiceRecord: (patientId, serviceRecord, modifiedBy) => set((state) => {
+    const patientIndex = state.patients.findIndex(p => p.id === patientId);
+    if (patientIndex === -1) return state;
+    
+    const currentPatient = state.patients[patientIndex];
+    const now = new Date().toISOString();
+    
+    const newServiceRecord: ServiceRecord = {
+      ...serviceRecord,
+      date: now
+    };
+    
+    const updatedPatients = [...state.patients];
+    updatedPatients[patientIndex] = {
+      ...currentPatient,
+      serviceHistory: [
+        ...(currentPatient.serviceHistory || []),
+        newServiceRecord
+      ],
+      modificationHistory: [
+        {
+          field: "serviceHistory",
+          oldValue: `${currentPatient.serviceHistory?.length || 0} services`,
+          newValue: `${(currentPatient.serviceHistory?.length || 0) + 1} services`,
+          modifiedBy,
+          timestamp: now
         },
         ...(currentPatient.modificationHistory || [])
       ]

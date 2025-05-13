@@ -18,6 +18,12 @@ export interface LabExam {
   status?: 'pending' | 'completed';
 }
 
+export interface ServiceRecord {
+  serviceType: "VM" | "Cons" | "Ug";
+  date: string;
+  serviceData: any;
+}
+
 export interface Patient {
   id: string;
   name: string;
@@ -43,4 +49,5 @@ export interface Patient {
   originalPatientId?: string; // ID de référence au patient original pour les visites répétées
   pendingLabExams?: LabExam[];
   completedLabExams?: LabExam[];
+  serviceHistory?: ServiceRecord[]; // Nouvel attribut pour l'historique des services
 }

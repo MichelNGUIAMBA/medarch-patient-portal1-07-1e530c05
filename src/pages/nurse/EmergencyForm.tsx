@@ -24,6 +24,7 @@ const EmergencyForm = () => {
   const patients = usePatientStore((state) => state.patients);
   const updatePatient = usePatientStore((state) => state.updatePatient);
   const setPatientCompleted = usePatientStore((state) => state.setPatientCompleted);
+  const addServiceRecord = usePatientStore((state) => state.addServiceRecord);
 
   const patient = patients.find(p => p.id === patientId);
 
@@ -63,8 +64,14 @@ const EmergencyForm = () => {
       return;
     }
 
+    // Ajouter la date et l'heure actuelles aux données du formulaire
+    const updatedFormData = {
+      ...formData,
+      serviceDateTime: new Date().toISOString()
+    };
+
     // Sauvegarder les données du formulaire
-    sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(formData));
+    sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(updatedFormData));
 
     if (isEditMode) {
       // Mettre à jour le patient avec les nouvelles données
@@ -86,6 +93,16 @@ const EmergencyForm = () => {
         patient.id,
         {
           notes: `${t('emergency')}: ${formData.mainComplaint || t('notSpecified')} - ${formData.immediateActions || t('noImmediateActions')}`
+        },
+        { name: user.name, role: user.role }
+      );
+      
+      // Ajouter l'enregistrement de service à l'historique du patient
+      addServiceRecord(
+        patient.id,
+        {
+          serviceType: "Ug",
+          serviceData: updatedFormData
         },
         { name: user.name, role: user.role }
       );

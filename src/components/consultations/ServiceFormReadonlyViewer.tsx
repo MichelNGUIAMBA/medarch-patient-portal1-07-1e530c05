@@ -5,6 +5,9 @@ import { Patient } from '@/types/patient';
 import { getServiceColor, getServiceName } from './utils/serviceUtils';
 import { toast } from '@/components/ui/sonner';
 import { useLanguage } from '@/hooks/useLanguage';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { Clock } from 'lucide-react';
 
 // Import the refactored service viewers
 import ConsultationDataViewer from './viewers/ConsultationDataViewer';
@@ -14,11 +17,13 @@ import EmergencyDataViewer from './viewers/EmergencyDataViewer';
 interface ServiceFormReadonlyViewerProps {
   patient: Patient;
   serviceData: any;
+  displayDateTime?: boolean;
 }
 
 const ServiceFormReadonlyViewer = ({
   patient,
-  serviceData
+  serviceData,
+  displayDateTime = false
 }: ServiceFormReadonlyViewerProps) => {
   const { t } = useLanguage();
   const [data, setData] = useState<any>(serviceData || {});
@@ -45,6 +50,12 @@ const ServiceFormReadonlyViewer = ({
     }
   }, [patient.id, serviceData, t]);
 
+  // Format date-time
+  const formatDateTime = (dateString: string) => {
+    if (!dateString) return '';
+    return format(new Date(dateString), 'dd/MM/yyyy à HH:mm', { locale: fr });
+  };
+
   // Render the appropriate viewer based on service type
   const renderServiceDataViewer = () => {
     switch (patient.service) {
@@ -66,10 +77,17 @@ const ServiceFormReadonlyViewer = ({
 
   return (
     <Card className="w-full mb-6">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className={getServiceColor(patient.service)}>
           {t('dataOf')} {getServiceName(patient.service)}
         </CardTitle>
+        
+        {displayDateTime && data.serviceDateTime && (
+          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+            <Clock className="h-4 w-4 mr-1" />
+            {formatDateTime(data.serviceDateTime)}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="pt-6">
         {renderServiceDataViewer()}

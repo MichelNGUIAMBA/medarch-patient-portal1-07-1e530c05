@@ -12,7 +12,13 @@ export const recordsTranslations: Record<string, TranslationRecord> = {
     'lastExamResults': 'Derniers résultats d\'examens',
     'medicalReport': 'Rapport médical',
     'generateAIInsights': 'Générer des insights IA',
-    'completeVisit': 'Terminer la visite'
+    'completeVisit': 'Terminer la visite',
+    'serviceHistory': 'Historique des services',
+    'noServiceHistory': 'Aucun service antérieur enregistré',
+    'viewDetails': 'Voir les détails',
+    'hideServiceHistory': 'Masquer l\'historique des services',
+    'showServiceHistory': 'Afficher l\'historique des services',
+    'dataOf': 'Données de'
   },
   en: {
     'patientHistory': 'Patient History',
@@ -24,7 +30,13 @@ export const recordsTranslations: Record<string, TranslationRecord> = {
     'lastExamResults': 'Last Exam Results',
     'medicalReport': 'Medical Report',
     'generateAIInsights': 'Generate AI Insights',
-    'completeVisit': 'Complete Visit'
+    'completeVisit': 'Complete Visit',
+    'serviceHistory': 'Service History',
+    'noServiceHistory': 'No previous services recorded',
+    'viewDetails': 'View details',
+    'hideServiceHistory': 'Hide service history',
+    'showServiceHistory': 'Show service history',
+    'dataOf': 'Data of'
   },
   de: {
     'patientHistory': 'Patientengeschichte',
@@ -36,6 +48,12 @@ export const recordsTranslations: Record<string, TranslationRecord> = {
     'lastExamResults': 'Letzte Untersuchungsergebnisse',
     'medicalReport': 'Medizinischer Bericht',
     'generateAIInsights': 'KI-Erkenntnisse generieren',
-    'completeVisit': 'Besuch abschließen'
+    'completeVisit': 'Besuch abschließen',
+    'serviceHistory': 'Leistungsverlauf',
+    'noServiceHistory': 'Keine früheren Leistungen aufgezeichnet',
+    'viewDetails': 'Details anzeigen',
+    'hideServiceHistory': 'Leistungsverlauf ausblenden',
+    'showServiceHistory': 'Leistungsverlauf anzeigen',
+    'dataOf': 'Daten von'
   }
 };
