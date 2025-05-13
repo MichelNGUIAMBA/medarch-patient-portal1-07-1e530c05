@@ -16,6 +16,7 @@ import ModificationHistory from '@/components/nurse/ModificationHistory';
 import PatientPersonalInfoCard from '@/components/patient/PatientPersonalInfoCard';
 import ServiceInfoCard from '@/components/patient/ServiceInfoCard';
 import PatientActionButtons from '@/components/patient/PatientActionButtons';
+import BackButton from '@/components/shared/BackButton';
 import { getServiceColor, getServiceName } from '@/components/patient/utils/patientDetailUtils';
 
 const PatientDetailView = () => {
@@ -36,6 +37,7 @@ const PatientDetailView = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCompleteEditOpen, setIsCompleteEditOpen] = useState(false);
   const [serviceData, setServiceData] = useState<any>({});
+  const [serviceCompleted, setServiceCompleted] = useState(false);
   
   // Récupérer les données précédentes lors du montage du composant
   useEffect(() => {
@@ -46,6 +48,8 @@ const PatientDetailView = () => {
         try {
           const parsedData = JSON.parse(storedServiceData);
           setServiceData(parsedData);
+          // Vérifier si le service est complété basé sur la présence de serviceDateTime
+          setServiceCompleted(!!parsedData.serviceDateTime);
           console.log("Service data loaded:", parsedData);
         } catch (e) {
           console.error("Erreur lors du parsing des données de service:", e);
@@ -92,9 +96,7 @@ const PatientDetailView = () => {
             {getServiceName(patient.service)}
           </span> - {patient.name}
         </h1>
-        <div className="space-x-2">
-          <Button variant="outline" onClick={() => navigate(-1)}>{t('cancel')}</Button>
-        </div>
+        <BackButton />
       </div>
       
       <PatientInfoCard patient={patient} />
@@ -104,8 +106,8 @@ const PatientDetailView = () => {
         <ServiceInfoCard patient={patient} />
       </div>
       
-      {/* Service Data Viewer - Only show if service data exists */}
-      {Object.keys(serviceData).length > 0 && (
+      {/* Service Data Viewer - Only show if service data exists AND service is completed */}
+      {Object.keys(serviceData).length > 0 && serviceCompleted && (
         <ServiceFormReadonlyViewer 
           patient={patient} 
           serviceData={serviceData} 

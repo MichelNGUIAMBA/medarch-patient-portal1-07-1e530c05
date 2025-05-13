@@ -27,11 +27,14 @@ const ServiceFormReadonlyViewer = ({
 }: ServiceFormReadonlyViewerProps) => {
   const { t } = useLanguage();
   const [data, setData] = useState<any>(serviceData || {});
+  const [isServiceCompleted, setIsServiceCompleted] = useState(false);
   
   useEffect(() => {
     // Si on a déjà reçu des données via props, utilisons-les
     if (Object.keys(serviceData).length > 0) {
       setData(serviceData);
+      // Vérifier si le service est complété basé sur la présence de serviceDateTime
+      setIsServiceCompleted(!!serviceData.serviceDateTime);
       console.log("Using service data from props:", serviceData);
       return;
     }
@@ -42,6 +45,8 @@ const ServiceFormReadonlyViewer = ({
       try {
         const parsed = JSON.parse(storedData);
         setData(parsed);
+        // Vérifier si le service est complété basé sur la présence de serviceDateTime
+        setIsServiceCompleted(!!parsed.serviceDateTime);
         console.log("Service data loaded from sessionStorage:", parsed);
       } catch (e) {
         console.error("Error parsing service data:", e);
@@ -72,6 +77,11 @@ const ServiceFormReadonlyViewer = ({
 
   // Si aucune donnée n'est disponible, ne pas afficher le composant
   if (Object.keys(data).length === 0) {
+    return null;
+  }
+  
+  // Si le service n'est pas complété, ne pas afficher le composant
+  if (!isServiceCompleted) {
     return null;
   }
 

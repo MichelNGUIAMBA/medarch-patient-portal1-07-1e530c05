@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Edit, FileEdit, History } from 'lucide-react';
 import { Patient } from '@/types/patient';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useNavigate } from 'react-router-dom';
 import { getServiceColor, getServiceName } from './utils/patientDetailUtils';
 
 interface PatientActionButtonsProps {
@@ -26,6 +27,18 @@ const PatientActionButtons = ({
   showServiceHistory
 }: PatientActionButtonsProps) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  
+  // Utiliser la navigation programmatique plutôt que des balises <a>
+  const handleServiceEdit = () => {
+    const route = patient.service === 'VM' 
+      ? `/medical-visits/${patient.id}/edit` 
+      : patient.service === 'Cons' 
+      ? `/consultations/${patient.id}/edit` 
+      : `/emergencies/${patient.id}/edit`;
+    
+    navigate(route);
+  };
   
   return (
     <div className="flex flex-col lg:flex-row gap-4 mb-6">
@@ -34,7 +47,7 @@ const PatientActionButtons = ({
         {t('edit')} {t('patientInfo').toLowerCase()}
       </Button>
       <Button 
-        onClick={onCompleteEdit}
+        onClick={handleServiceEdit}
         className={`${
           patient.service === 'Ug' 
             ? 'bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800' 

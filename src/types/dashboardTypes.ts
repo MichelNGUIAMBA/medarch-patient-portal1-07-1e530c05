@@ -11,3 +11,8 @@ export interface ServiceHistoryEntry {
   patientId: string;
   patientName: string;
 }
+
+export interface ServiceData {
+  serviceDateTime?: string;
+  [key: string]: any;
+}
