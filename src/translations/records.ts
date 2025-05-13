@@ -18,7 +18,13 @@ export const recordsTranslations: Record<string, TranslationRecord> = {
     'viewDetails': 'Voir les détails',
     'hideServiceHistory': 'Masquer l\'historique des services',
     'showServiceHistory': 'Afficher l\'historique des services',
-    'dataOf': 'Données de'
+    'dataOf': 'Données de',
+    'emergency': 'Urgence',
+    'medicalVisit': 'Visite médicale',
+    'consultation': 'Consultation',
+    'notTakenCare': 'Non pris en charge',
+    'noNotesAvailable': 'Aucune note disponible',
+    'notSpecified': 'Non spécifié'
   },
   en: {
     'patientHistory': 'Patient History',
@@ -36,7 +42,13 @@ export const recordsTranslations: Record<string, TranslationRecord> = {
     'viewDetails': 'View details',
     'hideServiceHistory': 'Hide service history',
     'showServiceHistory': 'Show service history',
-    'dataOf': 'Data of'
+    'dataOf': 'Data of',
+    'emergency': 'Emergency',
+    'medicalVisit': 'Medical Visit',
+    'consultation': 'Consultation',
+    'notTakenCare': 'Not taken care of',
+    'noNotesAvailable': 'No notes available',
+    'notSpecified': 'Not specified'
   },
   de: {
     'patientHistory': 'Patientengeschichte',
@@ -54,6 +66,12 @@ export const recordsTranslations: Record<string, TranslationRecord> = {
     'viewDetails': 'Details anzeigen',
     'hideServiceHistory': 'Leistungsverlauf ausblenden',
     'showServiceHistory': 'Leistungsverlauf anzeigen',
-    'dataOf': 'Daten von'
+    'dataOf': 'Daten von',
+    'emergency': 'Notfall',
+    'medicalVisit': 'Medizinischer Besuch',
+    'consultation': 'Konsultation',
+    'notTakenCare': 'Nicht betreut',
+    'noNotesAvailable': 'Keine Notizen verfügbar',
+    'notSpecified': 'Nicht angegeben'
   }
 };
