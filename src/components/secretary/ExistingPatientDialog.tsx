@@ -54,6 +54,7 @@ const ExistingPatientDialog = ({ open, onOpenChange, patient, onAddService }: Ex
       return;
     }
     
+    // Fix: Call addServiceToExistingPatient with correct number of arguments
     addServiceToExistingPatient(selectedPatient.id, selectedService);
     toast.success(t('patientAddedToQueue', { name: selectedPatient.name, service: selectedService }));
     
