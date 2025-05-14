@@ -16,6 +16,7 @@ export interface LabExam {
     role: string;
   };
   status?: 'pending' | 'completed';
+  data?: any; // Adding the data property to store exam-specific data
 }
 
 export interface ServiceRecord {
