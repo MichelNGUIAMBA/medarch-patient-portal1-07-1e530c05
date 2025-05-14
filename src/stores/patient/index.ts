@@ -15,6 +15,23 @@ export const usePatientStore = create<PatientSlice>()(
     }),
     {
       name: 'patient-storage',
+      // Ajout d'options pour assurer la persistance même après rechargement/mise à jour
+      partialize: (state) => ({
+        patients: state.patients,
+      }),
+      // S'assurer que les données sont stockées immédiatement
+      storage: {
+        getItem: (name) => {
+          const data = localStorage.getItem(name);
+          return data ? JSON.parse(data) : null;
+        },
+        setItem: (name, value) => {
+          localStorage.setItem(name, JSON.stringify(value));
+        },
+        removeItem: (name) => {
+          localStorage.removeItem(name);
+        },
+      },
     }
   )
 );

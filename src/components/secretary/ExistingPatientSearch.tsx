@@ -14,9 +14,20 @@ const ExistingPatientSearch = ({ onPatientSelect }: ExistingPatientSearchProps) 
   const [searchTerm, setSearchTerm] = useState('');
   const patients = usePatientStore((state) => state.patients);
   
+  // On veut obtenir une liste unique de patients sans doublons (en se basant sur l'ID original)
+  const uniquePatients = React.useMemo(() => {
+    const seen = new Set();
+    return patients.filter(patient => {
+      const uniqueId = patient.originalPatientId || patient.id;
+      const duplicate = seen.has(uniqueId);
+      seen.add(uniqueId);
+      return !duplicate;
+    });
+  }, [patients]);
+  
   // Filtrer les patients en fonction du terme de recherche
   const filteredPatients = searchTerm 
-    ? patients.filter(patient => 
+    ? uniquePatients.filter(patient => 
         patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         patient.id.toLowerCase().includes(searchTerm.toLowerCase())
       )
@@ -46,7 +57,7 @@ const ExistingPatientSearch = ({ onPatientSelect }: ExistingPatientSearchProps) 
                   <tr>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">ID</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Nom</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Service</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Entreprise</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Action</th>
                   </tr>
                 </thead>
@@ -55,15 +66,7 @@ const ExistingPatientSearch = ({ onPatientSelect }: ExistingPatientSearchProps) 
                     <tr key={patient.id} className="border-t hover:bg-gray-50">
                       <td className="px-4 py-2 text-sm">{patient.id}</td>
                       <td className="px-4 py-2 text-sm font-medium">{patient.name}</td>
-                      <td className="px-4 py-2 text-sm">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          patient.service === "VM" ? "bg-blue-100 text-blue-800" : 
-                          patient.service === "Ug" ? "bg-red-100 text-red-800" : 
-                          "bg-green-100 text-green-800"
-                        }`}>
-                          {patient.service}
-                        </span>
-                      </td>
+                      <td className="px-4 py-2 text-sm">{patient.company}</td>
                       <td className="px-4 py-2 text-sm">
                         <Button 
                           variant="ghost" 
