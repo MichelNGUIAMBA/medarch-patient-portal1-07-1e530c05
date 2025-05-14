@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth-context";
@@ -9,26 +10,25 @@ import { toast } from "@/components/ui/sonner";
 import ThemeSwitcher from "./ThemeSwitcher";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/hooks/useLanguage";
+
 const DashboardLayout = () => {
-  const {
-    user,
-    logout
-  } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const {
-    t
-  } = useLanguage();
+  const { t } = useLanguage();
+  
   const handleLogout = () => {
     logout();
     toast.success(t('logout'));
     navigate("/");
   };
+  
   const getNavigationItems = () => {
     const commonItems = [{
       title: t('dashboard'),
       url: "/dashboard",
       icon: FileText
     }];
+    
     const roleBasedItems = {
       admin: [{
         title: t('users'),
@@ -64,6 +64,10 @@ const DashboardLayout = () => {
         title: t('emergencies'),
         url: "/dashboard/emergencies",
         icon: Ambulance
+      }, {
+        title: t('exams'),
+        url: "/dashboard/exams",
+        icon: ClipboardCheck
       }],
       lab: [{
         title: t('pendingExams'),
@@ -84,8 +88,10 @@ const DashboardLayout = () => {
         icon: FileText
       }]
     };
+    
     return user?.role && roleBasedItems[user.role] ? [...commonItems, ...roleBasedItems[user.role]] : commonItems;
   };
+  
   return <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
         <Sidebar className="border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 dark:text-white">

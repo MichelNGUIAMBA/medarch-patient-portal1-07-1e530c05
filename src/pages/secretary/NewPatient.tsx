@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePatientStore } from '@/stores/usePatientStore';
 import CsvImport from '@/components/secretary/CsvImport';
@@ -39,11 +39,7 @@ const NewPatient = () => {
     address: '',
     company: '',
     employeeId: '',
-    services: {
-      vm: false,
-      cons: false,
-      urg: false
-    }
+    selectedService: '' // Modifié pour n'avoir qu'un seul service sélectionné
   });
 
   // Vérification des patients similaires lors des changements de prénom, nom et date de naissance
@@ -84,13 +80,10 @@ const NewPatient = () => {
     }));
   };
 
-  const handleServiceChange = (service: 'vm' | 'cons' | 'urg', checked: boolean) => {
+  const handleServiceChange = (service: string) => {
     setFormData(prev => ({
       ...prev,
-      services: {
-        ...prev.services,
-        [service]: checked
-      }
+      selectedService: service
     }));
   };
 
@@ -108,19 +101,19 @@ const NewPatient = () => {
       return false;
     }
     
-    // Check if at least one service is selected
-    if (!formData.services.vm && !formData.services.cons && !formData.services.urg) {
-      toast.error("Veuillez sélectionner au moins un service");
+    // Check if a service is selected
+    if (!formData.selectedService) {
+      toast.error("Veuillez sélectionner un service");
       return false;
     }
     
     // Company-specific service validation
-    if (formData.company === "Total SA" && formData.services.cons) {
+    if (formData.company === "Total SA" && formData.selectedService === "Cons") {
       toast.error("Total SA n'a pas accès aux consultations");
       return false;
     }
     
-    if ((formData.company === "Autre" || formData.company === "Stagiaire") && formData.services.vm) {
+    if ((formData.company === "Autre" || formData.company === "Stagiaire") && formData.selectedService === "VM") {
       toast.error("Les autres sociétés et stagiaires n'ont pas accès aux visites médicales");
       return false;
     }
@@ -143,8 +136,9 @@ const NewPatient = () => {
     if (validateStep2()) {
       // Ajout du patient au store
       let serviceType: "VM" | "Cons" | "Ug" = "VM";
-      if (formData.services.urg) serviceType = "Ug";
-      else if (formData.services.cons) serviceType = "Cons";
+      if (formData.selectedService === "Ug") serviceType = "Ug";
+      else if (formData.selectedService === "Cons") serviceType = "Cons";
+      else if (formData.selectedService === "VM") serviceType = "VM";
 
       // Make sure to pass all the required fields from the Patient type
       addPatient({
@@ -404,68 +398,70 @@ const NewPatient = () => {
                       </div>
                       
                       <div className="space-y-2">
-                        <Label>Services requis <span className="text-red-500">*</span></Label>
+                        <Label>Service requis <span className="text-red-500">*</span></Label>
                         <Card className="p-4 border-dashed">
                           <div className="space-y-4">
-                            <div className="flex items-center space-x-2">
-                              <Checkbox 
-                                id="vm" 
-                                checked={formData.services.vm}
-                                onCheckedChange={(checked) => handleServiceChange('vm', checked as boolean)}
-                                disabled={!availableServices.vm}
-                              />
-                              <Label 
-                                htmlFor="vm" 
-                                className={!availableServices.vm ? "text-gray-400" : ""}
-                              >
-                                Visite Médicale (VM)
-                                {!availableServices.vm && 
-                                  <span className="ml-2 text-xs text-red-500">
-                                    Non disponible pour cette entreprise
-                                  </span>
-                                }
-                              </Label>
-                            </div>
-                            
-                            <div className="flex items-center space-x-2">
-                              <Checkbox 
-                                id="cons" 
-                                checked={formData.services.cons}
-                                onCheckedChange={(checked) => handleServiceChange('cons', checked as boolean)}
-                                disabled={!availableServices.cons}
-                              />
-                              <Label
-                                htmlFor="cons"
-                                className={!availableServices.cons ? "text-gray-400" : ""}
-                              >
-                                Consultation (Cons)
-                                {!availableServices.cons && 
-                                  <span className="ml-2 text-xs text-red-500">
-                                    Non disponible pour cette entreprise
-                                  </span>
-                                }
-                              </Label>
-                            </div>
-                            
-                            <div className="flex items-center space-x-2">
-                              <Checkbox 
-                                id="urg" 
-                                checked={formData.services.urg}
-                                onCheckedChange={(checked) => handleServiceChange('urg', checked as boolean)}
-                                disabled={!availableServices.urg}
-                              />
-                              <Label 
-                                htmlFor="urg"
-                                className={!availableServices.urg ? "text-gray-400" : ""}
-                              >
-                                Urgence (Urg)
-                                {!availableServices.urg && 
-                                  <span className="ml-2 text-xs text-red-500">
-                                    Non disponible pour cette entreprise
-                                  </span>
-                                }
-                              </Label>
-                            </div>
+                            <RadioGroup 
+                              value={formData.selectedService} 
+                              onValueChange={handleServiceChange}
+                            >
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem 
+                                  id="vm" 
+                                  value="VM"
+                                  disabled={!availableServices.vm}
+                                />
+                                <Label 
+                                  htmlFor="vm" 
+                                  className={!availableServices.vm ? "text-gray-400" : ""}
+                                >
+                                  Visite Médicale (VM)
+                                  {!availableServices.vm && 
+                                    <span className="ml-2 text-xs text-red-500">
+                                      Non disponible pour cette entreprise
+                                    </span>
+                                  }
+                                </Label>
+                              </div>
+                              
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem 
+                                  id="cons" 
+                                  value="Cons"
+                                  disabled={!availableServices.cons}
+                                />
+                                <Label
+                                  htmlFor="cons"
+                                  className={!availableServices.cons ? "text-gray-400" : ""}
+                                >
+                                  Consultation (Cons)
+                                  {!availableServices.cons && 
+                                    <span className="ml-2 text-xs text-red-500">
+                                      Non disponible pour cette entreprise
+                                    </span>
+                                  }
+                                </Label>
+                              </div>
+                              
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem 
+                                  id="urg" 
+                                  value="Ug"
+                                  disabled={!availableServices.urg}
+                                />
+                                <Label 
+                                  htmlFor="urg"
+                                  className={!availableServices.urg ? "text-gray-400" : ""}
+                                >
+                                  Urgence (Urg)
+                                  {!availableServices.urg && 
+                                    <span className="ml-2 text-xs text-red-500">
+                                      Non disponible pour cette entreprise
+                                    </span>
+                                  }
+                                </Label>
+                              </div>
+                            </RadioGroup>
                           </div>
                         </Card>
                         <p className="text-sm text-muted-foreground mt-2">

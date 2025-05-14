@@ -27,6 +27,7 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'adminPortal': 'Portail administration',
     'back': 'Retour',
     'goBack': 'Retour',
+    'exams': 'Examens',
   },
   en: {
     'dashboard': 'Dashboard',
@@ -53,6 +54,7 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'adminPortal': 'Admin portal',
     'back': 'Back',
     'goBack': 'Go Back',
+    'exams': 'Exams',
   },
   de: {
     'dashboard': 'Dashboard',
@@ -79,5 +81,6 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'adminPortal': 'Administrationsportal',
     'back': 'Zurück',
     'goBack': 'Zurück',
+    'exams': 'Untersuchungen',
   }
 };

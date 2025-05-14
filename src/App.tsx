@@ -29,6 +29,7 @@ import { ThemeProvider } from "./hooks/useTheme";
 import { LanguageProvider } from "./hooks/useLanguage";
 import Chatbot from "./components/chatbot/Chatbot";
 import PerformExams from "./pages/laboratory/PerformExams";
+import ExamsRequestPage from "./pages/nurse/ExamsRequestPage";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,7 @@ const App = () => (
                   <Route path="emergencies/:patientId/edit" element={<EmergencyForm />} />
                   <Route path="emergencies" element={<EmergenciesStats />} />
                   <Route path="patient-details/:patientId" element={<PatientDetailView />} />
+                  <Route path="exams" element={<ExamsRequestPage />} />
                   
                   {/* Lab routes */}
                   <Route path="pending-exams" element={<LabExams />} />
