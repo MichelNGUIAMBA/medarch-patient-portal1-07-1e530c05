@@ -5,21 +5,31 @@ import { useAuth } from '@/hooks/use-auth-context';
 import { toast } from '@/components/ui/sonner';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { saveReturnPath } from '@/lib/utils';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export const useServiceFormSubmit = (patient: Patient, onClose: () => void) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const updatePatient = usePatientStore((state) => state.updatePatient);
   const addServiceRecord = usePatientStore((state) => state.addServiceRecord);
+  const setPatientCompleted = usePatientStore((state) => state.setPatientCompleted);
 
   const handleFormSubmit = (formData: any) => {
     if (!user) {
-      toast.error("Vous devez être connecté pour modifier un patient");
+      toast.error(t('mustBeLoggedIn'));
       return;
     }
     
+    // Marquer le formulaire comme validé en ajoutant un timestamp
+    const now = new Date();
+    const formWithTimestamp = {
+      ...formData,
+      serviceDateTime: now.toISOString()
+    };
+    
     // Sauvegarder les données pour une utilisation ultérieure
-    sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(formData));
+    sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(formWithTimestamp));
     
     // Mise à jour des notes du patient en fonction du service
     let notesPrefix = '';
@@ -28,33 +38,33 @@ export const useServiceFormSubmit = (patient: Patient, onClose: () => void) => {
     
     switch(patient.service) {
       case 'VM':
-        notesPrefix = 'Visite médicale: ';
+        notesPrefix = t('medicalVisit') + ': ';
         patientUpdates = {
-          notes: `${notesPrefix}${formData.workstation || ''} - ${formData.recommendations || 'Aucune recommandation'}`
+          notes: `${notesPrefix}${formData.workstation || ''} - ${formData.recommendations || t('noRecommendations')}`
         };
         serviceData = {
           serviceType: "VM",
-          serviceData: formData
+          serviceData: formWithTimestamp
         };
         break;
       case 'Cons':
-        notesPrefix = 'Consultation: ';
+        notesPrefix = t('consultation') + ': ';
         patientUpdates = {
-          notes: `${notesPrefix}${formData.mainComplaint || ''} - ${formData.diagnosis || 'Aucun diagnostic'}`
+          notes: `${notesPrefix}${formData.mainComplaint || ''} - ${formData.diagnosis || t('noDiagnosis')}`
         };
         serviceData = {
           serviceType: "Cons",
-          serviceData: formData
+          serviceData: formWithTimestamp
         };
         break;
       case 'Ug':
-        notesPrefix = 'Urgence: ';
+        notesPrefix = t('emergency') + ': ';
         patientUpdates = {
-          notes: `${notesPrefix}${formData.mainComplaint || ''} - ${formData.immediateActions || 'Aucune action immédiate'}`
+          notes: `${notesPrefix}${formData.mainComplaint || ''} - ${formData.immediateActions || t('noImmediateActions')}`
         };
         serviceData = {
           serviceType: "Ug",
-          serviceData: formData
+          serviceData: formWithTimestamp
         };
         break;
     }
@@ -73,10 +83,13 @@ export const useServiceFormSubmit = (patient: Patient, onClose: () => void) => {
       { name: user.name, role: user.role }
     );
     
+    // Marquer le service du patient comme terminé
+    setPatientCompleted(patient.id, { name: user.name, role: user.role });
+    
     // Fermer le dialogue
     onClose();
     
-    toast.success("Modifications enregistrées avec succès");
+    toast.success(t('changesSaved'));
     
     // Définir le chemin de retour en fonction du service
     let returnPath;

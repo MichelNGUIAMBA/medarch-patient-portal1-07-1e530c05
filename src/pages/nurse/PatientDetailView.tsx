@@ -59,7 +59,7 @@ const PatientDetailView = () => {
   }, [patient]);
   
   if (!patient) {
-    toast.error("Patient non trouvé");
+    toast.error(t('patientNotFound'));
     navigate('/dashboard');
     return null;
   }
