@@ -11,7 +11,7 @@ import ServiceFormReadonlyViewer from '@/components/consultations/ServiceFormRea
 import ServicesHistoryViewer from '@/components/consultations/ServicesHistoryViewer';
 import { useLanguage } from '@/hooks/useLanguage';
 import PatientEditDialog from '@/components/nurse/PatientEditDialog';
-import CompletePatientEditDialog from '@/components/nurse/CompletePatientEditDialog';
+import { CompletePatientEditDialog } from '@/components/nurse/patientEdit';
 import ModificationHistory from '@/components/nurse/ModificationHistory';
 import PatientPersonalInfoCard from '@/components/patient/PatientPersonalInfoCard';
 import ServiceInfoCard from '@/components/patient/ServiceInfoCard';

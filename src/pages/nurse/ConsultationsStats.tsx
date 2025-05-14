@@ -6,8 +6,9 @@ import { Patient } from '@/types/patient';
 import { Button } from '@/components/ui/button';
 import PatientEditDialog from '@/components/nurse/PatientEditDialog';
 import ModificationHistory from '@/components/nurse/ModificationHistory';
-import CompletePatientEditDialog from '@/components/nurse/CompletePatientEditDialog';
+import { CompletePatientEditDialog } from '@/components/nurse/patientEdit';
 import { useNavigate } from 'react-router-dom';
+
 const ConsultationsStats = () => {
   const navigate = useNavigate();
   // Fix: Separate state selectors to prevent infinite re-renders

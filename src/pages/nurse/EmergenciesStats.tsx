@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +7,7 @@ import { Patient } from '@/types/patient';
 import { Button } from '@/components/ui/button';
 import PatientEditDialog from '@/components/nurse/PatientEditDialog';
 import ModificationHistory from '@/components/nurse/ModificationHistory';
-import CompletePatientEditDialog from '@/components/nurse/CompletePatientEditDialog';
+import { CompletePatientEditDialog } from '@/components/nurse/patientEdit';
 import { useNavigate } from 'react-router-dom';
 
 const EmergenciesStats = () => {
