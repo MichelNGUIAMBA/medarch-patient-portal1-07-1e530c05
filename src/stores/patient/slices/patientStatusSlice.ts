@@ -10,6 +10,8 @@ export interface PatientStatusSlice {
 }
 
 export const createPatientStatusSlice: StateCreator<PatientStatusSlice & PatientState> = (set) => ({
+  patients: [], // Ajout de la propriété patients requise par PatientState
+  
   takeCharge: (id, nurse) => set((state) => {
     const patientIndex = state.patients.findIndex(p => p.id === id);
     if (patientIndex === -1) return state;

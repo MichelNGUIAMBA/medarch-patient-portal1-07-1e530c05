@@ -10,6 +10,8 @@ export interface BasicPatientSlice {
 }
 
 export const createBasicPatientSlice: StateCreator<BasicPatientSlice & PatientState> = (set) => ({
+  patients: [], // Ajout de la propriété patients requise par PatientState
+  
   addPatient: (patient) => set((state) => ({
     patients: [
       {

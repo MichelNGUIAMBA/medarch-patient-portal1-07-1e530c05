@@ -9,6 +9,8 @@ export interface LabExamsSlice {
 }
 
 export const createLabExamsSlice: StateCreator<LabExamsSlice & PatientState> = (set) => ({
+  patients: [], // Ajout de la propriété patients requise par PatientState
+  
   requestLabExams: (patientId, exams, requestedBy) => set((state) => {
     const patientIndex = state.patients.findIndex(p => p.id === patientId);
     if (patientIndex === -1) return state;
