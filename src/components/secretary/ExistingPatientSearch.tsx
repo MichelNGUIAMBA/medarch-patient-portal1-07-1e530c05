@@ -9,14 +9,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth-context";
 import { toast } from "@/components/ui/sonner";
-import ExistingPatientDialog from "./ExistingPatientDialog";
 import { useLanguage } from "@/hooks/useLanguage";
+import ExistingPatientDialog from "./ExistingPatientDialog";
 
 interface ExistingPatientSearchProps {
   onAdd?: (patient: Patient) => void;
+  onPatientSelect?: (patient: Patient) => void;
 }
 
-const ExistingPatientSearch: React.FC<ExistingPatientSearchProps> = ({ onAdd }) => {
+const ExistingPatientSearch: React.FC<ExistingPatientSearchProps> = ({ onAdd, onPatientSelect }) => {
   const { t } = useLanguage();
   const { user } = useAuth();
   const patients = usePatientStore((state) => state.patients);
@@ -56,7 +57,11 @@ const ExistingPatientSearch: React.FC<ExistingPatientSearchProps> = ({ onAdd }) 
 
   const handlePatientClick = (patient: Patient) => {
     setSelectedPatient(patient);
-    setIsDialogOpen(true);
+    if (onPatientSelect) {
+      onPatientSelect(patient);
+    } else {
+      setIsDialogOpen(true);
+    }
   };
 
   const handleServiceChange = (value: string) => {
@@ -149,11 +154,11 @@ const ExistingPatientSearch: React.FC<ExistingPatientSearchProps> = ({ onAdd }) 
         </p>
       ) : null}
 
-      {selectedPatient && (
+      {selectedPatient && !onPatientSelect && (
         <>
           <ExistingPatientDialog
-            isOpen={isDialogOpen}
-            onClose={() => setIsDialogOpen(false)}
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
             patient={selectedPatient}
             onAddService={handleOpenConfirmDialog}
           />

@@ -9,15 +9,19 @@ import { Label } from '@/components/ui/label';
 import { Patient } from '@/types/patient';
 import { usePatientStore } from '@/stores/usePatientStore';
 import ExistingPatientSearch from './ExistingPatientSearch';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface ExistingPatientDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  patient?: Patient;
+  onAddService?: () => void;
 }
 
-const ExistingPatientDialog = ({ open, onOpenChange }: ExistingPatientDialogProps) => {
+const ExistingPatientDialog = ({ open, onOpenChange, patient, onAddService }: ExistingPatientDialogProps) => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(patient || null);
   const [selectedService, setSelectedService] = useState<"VM" | "Cons" | "Ug" | "">("");
   const addServiceToExistingPatient = usePatientStore((state) => state.addServiceToExistingPatient);
   
@@ -46,12 +50,12 @@ const ExistingPatientDialog = ({ open, onOpenChange }: ExistingPatientDialogProp
   
   const handleSubmit = () => {
     if (!selectedPatient || !selectedService) {
-      toast.error("Veuillez sélectionner un patient et un service");
+      toast.error(t('pleaseSelectPatientAndService'));
       return;
     }
     
     addServiceToExistingPatient(selectedPatient.id, selectedService);
-    toast.success(`${selectedPatient.name} ajouté à la file d'attente pour ${selectedService}`);
+    toast.success(t('patientAddedToQueue', { name: selectedPatient.name, service: selectedService }));
     
     // Reset form
     setSelectedPatient(null);
@@ -68,9 +72,9 @@ const ExistingPatientDialog = ({ open, onOpenChange }: ExistingPatientDialogProp
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md md:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Patient existant</DialogTitle>
+          <DialogTitle>{t('existingPatient')}</DialogTitle>
           <DialogDescription>
-            Recherchez et sélectionnez un patient existant pour ajouter un nouveau service
+            {t('searchAndSelectExistingPatient')}
           </DialogDescription>
         </DialogHeader>
         
@@ -81,49 +85,49 @@ const ExistingPatientDialog = ({ open, onOpenChange }: ExistingPatientDialogProp
             <div className="p-4 border rounded-md bg-gray-50">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <p className="text-sm text-gray-500">ID Patient</p>
+                  <p className="text-sm text-gray-500">{t('patientId')}</p>
                   <p className="font-medium">{selectedPatient.id}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Nom</p>
+                  <p className="text-sm text-gray-500">{t('name')}</p>
                   <p className="font-medium">{selectedPatient.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Date de naissance</p>
+                  <p className="text-sm text-gray-500">{t('birthDate')}</p>
                   <p className="font-medium">{selectedPatient.birthDate}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Entreprise</p>
+                  <p className="text-sm text-gray-500">{t('company')}</p>
                   <p className="font-medium">{selectedPatient.company}</p>
                 </div>
               </div>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="service">Sélectionnez un nouveau service</Label>
+              <Label htmlFor="service">{t('selectNewService')}</Label>
               <Select 
                 value={selectedService} 
                 onValueChange={(value) => setSelectedService(value as "VM" | "Cons" | "Ug")}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez un service" />
+                  <SelectValue placeholder={t('selectService')} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableServices.vm && (
-                    <SelectItem value="VM">Visite Médicale (VM)</SelectItem>
+                    <SelectItem value="VM">{t('medicalVisit')} (VM)</SelectItem>
                   )}
                   {availableServices.cons && (
-                    <SelectItem value="Cons">Consultation (Cons)</SelectItem>
+                    <SelectItem value="Cons">{t('consultation')} (Cons)</SelectItem>
                   )}
                   {availableServices.urg && (
-                    <SelectItem value="Ug">Urgence (Ug)</SelectItem>
+                    <SelectItem value="Ug">{t('emergency')} (Ug)</SelectItem>
                   )}
                 </SelectContent>
               </Select>
             </div>
             
             <Button variant="outline" onClick={() => setSelectedPatient(null)} className="w-full">
-              Changer de patient
+              {t('changePatient')}
             </Button>
           </div>
         )}
@@ -137,14 +141,14 @@ const ExistingPatientDialog = ({ open, onOpenChange }: ExistingPatientDialogProp
               onOpenChange(false);
             }}
           >
-            Annuler
+            {t('cancel')}
           </Button>
           {selectedPatient && (
             <Button 
               onClick={handleSubmit}
               disabled={!selectedService}
             >
-              Ajouter à la file d'attente
+              {t('addToQueue')}
             </Button>
           )}
         </DialogFooter>
