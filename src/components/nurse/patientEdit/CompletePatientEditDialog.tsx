@@ -2,12 +2,12 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Patient } from '@/types/patient';
 import { useServiceFormData } from './useServiceFormData';
 import { useServiceFormSubmit } from './useServiceFormSubmit';
 import ServiceFormSelector from './ServiceFormSelector';
-import LoadingSpinner from './LoadingSpinner';
+import { LoadingSpinner } from './LoadingSpinner';
 
 interface CompletePatientEditDialogProps {
   patient: Patient;
@@ -40,7 +40,7 @@ const CompletePatientEditDialog = ({ patient, isOpen, onClose }: CompletePatient
             
             <TabsContent value="serviceForm" className="space-y-4 py-4">
               <ServiceFormSelector 
-                serviceType={patient.service}
+                patient={patient}
                 initialData={initialData}
                 onSubmit={handleFormSubmit}
               />

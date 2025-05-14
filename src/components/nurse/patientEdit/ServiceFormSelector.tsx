@@ -4,20 +4,16 @@ import { Patient } from '@/types/patient';
 import ConsultationFormWrapper from '@/components/consultations/ConsultationFormWrapper';
 import MedicalVisitFormWrapper from '@/components/medicalvisits/MedicalVisitFormWrapper';
 import EmergencyFormWrapper from '@/components/emergencies/EmergencyFormWrapper';
-import { useServiceFormData } from './useServiceFormData';
-import { useServiceFormSubmit } from './useServiceFormSubmit';
 import { LoadingSpinner } from './LoadingSpinner';
 
 interface ServiceFormSelectorProps {
   patient: Patient;
-  onClose: () => void;
+  initialData: any;
+  onSubmit: (formData: any) => void;
 }
 
-const ServiceFormSelector = ({ patient, onClose }: ServiceFormSelectorProps) => {
-  const { initialData, isLoading } = useServiceFormData(patient, true);
-  const { handleFormSubmit } = useServiceFormSubmit(patient, onClose);
-  
-  if (isLoading) {
+const ServiceFormSelector = ({ patient, initialData, onSubmit }: ServiceFormSelectorProps) => {
+  if (!patient) {
     return <LoadingSpinner />;
   }
   
@@ -26,7 +22,7 @@ const ServiceFormSelector = ({ patient, onClose }: ServiceFormSelectorProps) => 
       return (
         <ConsultationFormWrapper 
           patient={patient} 
-          onSubmit={handleFormSubmit}
+          onSubmit={onSubmit}
           isEditMode={true}
           initialData={initialData}
         />
@@ -35,7 +31,7 @@ const ServiceFormSelector = ({ patient, onClose }: ServiceFormSelectorProps) => 
       return (
         <MedicalVisitFormWrapper
           patient={patient}
-          onSubmit={handleFormSubmit}
+          onSubmit={onSubmit}
           isEditMode={true}
           initialData={initialData}
         />
@@ -44,7 +40,7 @@ const ServiceFormSelector = ({ patient, onClose }: ServiceFormSelectorProps) => 
       return (
         <EmergencyFormWrapper
           patient={patient}
-          onSubmit={handleFormSubmit}
+          onSubmit={onSubmit}
           isEditMode={true}
           initialData={initialData}
         />
