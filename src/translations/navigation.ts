@@ -27,6 +27,9 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'adminPortal': 'Portail administration',
     'back': 'Retour',
     'goBack': 'Retour',
+    'examForms': 'Formulaires d\'examens',
+    'examHistory': 'Historique d\'examens',
+    'pendingExams': 'Examens en attente',
   },
   en: {
     'dashboard': 'Dashboard',
@@ -53,6 +56,9 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'adminPortal': 'Admin portal',
     'back': 'Back',
     'goBack': 'Go Back',
+    'examForms': 'Exam forms',
+    'examHistory': 'Exam history',
+    'pendingExams': 'Pending exams',
   },
   de: {
     'dashboard': 'Dashboard',
@@ -79,5 +85,8 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'adminPortal': 'Administrationsportal',
     'back': 'Zurück',
     'goBack': 'Zurück',
+    'examForms': 'Untersuchungsformulare',
+    'examHistory': 'Untersuchungsverlauf',
+    'pendingExams': 'Ausstehende Untersuchungen',
   }
 };

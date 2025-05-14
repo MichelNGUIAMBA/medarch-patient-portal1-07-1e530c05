@@ -1,14 +1,16 @@
+
 import React from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth-context";
 import { Button } from "@/components/ui/button";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Hospital, User, Users, Database, ClipboardCheck, LogOut, FileText, Calendar, UserCheck, Search, MessageSquare, Ambulance } from "lucide-react";
+import { Hospital, User, Users, Database, ClipboardCheck, LogOut, FileText, Calendar, UserCheck, Search, MessageSquare, Ambulance, Flask } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import ThemeSwitcher from "./ThemeSwitcher";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/hooks/useLanguage";
+
 const DashboardLayout = () => {
   const {
     user,
@@ -18,17 +20,20 @@ const DashboardLayout = () => {
   const {
     t
   } = useLanguage();
+  
   const handleLogout = () => {
     logout();
     toast.success(t('logout'));
     navigate("/");
   };
+  
   const getNavigationItems = () => {
     const commonItems = [{
       title: t('dashboard'),
       url: "/dashboard",
       icon: FileText
     }];
+    
     const roleBasedItems = {
       admin: [{
         title: t('users'),
@@ -64,6 +69,10 @@ const DashboardLayout = () => {
         title: t('emergencies'),
         url: "/dashboard/emergencies",
         icon: Ambulance
+      }, {
+        title: t('examForms'),
+        url: "/dashboard/exam-forms",
+        icon: Flask
       }],
       lab: [{
         title: t('pendingExams'),
@@ -84,8 +93,10 @@ const DashboardLayout = () => {
         icon: FileText
       }]
     };
+    
     return user?.role && roleBasedItems[user.role] ? [...commonItems, ...roleBasedItems[user.role]] : commonItems;
   };
+  
   return <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
         <Sidebar className="border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 dark:text-white">
@@ -149,4 +160,5 @@ const DashboardLayout = () => {
       </div>
     </SidebarProvider>;
 };
+
 export default DashboardLayout;
