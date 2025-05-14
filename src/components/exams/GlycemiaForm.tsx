@@ -68,7 +68,8 @@ const GlycemiaForm = () => {
         [{
           type: 'GlycemiaControl',
           status: 'pending',
-          data: filledRows
+          data: filledRows,
+          requestedBy: { name: user.name, role: user.role }
         }], 
         { name: user.name, role: user.role }
       );

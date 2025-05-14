@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -74,7 +73,8 @@ const BloodPressureForm = () => {
         [{
           type: 'BloodPressureChart',
           status: 'pending',
-          data: filledRows
+          data: filledRows,
+          requestedBy: { name: user.name, role: user.role }
         }], 
         { name: user.name, role: user.role }
       );
