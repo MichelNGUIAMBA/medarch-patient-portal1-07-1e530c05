@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,13 +23,15 @@ interface EmergencyFormWrapperProps {
   onSubmit: (formData: any) => void;
   isEditMode?: boolean;
   initialData?: any;
+  formType?: string; // Ajout de la propriété formType ici
 }
 
 const EmergencyFormWrapper = ({
   patient,
   onSubmit,
   isEditMode = false,
-  initialData = {}
+  initialData = {},
+  formType = 'standard' // Par défaut, utiliser le formulaire standard
 }: EmergencyFormWrapperProps) => {
   const [step, setStep] = useState(1);
   const { t } = useLanguage();
@@ -156,19 +157,146 @@ const EmergencyFormWrapper = ({
     }
   };
   
-  return (
-    <>
-      <Card className="w-full border-red-200">
-        <CardHeader className="bg-inherit">
-          <CardTitle className="text-red-700">
-            {isEditMode ? "Modification du traitement d'urgence" : "Formulaire de traitement d'urgence"}
-          </CardTitle>
-          <CardDescription>
-            {isEditMode ? "Modifiez les informations du traitement d'urgence" : "Ce formulaire est utilisé pour documenter les interventions d'urgence"}
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent>
+  const renderForm = () => {
+    switch (formType) {
+      case 'surveillance':
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-red-600">Fiche de Surveillance (FS)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="patientStatus">État du patient</Label>
+                <select
+                  id="patientStatus"
+                  name="patientStatus"
+                  value={formData.patientStatus || ''}
+                  onChange={(e) => handleSelectChange('patientStatus', e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md"
+                >
+                  <option value="">Sélectionner l'état</option>
+                  <option value="stable">Stable</option>
+                  <option value="critical">Critique</option>
+                  <option value="improving">En amélioration</option>
+                  <option value="deteriorating">En dégradation</option>
+                </select>
+              </div>
+              
+              <div>
+                <Label htmlFor="monitoringFrequency">Fréquence de surveillance</Label>
+                <select
+                  id="monitoringFrequency"
+                  name="monitoringFrequency"
+                  value={formData.monitoringFrequency || ''}
+                  onChange={(e) => handleSelectChange('monitoringFrequency', e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md"
+                >
+                  <option value="">Sélectionner la fréquence</option>
+                  <option value="15min">Toutes les 15 minutes</option>
+                  <option value="30min">Toutes les 30 minutes</option>
+                  <option value="1hour">Toutes les heures</option>
+                  <option value="2hours">Toutes les 2 heures</option>
+                  <option value="4hours">Toutes les 4 heures</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="vitalSignsTrend">Évolution des signes vitaux</Label>
+              <textarea
+                id="vitalSignsTrend"
+                name="vitalSignsTrend"
+                value={formData.vitalSignsTrend || ''}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border rounded-md resize-none h-24"
+                placeholder="Décrivez l'évolution des signes vitaux..."
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="nurseObservations">Observations de l'infirmier(e)</Label>
+              <textarea
+                id="nurseObservations"
+                name="nurseObservations"
+                value={formData.nurseObservations || ''}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border rounded-md resize-none h-24"
+                placeholder="Noter vos observations..."
+              />
+            </div>
+          </div>
+        );
+      case 'observation':
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-red-600">Fiche d'Observation (FO)</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="observationTime">Heure d'observation</Label>
+                <Input
+                  type="time"
+                  id="observationTime"
+                  name="observationTime"
+                  value={formData.observationTime || ''}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="consciousnessLevel">Niveau de conscience</Label>
+                <select
+                  id="consciousnessLevel"
+                  name="consciousnessLevel"
+                  value={formData.consciousnessLevel || ''}
+                  onChange={(e) => handleSelectChange('consciousnessLevel', e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md"
+                >
+                  <option value="">Sélectionner le niveau</option>
+                  <option value="alert">Alerte</option>
+                  <option value="confused">Confus</option>
+                  <option value="drowsy">Somnolent</option>
+                  <option value="unconscious">Inconscient</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="physicalExamination">Examen physique</Label>
+              <textarea
+                id="physicalExamination"
+                name="physicalExamination"
+                value={formData.physicalExamination || ''}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border rounded-md resize-none h-24"
+                placeholder="Résultats de l'examen physique..."
+              />
+            </div>
+            
+            <div>
+              <Label className="mb-2 block">Symptômes observés</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="painSymptom" 
+                    checked={formData.painSymptom || false}
+                    onCheckedChange={(checked) => handleCheckboxChange('painSymptom', !!checked)}
+                  />
+                  <Label htmlFor="painSymptom">Douleur</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="feverSymptom" 
+                    checked={formData.feverSymptom || false}
+                    onCheckedChange={(checked) => handleCheckboxChange('feverSymptom', !!checked)}
+                  />
+                  <Label htmlFor="feverSymptom">Fièvre</Label>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      default: // 'standard'
+        return (
           <Tabs defaultValue="step1" value={`step${step}`}>
             <TabsList className="mb-6">
               <TabsTrigger value="step1" disabled={step !== 1}>
@@ -218,26 +346,74 @@ const EmergencyFormWrapper = ({
               <StepTreatment formData={formData} handleInputChange={handleInputChange} handleCheckboxChange={handleCheckboxChange} />
             </TabsContent>
           </Tabs>
+        );
+    }
+  };
+  
+  return (
+    <>
+      <Card className="w-full border-red-200">
+        <CardHeader className="bg-inherit">
+          <CardTitle className="text-red-700">
+            {isEditMode ? "Modification du traitement d'urgence" : "Formulaire de traitement d'urgence"}
+            {formType === 'surveillance' && " - Fiche de Surveillance (FS)"}
+            {formType === 'observation' && " - Fiche d'Observation (FO)"}
+          </CardTitle>
+          <CardDescription>
+            {isEditMode ? "Modifiez les informations du traitement d'urgence" : "Ce formulaire est utilisé pour documenter les interventions d'urgence"}
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          {renderForm()}
+          
+          {/* Option pour demander des examens de laboratoire pour les nouveaux formulaires */}
+          {formType !== 'standard' && (
+            <div className="mt-6">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="requestLabExams"
+                  checked={requestLabExamsChecked}
+                  onCheckedChange={(checked) => setRequestLabExamsChecked(checked as boolean)}
+                />
+                <Label htmlFor="requestLabExams" className="font-medium text-red-600">
+                  {t('requestLabExams')}
+                </Label>
+              </div>
+              
+              {requestLabExamsChecked && (
+                <Button 
+                  type="button"
+                  variant="outline"
+                  className="w-full mt-2 border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                  onClick={() => setShowLabForm(true)}
+                >
+                  <ClipboardList className="h-4 w-4 mr-2" />
+                  {t('openLabRequestForm')}
+                </Button>
+              )}
+            </div>
+          )}
         </CardContent>
         
         <CardFooter className="flex justify-between">
-          {step > 1 ? 
+          {formType === 'standard' && step > 1 ? (
             <Button variant="outline" onClick={handlePrevStep}>
               Précédent
-            </Button> 
-            : 
+            </Button>
+          ) : (
             <div></div> // Div vide pour l'espacement
-          }
+          )}
           
-          {step < 3 ? 
+          {formType === 'standard' && step < 3 ? (
             <Button onClick={handleNextStep} className="bg-red-600 hover:bg-red-700">
               Suivant
-            </Button> 
-            : 
+            </Button>
+          ) : (
             <Button onClick={handleSubmit} className="bg-red-600 hover:bg-red-700">
               {isEditMode ? "Valider les modifications" : "Valider le traitement d'urgence"}
             </Button>
-          }
+          )}
         </CardFooter>
       </Card>
       
