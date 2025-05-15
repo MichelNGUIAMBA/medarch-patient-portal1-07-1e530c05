@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import NewPatient from "./pages/secretary/NewPatient";
 import MedicalVisitForm from "./pages/nurse/MedicalVisitForm";
+import MedicalVisitTypeSelector from "./pages/nurse/MedicalVisitTypeSelector";
 import UserManagement from "./pages/admin/UserManagement";
 import LabExams from "./pages/laboratory/LabExams";
 import { AuthProvider, useAuth } from "./hooks/use-auth-context";
@@ -77,6 +78,7 @@ const App = () => (
                   <Route path="medical-visits/:patientId" element={<MedicalVisitForm />} />
                   <Route path="medical-visits/:patientId/edit" element={<MedicalVisitForm />} />
                   <Route path="medical-visits" element={<MedicalVisitsStats />} />
+                  <Route path="medical-visit-type" element={<MedicalVisitTypeSelector />} />
                   <Route path="consultations/:patientId" element={<ConsultationForm />} />
                   <Route path="consultations/:patientId/edit" element={<ConsultationForm />} />
                   <Route path="consultations" element={<ConsultationsStats />} />
@@ -115,6 +117,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <MedicalVisitForm />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/medical-visit-type" 
+                  element={
+                    <ProtectedRoute>
+                      <MedicalVisitTypeSelector />
                     </ProtectedRoute>
                   } 
                 />

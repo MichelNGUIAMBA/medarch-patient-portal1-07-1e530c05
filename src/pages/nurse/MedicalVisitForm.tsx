@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/hooks/use-auth-context';
@@ -15,10 +15,14 @@ const MedicalVisitForm = () => {
   const { patientId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { t } = useLanguage();
   const isEditMode = location.pathname.includes('/edit');
   const [initialData, setInitialData] = useState({});
+  
+  // Récupérer le type de visite depuis les paramètres de recherche ou le sessionStorage
+  const visitType = searchParams.get('type') || sessionStorage.getItem('medical-visit-type') || 'standard';
   
   // Fix: Use primitive selectors to prevent unnecessary rerenders
   const patients = usePatientStore((state) => state.patients);
@@ -52,7 +56,12 @@ const MedicalVisitForm = () => {
         }
       }
     }
-  }, [isEditMode, patient]);
+    
+    // Sauvegarder le type de visite pour pouvoir le récupérer plus tard
+    if (searchParams.get('type')) {
+      sessionStorage.setItem('medical-visit-type', searchParams.get('type') || 'standard');
+    }
+  }, [isEditMode, patient, searchParams]);
 
   if (!patient) {
     return <div className="container mx-auto py-6">{t('noPatientFound')}</div>;
@@ -73,17 +82,25 @@ const MedicalVisitForm = () => {
     // Sauvegarder les données du formulaire
     sessionStorage.setItem(`service-data-${patient.id}`, JSON.stringify(updatedFormData));
 
+    // Déterminer le type de visite pour les messages
+    let visitTypeText = "Visite médicale";
+    if (formData.visitType === 'annual') {
+      visitTypeText = "Visite médicale annuelle";
+    } else if (formData.visitType === 'family') {
+      visitTypeText = "Visite médicale annuelle famille";
+    }
+
     if (isEditMode) {
       // Mettre à jour le patient avec les nouvelles données
       updatePatient(
         patient.id,
         {
-          notes: `${t('medicalVisit')}: ${formData.workstation || t('notSpecified')} - ${formData.recommendations || t('noRecommendations')}`
+          notes: `${visitTypeText}: ${formData.workstation || formData.vmaData?.occupationalHistory || formData.vmafData?.relationship || t('notSpecified')} - ${formData.recommendations || t('noRecommendations')}`
         },
         { name: user.name, role: user.role }
       );
       
-      toast.success(t('medicalVisitUpdated'));
+      toast.success(`${visitTypeText} mise à jour`);
       
       // Nettoyer le stockage temporaire
       sessionStorage.removeItem(`edit-${patient.id}`);
@@ -92,7 +109,7 @@ const MedicalVisitForm = () => {
       updatePatient(
         patient.id,
         {
-          notes: `${t('medicalVisit')}: ${formData.workstation || t('notSpecified')} - ${formData.recommendations || t('noRecommendations')}`
+          notes: `${visitTypeText}: ${formData.workstation || formData.vmaData?.occupationalHistory || formData.vmafData?.relationship || t('notSpecified')} - ${formData.recommendations || t('noRecommendations')}`
         },
         { name: user.name, role: user.role }
       );
@@ -110,7 +127,7 @@ const MedicalVisitForm = () => {
       // Marquer le patient comme terminé
       setPatientCompleted(patient.id, { name: user.name, role: user.role });
       
-      toast.success(t('medicalVisitSaved'));
+      toast.success(`${visitTypeText} enregistrée`);
     }
     
     // Redirection vers la page de détails du patient
@@ -119,11 +136,19 @@ const MedicalVisitForm = () => {
     }, 1000);
   };
 
+  // Titre en fonction du type de visite
+  let formTitle = t('medicalVisit');
+  if (visitType === 'annual') {
+    formTitle = "Visite Médicale Annuelle (VMA)";
+  } else if (visitType === 'family') {
+    formTitle = "Visite Médicale Annuelle Famille (VMAF)";
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-          {isEditMode ? t('modifyingMedicalVisit') : t('medicalVisit')} - {patient.name}
+          {isEditMode ? `${t('modifying')} ${formTitle}` : formTitle} - {patient.name}
         </h1>
         <BackButton />
       </div>
@@ -137,6 +162,7 @@ const MedicalVisitForm = () => {
         onSubmit={handleFormSubmit}
         isEditMode={isEditMode}
         initialData={initialData}
+        visitType={visitType}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, ClipboardCheck, Hospital, Users, FilePlus2 } from 'lucide-react';
+import { Calendar, ClipboardCheck, Hospital, Users, FilePlus2, CalendarCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { usePatientStore } from '@/stores/usePatientStore';
@@ -58,6 +58,10 @@ const NurseDashboard = () => {
     navigate('/emergency-forms');
   };
   
+  const handleNewMedicalVisit = () => {
+    navigate('/medical-visit-type');
+  };
+  
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -67,7 +71,14 @@ const NurseDashboard = () => {
         <StatsCard title={t('waitingPatients')} value={patientStats.waiting} icon={Users} iconColor="text-purple-600" />
       </div>
 
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-end mb-4 gap-2">
+        <Button 
+          onClick={handleNewMedicalVisit}
+          className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+        >
+          <CalendarCheck size={16} />
+          Nouvelle visite médicale
+        </Button>
         <Button 
           onClick={handleNewEmergencyForm}
           className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
@@ -109,7 +120,7 @@ const NurseDashboard = () => {
                     <Button 
                       variant="default" 
                       size="sm" 
-                      className={`text-white px-3 py-1 rounded text-xs font-medium ${patient.service === "Ug" ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700"}`} 
+                      className={`text-white px-3 py-1 rounded text-xs font-medium ${patient.service === "Ug" ? "bg-red-600 hover:bg-red-700" : patient.service === "VM" ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"}`} 
                       onClick={() => handleTakeCharge(patient.id, patient.service)}
                     >
                       {t('takeInCharge')}

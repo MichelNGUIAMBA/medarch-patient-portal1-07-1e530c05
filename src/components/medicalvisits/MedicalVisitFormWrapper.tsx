@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from '@/components/ui/sonner';
 import { Patient } from '@/types/patient';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -18,19 +18,23 @@ import StepVitalSigns from '@/components/consultations/StepVitalSigns';
 import StepWorkEnvironment from './StepWorkEnvironment';
 import StepPhysicalExam from './StepPhysicalExam';
 import LabExamRequestForm from '../lab/LabExamRequestForm';
+import AnnualMedicalVisitForm from './AnnualMedicalVisitForm';
+import FamilyAnnualMedicalVisitForm from './FamilyAnnualMedicalVisitForm';
 
 interface MedicalVisitFormWrapperProps {
   patient: Patient;
   onSubmit: (formData: any) => void;
   isEditMode?: boolean;
   initialData?: any;
+  visitType?: string;
 }
 
 const MedicalVisitFormWrapper = ({
   patient,
   onSubmit,
   isEditMode = false,
-  initialData = {}
+  initialData = {},
+  visitType = 'standard'
 }: MedicalVisitFormWrapperProps) => {
   const [step, setStep] = useState(1);
   const { t } = useLanguage();
@@ -40,6 +44,7 @@ const MedicalVisitFormWrapper = ({
   const [requestLabExamsChecked, setRequestLabExamsChecked] = useState(false);
   
   const [formData, setFormData] = useState({
+    // Données standards pour la visite médicale de base
     // Signes vitaux
     temperature: '',
     bloodPressureSys: '',
@@ -65,29 +70,92 @@ const MedicalVisitFormWrapper = ({
     followUpNeeded: false,
     followUpDate: '',
     notes: '',
+    
+    // Pour les visites annuelles (VMA)
+    vmaData: {
+      generalHealth: '',
+      familyHistory: '',
+      occupationalHistory: '',
+      currentTreatments: '',
+      allergies: '',
+      smoking: false,
+      alcohol: false,
+      physicalActivity: '',
+      specializedTests: ''
+    },
+    
+    // Pour les visites familiales (VMAF)
+    vmafData: {
+      relationship: '',
+      chronicConditions: '',
+      childrenVaccinations: '',
+      lifestyleFactors: '',
+      medicalCoverage: ''
+    },
+    
+    // Ajouter le type de visite
+    visitType: visitType,
+    
     ...initialData // Remplir avec les données initiales si fournies
   });
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Vérifier si le nom du champ contient un point pour les données imbriquées
+    if (name.includes('.')) {
+      const [section, field] = name.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [section]: {
+          ...prev[section as keyof typeof prev],
+          [field]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
   
   const handleCheckboxChange = (field: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: checked
-    }));
+    // Vérifier si le champ contient un point pour les données imbriquées
+    if (field.includes('.')) {
+      const [section, fieldName] = field.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [section]: {
+          ...prev[section as keyof typeof prev],
+          [fieldName]: checked
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [field]: checked
+      }));
+    }
   };
   
   const handleSelectChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    // Vérifier si le champ contient un point pour les données imbriquées
+    if (field.includes('.')) {
+      const [section, fieldName] = field.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [section]: {
+          ...prev[section as keyof typeof prev],
+          [fieldName]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    }
   };
   
   const validateStep1 = () => {
@@ -156,7 +224,37 @@ const MedicalVisitFormWrapper = ({
       toast.error(t('selectAtLeastOneExam'));
     }
   };
+
+  // Afficher le formulaire spécifique en fonction du type de visite
+  if (visitType === 'annual') {
+    return (
+      <AnnualMedicalVisitForm
+        patient={patient}
+        onSubmit={onSubmit}
+        isEditMode={isEditMode}
+        initialData={formData}
+        handleInputChange={handleInputChange}
+        handleCheckboxChange={handleCheckboxChange}
+        handleSelectChange={handleSelectChange}
+      />
+    );
+  }
   
+  if (visitType === 'family') {
+    return (
+      <FamilyAnnualMedicalVisitForm
+        patient={patient}
+        onSubmit={onSubmit}
+        isEditMode={isEditMode}
+        initialData={formData}
+        handleInputChange={handleInputChange}
+        handleCheckboxChange={handleCheckboxChange}
+        handleSelectChange={handleSelectChange}
+      />
+    );
+  }
+  
+  // Formulaire de visite médicale standard
   return (
     <>
       <Card className="w-full border-blue-200">
