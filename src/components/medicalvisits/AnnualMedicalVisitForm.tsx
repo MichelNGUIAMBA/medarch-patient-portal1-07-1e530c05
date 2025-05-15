@@ -14,6 +14,8 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { useAuth } from '@/hooks/use-auth-context';
 import LabExamRequestForm from '../lab/LabExamRequestForm';
+import LabExamRequestButton from './LabExamRequestButton';
+import { useMedicalVisitForm } from '@/hooks/useMedicalVisitForm';
 
 interface AnnualMedicalVisitFormProps {
   patient: Patient;
@@ -29,9 +31,7 @@ const AnnualMedicalVisitForm = ({
   patient,
   onSubmit,
   isEditMode = false,
-  initialData = {},
-  handleInputChange,
-  handleCheckboxChange
+  initialData = {}
 }: AnnualMedicalVisitFormProps) => {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -39,10 +39,20 @@ const AnnualMedicalVisitForm = ({
   const [showLabForm, setShowLabForm] = useState(false);
   const [requestLabExamsChecked, setRequestLabExamsChecked] = useState(false);
   
+  // Use our custom hook for form management
+  const { 
+    formData, 
+    handleInputChange, 
+    handleCheckboxChange 
+  } = useMedicalVisitForm({
+    initialData,
+    type: 'annual'
+  });
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
-      ...initialData,
+      ...formData,
       visitType: 'annual'
     });
   };
@@ -92,21 +102,24 @@ const AnnualMedicalVisitForm = ({
         
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-6">
+            {/* Vital Signs Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium border-b pb-2">Signes vitaux</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Temperature Field */}
                 <div className="space-y-2">
                   <Label htmlFor="temperature">Température (°C) *</Label>
                   <Input
                     id="temperature"
                     name="temperature"
                     placeholder="37.0"
-                    value={initialData.temperature || ''}
+                    value={formData.temperature}
                     onChange={handleInputChange}
                     required
                   />
                 </div>
                 
+                {/* Blood Pressure Field */}
                 <div className="space-y-2">
                   <Label htmlFor="bloodPressureSys">Pression artérielle (mmHg) *</Label>
                   <div className="flex space-x-2">
@@ -115,7 +128,7 @@ const AnnualMedicalVisitForm = ({
                       name="bloodPressureSys"
                       placeholder="120"
                       className="w-1/2"
-                      value={initialData.bloodPressureSys || ''}
+                      value={formData.bloodPressureSys}
                       onChange={handleInputChange}
                       required
                     />
@@ -125,38 +138,41 @@ const AnnualMedicalVisitForm = ({
                       name="bloodPressureDia"
                       placeholder="80"
                       className="w-1/2"
-                      value={initialData.bloodPressureDia || ''}
+                      value={formData.bloodPressureDia}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
                 </div>
                 
+                {/* Heart Rate Field */}
                 <div className="space-y-2">
                   <Label htmlFor="heartRate">Rythme cardiaque (bpm) *</Label>
                   <Input
                     id="heartRate"
                     name="heartRate"
                     placeholder="70"
-                    value={initialData.heartRate || ''}
+                    value={formData.heartRate}
                     onChange={handleInputChange}
                     required
                   />
                 </div>
                 
+                {/* Oxygen Saturation Field */}
                 <div className="space-y-2">
                   <Label htmlFor="oxygenSaturation">Saturation en oxygène (%)</Label>
                   <Input
                     id="oxygenSaturation"
                     name="oxygenSaturation"
                     placeholder="98"
-                    value={initialData.oxygenSaturation || ''}
+                    value={formData.oxygenSaturation}
                     onChange={handleInputChange}
                   />
                 </div>
               </div>
             </div>
             
+            {/* Medical History Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium border-b pb-2">Antécédents et informations générales</h3>
               <div className="space-y-2">
@@ -165,7 +181,7 @@ const AnnualMedicalVisitForm = ({
                   id="vmaData.generalHealth"
                   name="vmaData.generalHealth"
                   placeholder="Décrivez l'état de santé général du patient"
-                  value={initialData.vmaData?.generalHealth || ''}
+                  value={formData.vmaData?.generalHealth || ''}
                   onChange={handleInputChange}
                   rows={3}
                 />
@@ -177,7 +193,7 @@ const AnnualMedicalVisitForm = ({
                   id="vmaData.familyHistory"
                   name="vmaData.familyHistory"
                   placeholder="Antécédents familiaux pertinents"
-                  value={initialData.vmaData?.familyHistory || ''}
+                  value={formData.vmaData?.familyHistory || ''}
                   onChange={handleInputChange}
                   rows={3}
                 />
@@ -189,7 +205,7 @@ const AnnualMedicalVisitForm = ({
                   id="vmaData.occupationalHistory"
                   name="vmaData.occupationalHistory"
                   placeholder="Historique des postes occupés et expositions professionnelles"
-                  value={initialData.vmaData?.occupationalHistory || ''}
+                  value={formData.vmaData?.occupationalHistory || ''}
                   onChange={handleInputChange}
                   rows={3}
                 />
@@ -201,7 +217,7 @@ const AnnualMedicalVisitForm = ({
                   id="vmaData.currentTreatments"
                   name="vmaData.currentTreatments"
                   placeholder="Médicaments et traitements en cours"
-                  value={initialData.vmaData?.currentTreatments || ''}
+                  value={formData.vmaData?.currentTreatments || ''}
                   onChange={handleInputChange}
                   rows={3}
                 />
@@ -213,20 +229,21 @@ const AnnualMedicalVisitForm = ({
                   id="vmaData.allergies"
                   name="vmaData.allergies"
                   placeholder="Allergies connues (médicaments, aliments, etc.)"
-                  value={initialData.vmaData?.allergies || ''}
+                  value={formData.vmaData?.allergies || ''}
                   onChange={handleInputChange}
                   rows={2}
                 />
               </div>
             </div>
             
+            {/* Lifestyle Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium border-b pb-2">Habitudes de vie</h3>
               
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="vmaData.smoking"
-                  checked={initialData.vmaData?.smoking || false}
+                  checked={formData.vmaData?.smoking || false}
                   onCheckedChange={(checked) => handleCheckboxChange('vmaData.smoking', checked as boolean)}
                 />
                 <Label htmlFor="vmaData.smoking">Tabagisme</Label>
@@ -235,7 +252,7 @@ const AnnualMedicalVisitForm = ({
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="vmaData.alcohol"
-                  checked={initialData.vmaData?.alcohol || false}
+                  checked={formData.vmaData?.alcohol || false}
                   onCheckedChange={(checked) => handleCheckboxChange('vmaData.alcohol', checked as boolean)}
                 />
                 <Label htmlFor="vmaData.alcohol">Consommation d'alcool</Label>
@@ -247,13 +264,14 @@ const AnnualMedicalVisitForm = ({
                   id="vmaData.physicalActivity"
                   name="vmaData.physicalActivity"
                   placeholder="Fréquence et type d'exercice physique"
-                  value={initialData.vmaData?.physicalActivity || ''}
+                  value={formData.vmaData?.physicalActivity || ''}
                   onChange={handleInputChange}
                   rows={2}
                 />
               </div>
             </div>
             
+            {/* Exams Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium border-b pb-2">Examens complémentaires</h3>
               
@@ -263,44 +281,28 @@ const AnnualMedicalVisitForm = ({
                   id="vmaData.specializedTests"
                   name="vmaData.specializedTests"
                   placeholder="Tests et examens spécialisés à prévoir"
-                  value={initialData.vmaData?.specializedTests || ''}
+                  value={formData.vmaData?.specializedTests || ''}
                   onChange={handleInputChange}
                   rows={3}
                 />
               </div>
               
-              {/* Option pour demander des examens de laboratoire */}
-              <div className="flex items-center space-x-2 mt-8">
-                <Checkbox
-                  id="requestLabExams"
-                  checked={requestLabExamsChecked}
-                  onCheckedChange={(checked) => setRequestLabExamsChecked(checked as boolean)}
-                />
-                <Label htmlFor="requestLabExams" className="font-medium text-blue-600">
-                  {t('requestLabExams')}
-                </Label>
-              </div>
-              
-              {requestLabExamsChecked && (
-                <Button 
-                  type="button"
-                  variant="outline"
-                  className="w-full mt-2 border-blue-300 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950"
-                  onClick={() => setShowLabForm(true)}
-                >
-                  <ClipboardList className="h-4 w-4 mr-2" />
-                  {t('openLabRequestForm')}
-                </Button>
-              )}
+              {/* Lab Exam Request Button */}
+              <LabExamRequestButton
+                requestLabExamsChecked={requestLabExamsChecked}
+                setRequestLabExamsChecked={setRequestLabExamsChecked}
+                setShowLabForm={setShowLabForm}
+              />
             </div>
             
+            {/* Conclusion Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium border-b pb-2">Conclusion</h3>
               
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="fitForWork"
-                  checked={initialData.fitForWork !== undefined ? initialData.fitForWork : true}
+                  checked={formData.fitForWork !== undefined ? formData.fitForWork : true}
                   onCheckedChange={(checked) => handleCheckboxChange('fitForWork', checked as boolean)}
                 />
                 <Label htmlFor="fitForWork">Apte au travail</Label>
@@ -312,7 +314,7 @@ const AnnualMedicalVisitForm = ({
                   id="restrictions"
                   name="restrictions"
                   placeholder="Restrictions ou limitations professionnelles"
-                  value={initialData.restrictions || ''}
+                  value={formData.restrictions || ''}
                   onChange={handleInputChange}
                   rows={2}
                 />
@@ -324,7 +326,7 @@ const AnnualMedicalVisitForm = ({
                   id="recommendations"
                   name="recommendations"
                   placeholder="Recommandations pour le suivi médical"
-                  value={initialData.recommendations || ''}
+                  value={formData.recommendations || ''}
                   onChange={handleInputChange}
                   rows={3}
                 />
@@ -333,20 +335,20 @@ const AnnualMedicalVisitForm = ({
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="followUpNeeded"
-                  checked={initialData.followUpNeeded || false}
+                  checked={formData.followUpNeeded || false}
                   onCheckedChange={(checked) => handleCheckboxChange('followUpNeeded', checked as boolean)}
                 />
                 <Label htmlFor="followUpNeeded">Suivi nécessaire</Label>
               </div>
               
-              {initialData.followUpNeeded && (
+              {formData.followUpNeeded && (
                 <div className="space-y-2">
                   <Label htmlFor="followUpDate">Date de suivi</Label>
                   <Input
                     id="followUpDate"
                     name="followUpDate"
                     type="date"
-                    value={initialData.followUpDate || ''}
+                    value={formData.followUpDate || ''}
                     onChange={handleInputChange}
                   />
                 </div>

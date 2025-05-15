@@ -9,12 +9,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Patient } from '@/types/patient';
-import { ClipboardList } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 import { useLanguage } from '@/hooks/useLanguage';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { useAuth } from '@/hooks/use-auth-context';
 import LabExamRequestForm from '../lab/LabExamRequestForm';
+import LabExamRequestButton from './LabExamRequestButton';
+import { useMedicalVisitForm } from '@/hooks/useMedicalVisitForm';
 
 interface FamilyAnnualMedicalVisitFormProps {
   patient: Patient;
@@ -30,10 +31,7 @@ const FamilyAnnualMedicalVisitForm = ({
   patient,
   onSubmit,
   isEditMode = false,
-  initialData = {},
-  handleInputChange,
-  handleCheckboxChange,
-  handleSelectChange
+  initialData = {}
 }: FamilyAnnualMedicalVisitFormProps) => {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -41,10 +39,21 @@ const FamilyAnnualMedicalVisitForm = ({
   const [showLabForm, setShowLabForm] = useState(false);
   const [requestLabExamsChecked, setRequestLabExamsChecked] = useState(false);
   
+  // Use our custom hook for form management
+  const { 
+    formData, 
+    handleInputChange, 
+    handleCheckboxChange,
+    handleSelectChange
+  } = useMedicalVisitForm({
+    initialData,
+    type: 'family'
+  });
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
-      ...initialData,
+      ...formData,
       visitType: 'family'
     });
   };
@@ -101,7 +110,7 @@ const FamilyAnnualMedicalVisitForm = ({
                 <Label htmlFor="vmafData.relationship">Relation avec l'employé *</Label>
                 <Select 
                   onValueChange={(value) => handleSelectChange('vmafData.relationship', value)}
-                  value={initialData.vmafData?.relationship || ''}
+                  value={formData.vmafData?.relationship || ''}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner la relation" />
@@ -125,7 +134,7 @@ const FamilyAnnualMedicalVisitForm = ({
                     id="temperature"
                     name="temperature"
                     placeholder="37.0"
-                    value={initialData.temperature || ''}
+                    value={formData.temperature || ''}
                     onChange={handleInputChange}
                     required
                   />
@@ -139,7 +148,7 @@ const FamilyAnnualMedicalVisitForm = ({
                       name="bloodPressureSys"
                       placeholder="120"
                       className="w-1/2"
-                      value={initialData.bloodPressureSys || ''}
+                      value={formData.bloodPressureSys || ''}
                       onChange={handleInputChange}
                       required
                     />
@@ -149,7 +158,7 @@ const FamilyAnnualMedicalVisitForm = ({
                       name="bloodPressureDia"
                       placeholder="80"
                       className="w-1/2"
-                      value={initialData.bloodPressureDia || ''}
+                      value={formData.bloodPressureDia || ''}
                       onChange={handleInputChange}
                       required
                     />
@@ -162,7 +171,7 @@ const FamilyAnnualMedicalVisitForm = ({
                     id="heartRate"
                     name="heartRate"
                     placeholder="70"
-                    value={initialData.heartRate || ''}
+                    value={formData.heartRate || ''}
                     onChange={handleInputChange}
                     required
                   />
@@ -174,7 +183,7 @@ const FamilyAnnualMedicalVisitForm = ({
                     id="oxygenSaturation"
                     name="oxygenSaturation"
                     placeholder="98"
-                    value={initialData.oxygenSaturation || ''}
+                    value={formData.oxygenSaturation || ''}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -190,7 +199,7 @@ const FamilyAnnualMedicalVisitForm = ({
                   id="vmafData.chronicConditions"
                   name="vmafData.chronicConditions"
                   placeholder="Conditions chroniques connues"
-                  value={initialData.vmafData?.chronicConditions || ''}
+                  value={formData.vmafData?.chronicConditions || ''}
                   onChange={handleInputChange}
                   rows={3}
                 />
@@ -202,7 +211,7 @@ const FamilyAnnualMedicalVisitForm = ({
                   id="vmafData.childrenVaccinations"
                   name="vmafData.childrenVaccinations"
                   placeholder="Vaccinations reçues et à prévoir"
-                  value={initialData.vmafData?.childrenVaccinations || ''}
+                  value={formData.vmafData?.childrenVaccinations || ''}
                   onChange={handleInputChange}
                   rows={3}
                 />
@@ -214,7 +223,7 @@ const FamilyAnnualMedicalVisitForm = ({
                   id="vmafData.lifestyleFactors"
                   name="vmafData.lifestyleFactors"
                   placeholder="Alimentation, activité physique, etc."
-                  value={initialData.vmafData?.lifestyleFactors || ''}
+                  value={formData.vmafData?.lifestyleFactors || ''}
                   onChange={handleInputChange}
                   rows={3}
                 />
@@ -226,7 +235,7 @@ const FamilyAnnualMedicalVisitForm = ({
                   id="vmafData.medicalCoverage"
                   name="vmafData.medicalCoverage"
                   placeholder="Informations sur la couverture médicale du membre de la famille"
-                  value={initialData.vmafData?.medicalCoverage || ''}
+                  value={formData.vmafData?.medicalCoverage || ''}
                   onChange={handleInputChange}
                   rows={2}
                 />
@@ -237,28 +246,11 @@ const FamilyAnnualMedicalVisitForm = ({
               <h3 className="text-lg font-medium border-b pb-2">Examens et suivi</h3>
               
               {/* Option pour demander des examens de laboratoire */}
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="requestLabExams"
-                  checked={requestLabExamsChecked}
-                  onCheckedChange={(checked) => setRequestLabExamsChecked(checked as boolean)}
-                />
-                <Label htmlFor="requestLabExams" className="font-medium text-blue-600">
-                  {t('requestLabExams')}
-                </Label>
-              </div>
-              
-              {requestLabExamsChecked && (
-                <Button 
-                  type="button"
-                  variant="outline"
-                  className="w-full mt-2 border-blue-300 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950"
-                  onClick={() => setShowLabForm(true)}
-                >
-                  <ClipboardList className="h-4 w-4 mr-2" />
-                  {t('openLabRequestForm')}
-                </Button>
-              )}
+              <LabExamRequestButton
+                requestLabExamsChecked={requestLabExamsChecked}
+                setRequestLabExamsChecked={setRequestLabExamsChecked}
+                setShowLabForm={setShowLabForm}
+              />
             </div>
             
             <div className="space-y-4">
@@ -270,7 +262,7 @@ const FamilyAnnualMedicalVisitForm = ({
                   id="recommendations"
                   name="recommendations"
                   placeholder="Recommandations médicales pour le membre de la famille"
-                  value={initialData.recommendations || ''}
+                  value={formData.recommendations || ''}
                   onChange={handleInputChange}
                   rows={3}
                 />
@@ -279,20 +271,20 @@ const FamilyAnnualMedicalVisitForm = ({
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="followUpNeeded"
-                  checked={initialData.followUpNeeded || false}
+                  checked={formData.followUpNeeded || false}
                   onCheckedChange={(checked) => handleCheckboxChange('followUpNeeded', checked as boolean)}
                 />
                 <Label htmlFor="followUpNeeded">Suivi nécessaire</Label>
               </div>
               
-              {initialData.followUpNeeded && (
+              {formData.followUpNeeded && (
                 <div className="space-y-2">
                   <Label htmlFor="followUpDate">Date de suivi</Label>
                   <Input
                     id="followUpDate"
                     name="followUpDate"
                     type="date"
-                    value={initialData.followUpDate || ''}
+                    value={formData.followUpDate || ''}
                     onChange={handleInputChange}
                   />
                 </div>
