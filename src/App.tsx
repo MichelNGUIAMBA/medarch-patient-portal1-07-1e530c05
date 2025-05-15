@@ -30,6 +30,7 @@ import { LanguageProvider } from "./hooks/useLanguage";
 import Chatbot from "./components/chatbot/Chatbot";
 import PerformExams from "./pages/laboratory/PerformExams";
 import ExamsRequestPage from "./pages/nurse/ExamsRequestPage";
+import EmergencyFormSelector from "./pages/nurse/EmergencyFormSelector";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,7 @@ const App = () => (
                   <Route path="emergencies/:patientId" element={<EmergencyForm />} />
                   <Route path="emergencies/:patientId/edit" element={<EmergencyForm />} />
                   <Route path="emergencies" element={<EmergenciesStats />} />
+                  <Route path="emergency-forms" element={<EmergencyFormSelector />} />
                   <Route path="patient-details/:patientId" element={<PatientDetailView />} />
                   <Route path="exams" element={<ExamsRequestPage />} />
                   
@@ -145,6 +147,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <EmergencyForm />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/emergency-forms" 
+                  element={
+                    <ProtectedRoute>
+                      <EmergencyFormSelector />
                     </ProtectedRoute>
                   } 
                 />
