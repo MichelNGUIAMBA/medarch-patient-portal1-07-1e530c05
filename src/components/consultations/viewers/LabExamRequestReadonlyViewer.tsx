@@ -30,11 +30,11 @@ const LabExamRequestReadonlyViewer = ({
           {t('labExamRequest')} - {t('readOnlyMode')}
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="pt-6 bg-card">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* HEMATOLOGIE */}
           <div className="space-y-4">
-            <div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 font-semibold text-center">
+            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
               {t('hematology')}
             </div>
             
@@ -56,7 +56,7 @@ const LabExamRequestReadonlyViewer = ({
             </div>
             
             {/* COAGULATION */}
-            <div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 font-semibold text-center">
+            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
               {t('coagulation')}
             </div>
             
@@ -73,7 +73,7 @@ const LabExamRequestReadonlyViewer = ({
             </div>
             
             {/* Bacteriology section */}
-            <div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 font-semibold text-center">
+            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
               {t('bacteriology')}
             </div>
             {/* ... more exams would go here ... */}
@@ -81,7 +81,7 @@ const LabExamRequestReadonlyViewer = ({
           
           {/* BIOCHIMIE */}
           <div className="space-y-4">
-            <div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 font-semibold text-center">
+            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
               {t('biochemistry')}
             </div>
             
@@ -115,7 +115,7 @@ const LabExamRequestReadonlyViewer = ({
           
           {/* IMMUNOLOGIE */}
           <div className="space-y-4">
-            <div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 font-semibold text-center">
+            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
               {t('immunology')}
             </div>
             
@@ -140,13 +140,13 @@ const LabExamRequestReadonlyViewer = ({
         
         <div className="mt-6 grid grid-cols-2 gap-4">
           <div className="col-span-1">
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('date')}</p>
-            <p className="p-2 border rounded mt-1 bg-gray-50 dark:bg-gray-800">{formattedDate}</p>
+            <p className="text-sm font-medium text-muted-foreground">{t('date')}</p>
+            <p className="p-2 border rounded mt-1 bg-muted/60">{formattedDate}</p>
           </div>
           
           <div className="col-span-1">
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('signature')}</p>
-            <p className="p-2 border rounded mt-1 bg-gray-50 dark:bg-gray-800">{signature || t('notSigned')}</p>
+            <p className="text-sm font-medium text-muted-foreground">{t('signature')}</p>
+            <p className="p-2 border rounded mt-1 bg-muted/60">{signature || t('notSigned')}</p>
           </div>
         </div>
       </CardContent>
@@ -158,10 +158,10 @@ const LabExamRequestReadonlyViewer = ({
 const ExamCheckbox = ({ checked, label }: { checked: boolean; label: string }) => {
   return (
     <div className="flex items-center space-x-2">
-      <div className={`w-4 h-4 border rounded-sm flex items-center justify-center ${checked ? 'bg-blue-600 text-white dark:bg-blue-500' : 'bg-gray-100 dark:bg-gray-700'}`}>
+      <div className={`w-4 h-4 border rounded-sm flex items-center justify-center ${checked ? 'bg-primary text-primary-foreground' : 'bg-muted dark:bg-muted'}`}>
         {checked && '✓'}
       </div>
-      <span className="dark:text-gray-300">{label}</span>
+      <span>{label}</span>
     </div>
   );
 };

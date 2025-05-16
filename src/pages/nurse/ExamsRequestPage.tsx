@@ -24,8 +24,8 @@ const ExamsRequestPage = () => {
         <BackButton />
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="border-muted bg-card text-card-foreground">
+        <CardHeader className="bg-card">
           <CardTitle>{t('requestExams')}</CardTitle>
           <CardDescription>
             {t('selectExamTypeAndPatient')}

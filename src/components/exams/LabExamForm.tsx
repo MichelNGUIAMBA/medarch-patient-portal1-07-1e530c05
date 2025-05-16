@@ -193,16 +193,16 @@ const LabExamForm = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Hématologie */}
-          <Card>
+          <Card className="bg-card border-muted">
             <CardContent className="p-4">
-              <h3 className="font-bold mb-2 uppercase text-sm bg-gray-100 p-2">HEMATOLOGIE</h3>
+              <h3 className="font-bold mb-2 uppercase text-sm bg-muted p-2 rounded">HEMATOLOGIE</h3>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="hemogram" 
                     {...register('examData.hematology.hemogram')} 
                   />
-                  <Label htmlFor="hemogram" className="text-blue-600">HEMOGRAMME</Label>
+                  <Label htmlFor="hemogram" className="text-primary">HEMOGRAMME</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -216,11 +216,11 @@ const LabExamForm = () => {
                     id="bloodGroup" 
                     {...register('examData.hematology.bloodGroup')} 
                   />
-                  <Label htmlFor="bloodGroup" className="text-yellow-600">GROUPE SANGUIN</Label>
+                  <Label htmlFor="bloodGroup" className="text-amber-600 dark:text-amber-400">GROUPE SANGUIN</Label>
                 </div>
               </div>
 
-              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-gray-100 p-2">COAGULATION</h3>
+              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-muted p-2 rounded">COAGULATION</h3>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -238,7 +238,7 @@ const LabExamForm = () => {
                 </div>
               </div>
 
-              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-gray-100 p-2">BACTERIOLOGIE</h3>
+              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-muted p-2 rounded">BACTERIOLOGIE</h3>
               <div className="space-y-2">
                 <p className="font-semibold underline">URINES</p>
                 <div className="flex items-center space-x-2">
@@ -278,7 +278,7 @@ const LabExamForm = () => {
                 </div>
               </div>
 
-              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-gray-100 p-2">PARASITOLOGIE</h3>
+              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-muted p-2 rounded">PARASITOLOGIE</h3>
               <div className="space-y-2">
                 <p className="font-semibold underline">SANG / SELLES</p>
                 <div className="flex items-center space-x-2">
@@ -293,7 +293,7 @@ const LabExamForm = () => {
                     id="microfilariae" 
                     {...register('examData.parasitology.blood.microfilariae')} 
                   />
-                  <Label htmlFor="microfilariae" className="text-blue-600">MICROFILAIRES</Label>
+                  <Label htmlFor="microfilariae" className="text-primary">MICROFILAIRES</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -321,16 +321,16 @@ const LabExamForm = () => {
           </Card>
 
           {/* Biochimie et fonctions */}
-          <Card>
+          <Card className="bg-card border-muted">
             <CardContent className="p-4">
-              <h3 className="font-bold mb-2 uppercase text-sm bg-gray-100 p-2">BIOCHIMIE</h3>
+              <h3 className="font-bold mb-2 uppercase text-sm bg-muted p-2 rounded">BIOCHIMIE</h3>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="glycemia" 
                     {...register('examData.biochemistry.glycemia')} 
                   />
-                  <Label htmlFor="glycemia" className="text-green-600">GLYCEMIE</Label>
+                  <Label htmlFor="glycemia" className="text-green-600 dark:text-green-400">GLYCEMIE</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -369,7 +369,7 @@ const LabExamForm = () => {
                 </div>
               </div>
 
-              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-gray-100 p-2">FONCTION RENALE</h3>
+              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-muted p-2 rounded">FONCTION RENALE</h3>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -408,7 +408,7 @@ const LabExamForm = () => {
                 </div>
               </div>
 
-              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-gray-100 p-2">FONCTION HEPATIQUE</h3>
+              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-muted p-2 rounded">FONCTION HEPATIQUE</h3>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -447,7 +447,7 @@ const LabExamForm = () => {
                 </div>
               </div>
 
-              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-gray-100 p-2">BILAN LIPIDIQUE</h3>
+              <h3 className="font-bold mt-4 mb-2 uppercase text-sm bg-muted p-2 rounded">BILAN LIPIDIQUE</h3>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -475,9 +475,9 @@ const LabExamForm = () => {
           </Card>
 
           {/* Immunologie */}
-          <Card>
+          <Card className="bg-card border-muted">
             <CardContent className="p-4">
-              <h3 className="font-bold mb-2 uppercase text-sm bg-gray-100 p-2">IMMUNOLOGIE</h3>
+              <h3 className="font-bold mb-2 uppercase text-sm bg-muted p-2 rounded">IMMUNOLOGIE</h3>
               
               <div className="space-y-4">
                 <div>
@@ -557,17 +557,18 @@ const LabExamForm = () => {
 
         <div className="flex justify-between items-end border-t pt-4">
           <div className="w-1/3">
-            <Label htmlFor="signature">Signature</Label>
+            <Label htmlFor="signature">{t('signature')}</Label>
             <Input 
               id="signature" 
-              {...register('signature', { required: 'La signature est requise' })} 
-              placeholder="Signature du demandeur"
+              {...register('signature', { required: t('signatureRequired') })} 
+              placeholder={t('enterSignature')}
+              className="bg-background"
             />
             {errors.signature && <p className="text-red-500 text-sm mt-1">{errors.signature.message}</p>}
           </div>
           <div>
-            <p className="text-sm mb-2">Date: {new Date().toLocaleDateString()}</p>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+            <p className="text-sm mb-2">{t('date')}: {new Date().toLocaleDateString()}</p>
+            <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground">
               {t('requestExam')}
             </Button>
           </div>
