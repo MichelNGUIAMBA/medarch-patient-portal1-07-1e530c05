@@ -61,19 +61,19 @@ const MedicalVisitTypeSelector = () => {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">{t('visiteType')}</h3>
+              <h3 className="text-lg font-medium">{t('visitType')}</h3>
               <RadioGroup value={visitType} onValueChange={handleTypeChange} className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="standard" id="standard" />
-                  <Label htmlFor="standard" className="font-medium">Visite Médicale Standard</Label>
+                  <Label htmlFor="standard" className="font-medium">{t('standardMedicalVisit')}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="annual" id="annual" />
-                  <Label htmlFor="annual" className="font-medium">Visite Médicale Annuelle (VMA)</Label>
+                  <Label htmlFor="annual" className="font-medium">{t('annualMedicalVisit')}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="family" id="family" />
-                  <Label htmlFor="family" className="font-medium">Visite Médicale Annuelle Famille (VMAF)</Label>
+                  <Label htmlFor="family" className="font-medium">{t('familyMedicalVisit')}</Label>
                 </div>
               </RadioGroup>
             </div>

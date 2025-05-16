@@ -23,6 +23,15 @@ export const serviceFormTranslations: Record<string, TranslationRecord> = {
     'emergency': 'Urgence',
     'unrecognizedService': 'Service non reconnu',
     'noRecommendations': 'Aucune recommandation',
+    'selectMedicalVisitType': 'Sélection du type de visite médicale',
+    'medicalVisitType': 'Type de visite médicale',
+    'selectTypeAndPatient': 'Veuillez sélectionner le type de visite médicale et le patient',
+    'visitType': 'Type de visite',
+    'standardMedicalVisit': 'Visite Médicale Standard',
+    'annualMedicalVisit': 'Visite Médicale Annuelle (VMA)',
+    'familyMedicalVisit': 'Visite Médicale Annuelle Famille (VMAF)',
+    'selectPatient': 'Sélectionner un patient',
+    'continue': 'Continuer'
   },
   en: {
     'service': 'Service',
@@ -45,6 +54,15 @@ export const serviceFormTranslations: Record<string, TranslationRecord> = {
     'emergency': 'Emergency',
     'unrecognizedService': 'Unrecognized service',
     'noRecommendations': 'No recommendations',
+    'selectMedicalVisitType': 'Select Medical Visit Type',
+    'medicalVisitType': 'Medical Visit Type',
+    'selectTypeAndPatient': 'Please select the medical visit type and patient',
+    'visitType': 'Visit Type',
+    'standardMedicalVisit': 'Standard Medical Visit',
+    'annualMedicalVisit': 'Annual Medical Visit (AMV)',
+    'familyMedicalVisit': 'Family Annual Medical Visit (FAMV)',
+    'selectPatient': 'Select a patient',
+    'continue': 'Continue'
   },
   de: {
     'service': 'Dienst',
@@ -67,5 +85,14 @@ export const serviceFormTranslations: Record<string, TranslationRecord> = {
     'emergency': 'Notfall',
     'unrecognizedService': 'Nicht erkannter Dienst',
     'noRecommendations': 'Keine Empfehlungen',
+    'selectMedicalVisitType': 'Medizinischen Besuchstyp auswählen',
+    'medicalVisitType': 'Medizinischer Besuchstyp',
+    'selectTypeAndPatient': 'Bitte wählen Sie den medizinischen Besuchstyp und den Patienten aus',
+    'visitType': 'Besuchstyp',
+    'standardMedicalVisit': 'Standard Medizinischer Besuch',
+    'annualMedicalVisit': 'Jährlicher Medizinischer Besuch (JMB)',
+    'familyMedicalVisit': 'Jährlicher Familien-Medizinischer Besuch (JFMB)',
+    'selectPatient': 'Patient auswählen',
+    'continue': 'Fortfahren'
   }
 };
