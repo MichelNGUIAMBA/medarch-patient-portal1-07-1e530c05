@@ -14,6 +14,7 @@ import { medicalTranslations } from './medical';
 import { labTranslations } from './lab';
 import { aiTranslations } from './ai';
 import { recordsTranslations } from './records';
+import { copyrightTranslations } from './copyright';
 
 // Merge all translation categories for each language
 const createMergedTranslations = (): Record<Language, TranslationRecord> => {
@@ -35,7 +36,8 @@ const createMergedTranslations = (): Record<Language, TranslationRecord> => {
       ...medicalTranslations[lang],
       ...labTranslations[lang],
       ...aiTranslations[lang],
-      ...recordsTranslations[lang]
+      ...recordsTranslations[lang],
+      ...copyrightTranslations[lang]
     };
   });
   
