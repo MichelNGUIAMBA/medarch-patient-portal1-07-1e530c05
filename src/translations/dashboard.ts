@@ -3,6 +3,7 @@ import { TranslationRecord } from './types';
 
 export const dashboardTranslations: Record<string, TranslationRecord> = {
   fr: {
+    'welcome': 'Bienvenue',
     'todaysStats': 'Statistiques du jour',
     'todayPatients': 'Patients du jour',
     'waitingPatients': 'Patients en attente',
@@ -30,6 +31,7 @@ export const dashboardTranslations: Record<string, TranslationRecord> = {
     'newEmergency': 'Nouvelle urgence',
   },
   en: {
+    'welcome': 'Welcome',
     'todaysStats': 'Today\'s stats',
     'todayPatients': 'Today\'s patients',
     'waitingPatients': 'Waiting patients',
@@ -57,6 +59,7 @@ export const dashboardTranslations: Record<string, TranslationRecord> = {
     'newEmergency': 'New emergency',
   },
   de: {
+    'welcome': 'Willkommen',
     'todaysStats': 'Heutige Statistiken',
     'todayPatients': 'Heutige Patienten',
     'waitingPatients': 'Wartende Patienten',

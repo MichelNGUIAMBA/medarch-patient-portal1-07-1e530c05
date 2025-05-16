@@ -2,6 +2,7 @@
 import { BaseTranslations } from './base';
 
 export interface DashboardTranslations extends BaseTranslations {
+  welcome: string;
   todaysStats: string;
   todayPatients: string;
   waitingPatients: string;

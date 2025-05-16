@@ -7,9 +7,11 @@ import LabDashboard from '@/components/dashboards/LabDashboard';
 import AdminDashboard from '@/components/dashboards/AdminDashboard';
 import DoctorDashboard from '@/components/dashboards/DoctorDashboard';
 import DefaultDashboard from '@/components/dashboards/DefaultDashboard';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   // Render dashboard based on user role
   const renderRoleDashboard = () => {
@@ -31,7 +33,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Bienvenue, {user?.name}</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('welcome')}, {user?.name}</h1>
       {renderRoleDashboard()}
     </div>
   );
