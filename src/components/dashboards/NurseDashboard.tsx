@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, ClipboardCheck, Hospital, Users, FilePlus2, CalendarCheck } from 'lucide-react';
+import { Calendar, ClipboardCheck, Hospital, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { usePatientStore } from '@/stores/usePatientStore';
@@ -54,14 +54,6 @@ const NurseDashboard = () => {
     }
   };
   
-  const handleNewEmergencyForm = () => {
-    navigate('/emergency-forms');
-  };
-  
-  const handleNewMedicalVisit = () => {
-    navigate('/medical-visit-type');
-  };
-  
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -69,23 +61,6 @@ const NurseDashboard = () => {
         <StatsCard title={t('consultations')} value={patientStats.consultations} icon={ClipboardCheck} iconColor="text-green-600" />
         <StatsCard title={t('emergencies')} value={patientStats.emergencies} icon={Hospital} iconColor="text-red-600" />
         <StatsCard title={t('waitingPatients')} value={patientStats.waiting} icon={Users} iconColor="text-purple-600" />
-      </div>
-
-      <div className="flex justify-end mb-4 gap-2">
-        <Button 
-          onClick={handleNewMedicalVisit}
-          className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
-        >
-          <CalendarCheck size={16} />
-          Nouvelle visite médicale
-        </Button>
-        <Button 
-          onClick={handleNewEmergencyForm}
-          className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
-        >
-          <FilePlus2 size={16} />
-          Nouvelle fiche d'urgence
-        </Button>
       </div>
 
       <div className="rounded-lg shadow bg-inherit">

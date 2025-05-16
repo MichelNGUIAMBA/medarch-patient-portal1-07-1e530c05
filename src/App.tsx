@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,6 +31,8 @@ import Chatbot from "./components/chatbot/Chatbot";
 import PerformExams from "./pages/laboratory/PerformExams";
 import ExamsRequestPage from "./pages/nurse/ExamsRequestPage";
 import EmergencyFormSelector from "./pages/nurse/EmergencyFormSelector";
+import NewConsultationSelector from "./pages/secretary/NewConsultationSelector";
+import SelectPatientForConsultation from "./pages/secretary/SelectPatientForConsultation";
 
 const queryClient = new QueryClient();
 
@@ -181,6 +182,22 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <PerformExams />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/new-consultation" 
+                  element={
+                    <ProtectedRoute>
+                      <NewConsultationSelector />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/select-patient-for-consultation" 
+                  element={
+                    <ProtectedRoute>
+                      <SelectPatientForConsultation />
                     </ProtectedRoute>
                   } 
                 />
