@@ -55,4 +55,7 @@ export interface UITranslations extends BaseTranslations {
   Ug: string;
   patientWaitingList: string;
   patientId: string;
+  takenCareBy: string;
+  serviceInfo: string;
+  notes: string;
 }

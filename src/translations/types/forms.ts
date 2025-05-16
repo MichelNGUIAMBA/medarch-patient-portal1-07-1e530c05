@@ -85,6 +85,16 @@ export interface ServiceFormTranslations extends BaseTranslations {
   emergency: string;
   unrecognizedService: string;
   noRecommendations: string;
+  // Add the missing keys for medical visit types
+  selectMedicalVisitType: string;
+  medicalVisitType: string;
+  selectTypeAndPatient: string;
+  visitType: string;
+  standardMedicalVisit: string;
+  annualMedicalVisit: string;
+  familyMedicalVisit: string;
+  selectPatient: string;
+  continue: string;
 }
 
 export interface ValidationFormTranslations extends BaseTranslations {

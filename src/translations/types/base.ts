@@ -18,24 +18,8 @@ export interface BaseTranslations {
 // Type for translations by language
 export type TranslationsByLanguage = Record<Language, TranslationsMap>;
 
-// Type for the complete translations object
+// Forward reference for the complete translations object
+// This avoids circular dependencies by not directly referencing the specific translation interfaces here
 export interface TranslationsMap {
-  auth: AuthTranslations;
-  navigation: NavigationTranslations;
-  patient: PatientTranslations;
-  status: StatusTranslations;
-  service: ServiceTranslations;
-  baseForm: BaseFormTranslations;
-  patientForm: PatientFormTranslations;
-  serviceForm: ServiceFormTranslations;
-  validationForm: ValidationFormTranslations;
-  history: HistoryTranslations;
-  chatbot: ChatbotTranslations;
-  ui: UITranslations;
-  dashboard: DashboardTranslations;
-  medical: MedicalTranslations;
-  lab: LabTranslations;
-  ai: AITranslations;
-  records: RecordsTranslations;
-  copyright: CopyrightTranslations;
+  [key: string]: BaseTranslations;
 }
