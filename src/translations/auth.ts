@@ -5,6 +5,7 @@ export const authTranslations: Record<string, TranslationRecord> = {
   fr: {
     'login': 'Se connecter',
     'email': 'Adresse e-mail',
+    'emailPlaceholder': 'votre@email.com',
     'password': 'Mot de passe',
     'forgotPassword': 'Mot de passe oublié?',
     'demoAccounts': 'Comptes de démonstration',
@@ -16,6 +17,7 @@ export const authTranslations: Record<string, TranslationRecord> = {
   en: {
     'login': 'Login',
     'email': 'Email address',
+    'emailPlaceholder': 'your@email.com',
     'password': 'Password',
     'forgotPassword': 'Forgot password?',
     'demoAccounts': 'Demo accounts',
@@ -27,6 +29,7 @@ export const authTranslations: Record<string, TranslationRecord> = {
   de: {
     'login': 'Anmelden',
     'email': 'E-Mail-Adresse',
+    'emailPlaceholder': 'ihre@email.com',
     'password': 'Passwort',
     'forgotPassword': 'Passwort vergessen?',
     'demoAccounts': 'Demo-Konten',

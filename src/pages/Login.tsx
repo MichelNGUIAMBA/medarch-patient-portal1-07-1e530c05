@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth-context";
@@ -61,7 +60,7 @@ const Login = () => {
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="votre@email.com" 
+                placeholder={t('emailPlaceholder')} 
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
                 className="w-full dark:bg-gray-700 dark:border-gray-600" 

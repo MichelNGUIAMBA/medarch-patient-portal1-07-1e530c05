@@ -4,6 +4,7 @@ import { BaseTranslations } from './base';
 export interface AuthTranslations extends BaseTranslations {
   login: string;
   email: string;
+  emailPlaceholder: string;
   password: string;
   forgotPassword: string;
   demoAccounts: string;
