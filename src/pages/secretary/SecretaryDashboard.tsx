@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { usePatientStore } from '@/stores/usePatientStore';
 import SearchBar from '@/components/secretary/SearchBar';
@@ -5,11 +6,15 @@ import StatsCards from '@/components/secretary/dashboard/StatsCards';
 import QuickActions from '@/components/secretary/dashboard/QuickActions';
 import PatientsTable from '@/components/secretary/dashboard/PatientsTable';
 import { differenceInYears } from 'date-fns';
+import { useLanguage } from '@/hooks/useLanguage';
+
 const SecretaryDashboard = () => {
   const patients = usePatientStore(state => state.patients);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('time');
   const [activeFilters, setActiveFilters] = useState<string[]>(['name']);
+  const { t } = useLanguage();
+  
   const filteredAndSortedPatients = useMemo(() => {
     let result = [...patients];
     if (searchTerm) {
@@ -43,11 +48,13 @@ const SecretaryDashboard = () => {
         return result;
     }
   }, [patients, searchTerm, sortOrder, activeFilters]);
+  
   const waitingListData = {
     vm: patients.filter(p => p.service === "VM" && p.status === "En attente").length,
     cons: patients.filter(p => p.service === "Cons" && p.status === "En attente").length,
     urg: patients.filter(p => p.service === "Ug").length
   };
+  
   return <div className="space-y-6 bg-inherit rounded-sm-">
       <StatsCards stats={waitingListData} />
       <QuickActions />
@@ -55,4 +62,5 @@ const SecretaryDashboard = () => {
       <PatientsTable patients={filteredAndSortedPatients} />
     </div>;
 };
+
 export default SecretaryDashboard;

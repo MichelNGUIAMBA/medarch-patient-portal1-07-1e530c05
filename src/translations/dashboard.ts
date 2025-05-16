@@ -29,6 +29,16 @@ export const dashboardTranslations: Record<string, TranslationRecord> = {
     'newMedicalVisit': 'Nouvelle visite médicale',
     'newConsultation': 'Nouvelle consultation',
     'newEmergency': 'Nouvelle urgence',
+    'waitingForConsultation': 'En attente de consultation',
+    'ongoingEmergencies': 'Urgences en cours',
+    'filterBy': 'Filtrer par',
+    'name': 'Nom',
+    'company': 'Société',
+    'age': 'Âge',
+    'service': 'Service',
+    'sortByAlphabeticalAsc': 'Trier par ordre alphabétique croissant',
+    'sortByAlphabeticalDesc': 'Trier par ordre alphabétique décroissant',
+    'sortByArrivalTime': 'Trier par heure d\'arrivée'
   },
   en: {
     'welcome': 'Welcome',
@@ -57,6 +67,16 @@ export const dashboardTranslations: Record<string, TranslationRecord> = {
     'newMedicalVisit': 'New medical visit',
     'newConsultation': 'New consultation',
     'newEmergency': 'New emergency',
+    'waitingForConsultation': 'Waiting for consultation',
+    'ongoingEmergencies': 'Ongoing emergencies',
+    'filterBy': 'Filter by',
+    'name': 'Name',
+    'company': 'Company',
+    'age': 'Age',
+    'service': 'Service',
+    'sortByAlphabeticalAsc': 'Sort by alphabetical order ascending',
+    'sortByAlphabeticalDesc': 'Sort by alphabetical order descending',
+    'sortByArrivalTime': 'Sort by arrival time'
   },
   de: {
     'welcome': 'Willkommen',
@@ -85,5 +105,15 @@ export const dashboardTranslations: Record<string, TranslationRecord> = {
     'newMedicalVisit': 'Neuer medizinischer Besuch',
     'newConsultation': 'Neue Konsultation',
     'newEmergency': 'Neuer Notfall',
+    'waitingForConsultation': 'Warten auf Konsultation',
+    'ongoingEmergencies': 'Laufende Notfälle',
+    'filterBy': 'Filtern nach',
+    'name': 'Name',
+    'company': 'Unternehmen',
+    'age': 'Alter',
+    'service': 'Dienst',
+    'sortByAlphabeticalAsc': 'Sortieren nach alphabetischer Reihenfolge aufsteigend',
+    'sortByAlphabeticalDesc': 'Sortieren nach alphabetischer Reihenfolge absteigend',
+    'sortByArrivalTime': 'Sortieren nach Ankunftszeit'
   }
 };

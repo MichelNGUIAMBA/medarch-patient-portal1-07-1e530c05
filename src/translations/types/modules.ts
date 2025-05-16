@@ -28,6 +28,16 @@ export interface DashboardTranslations extends BaseTranslations {
   newMedicalVisit: string;
   newConsultation: string;
   newEmergency: string;
+  waitingForConsultation: string;
+  ongoingEmergencies: string;
+  filterBy: string;
+  name: string;
+  company: string;
+  age: string;
+  service: string;
+  sortByAlphabeticalAsc: string;
+  sortByAlphabeticalDesc: string;
+  sortByArrivalTime: string;
 }
 
 export interface MedicalTranslations extends BaseTranslations {
