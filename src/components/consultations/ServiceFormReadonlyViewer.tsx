@@ -13,6 +13,7 @@ import { Clock } from 'lucide-react';
 import ConsultationDataViewer from './viewers/ConsultationDataViewer';
 import MedicalVisitDataViewer from './viewers/MedicalVisitDataViewer';
 import EmergencyDataViewer from './viewers/EmergencyDataViewer';
+import LabExamRequestReadonlyViewer from './viewers/LabExamRequestReadonlyViewer';
 
 interface ServiceFormReadonlyViewerProps {
   patient: Patient;
@@ -61,6 +62,9 @@ const ServiceFormReadonlyViewer = ({
     return format(new Date(dateString), 'dd/MM/yyyy à HH:mm', { locale: fr });
   };
 
+  // Vérifier si des examens de laboratoire ont été demandés
+  const hasLabExams = data.labExams && Object.values(data.labExams).some((value: any) => value === true);
+
   // Render the appropriate viewer based on service type
   const renderServiceDataViewer = () => {
     switch (patient.service) {
@@ -86,23 +90,34 @@ const ServiceFormReadonlyViewer = ({
   }
 
   return (
-    <Card className="w-full mb-6">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className={getServiceColor(patient.service)}>
-          {t('dataOf')} {getServiceName(patient.service)}
-        </CardTitle>
-        
-        {displayDateTime && data.serviceDateTime && (
-          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-            <Clock className="h-4 w-4 mr-1" />
-            {formatDateTime(data.serviceDateTime)}
-          </div>
-        )}
-      </CardHeader>
-      <CardContent className="pt-6">
-        {renderServiceDataViewer()}
-      </CardContent>
-    </Card>
+    <>
+      <Card className="w-full mb-6">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className={getServiceColor(patient.service)}>
+            {t('dataOf')} {getServiceName(patient.service)}
+          </CardTitle>
+          
+          {displayDateTime && data.serviceDateTime && (
+            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+              <Clock className="h-4 w-4 mr-1" />
+              {formatDateTime(data.serviceDateTime)}
+            </div>
+          )}
+        </CardHeader>
+        <CardContent className="pt-6">
+          {renderServiceDataViewer()}
+        </CardContent>
+      </Card>
+      
+      {/* Affichage des examens de laboratoire si présent */}
+      {hasLabExams && (
+        <LabExamRequestReadonlyViewer
+          selectedExams={data.labExams || {}}
+          signature={data.labSignature || ''}
+          date={data.serviceDateTime || ''}
+        />
+      )}
+    </>
   );
 };
 

@@ -51,11 +51,11 @@ const SelectPatientForConsultation = () => {
         <BackButton />
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="border-border">
+        <CardHeader className="bg-card">
           <CardTitle>{t('findPatient')}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           <ExistingPatientSearch onPatientSelect={handlePatientSelect} />
           
           {selectedPatient && (

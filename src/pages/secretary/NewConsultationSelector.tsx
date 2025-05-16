@@ -19,7 +19,7 @@ const NewConsultationSelector = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{t('newConsultation')}</h1>
+        <h1 className="text-2xl font-bold">{t('standardConsultation')}</h1>
         <BackButton />
       </div>
 
