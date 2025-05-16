@@ -59,7 +59,7 @@ const SelectPatientForConsultation = () => {
           <ExistingPatientSearch onPatientSelect={handlePatientSelect} />
           
           {selectedPatient && (
-            <div className="p-4 border rounded-md bg-green-50 dark:bg-green-900/20">
+            <div className="p-4 border rounded-md bg-accent/20">
               <h3 className="font-medium mb-2">{t('selectedPatient')}</h3>
               <p><strong>{t('name')}:</strong> {selectedPatient.name}</p>
               <p><strong>{t('id')}:</strong> {selectedPatient.id}</p>
@@ -67,7 +67,7 @@ const SelectPatientForConsultation = () => {
               
               <Button 
                 onClick={handleSubmit}
-                className="mt-4 bg-green-600 hover:bg-green-700"
+                className="mt-4 bg-green-600 hover:bg-green-700 dark:bg-green-600/80 dark:hover:bg-green-600 text-white"
               >
                 {t('confirmAndAddToQueue')}
               </Button>

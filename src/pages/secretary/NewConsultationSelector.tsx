@@ -13,7 +13,7 @@ const NewConsultationSelector = () => {
 
   const handleStandardConsultationClick = () => {
     // Rediriger vers la page de recherche/sélection de patient pour une consultation standard
-    navigate('/dashboard/select-patient-for-consultation');
+    navigate('/select-patient-for-consultation');
   };
 
   return (
@@ -24,9 +24,9 @@ const NewConsultationSelector = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-1">
-        <Card className="overflow-hidden">
-          <CardHeader className="bg-green-50 dark:bg-green-950">
-            <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
+        <Card className="overflow-hidden border-border">
+          <CardHeader className="bg-card">
+            <CardTitle className="flex items-center gap-2 text-primary">
               <ClipboardCheck className="h-6 w-6" />
               {t('standardConsultation')}
             </CardTitle>
@@ -44,10 +44,10 @@ const NewConsultationSelector = () => {
               <li>{t('possibilityToRequestAdditionalExams')}</li>
             </ul>
           </CardContent>
-          <CardFooter className="bg-gray-50 dark:bg-gray-900 p-4">
+          <CardFooter className="bg-muted/50 p-4">
             <Button 
               onClick={handleStandardConsultationClick}
-              className="w-full bg-green-600 hover:bg-green-700"
+              className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-600/80 dark:hover:bg-green-600 text-white"
             >
               {t('selectThisForm')}
             </Button>

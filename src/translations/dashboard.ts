@@ -24,6 +24,10 @@ export const dashboardTranslations: Record<string, TranslationRecord> = {
     'editSimple': 'Modif. simple',
     'editComplete': 'Modif. complète',
     'patientNotFound': 'Patient non trouvé',
+    'addService': 'Ajouter un service',
+    'newMedicalVisit': 'Nouvelle visite médicale',
+    'newConsultation': 'Nouvelle consultation',
+    'newEmergency': 'Nouvelle urgence',
   },
   en: {
     'todaysStats': 'Today\'s stats',
@@ -47,6 +51,10 @@ export const dashboardTranslations: Record<string, TranslationRecord> = {
     'editSimple': 'Simple edit',
     'editComplete': 'Complete edit',
     'patientNotFound': 'Patient not found',
+    'addService': 'Add a service',
+    'newMedicalVisit': 'New medical visit',
+    'newConsultation': 'New consultation',
+    'newEmergency': 'New emergency',
   },
   de: {
     'todaysStats': 'Heutige Statistiken',
@@ -70,5 +78,9 @@ export const dashboardTranslations: Record<string, TranslationRecord> = {
     'editSimple': 'Einfache Bearbeitung',
     'editComplete': 'Vollständige Bearbeitung',
     'patientNotFound': 'Patient nicht gefunden',
+    'addService': 'Einen Dienst hinzufügen',
+    'newMedicalVisit': 'Neuer medizinischer Besuch',
+    'newConsultation': 'Neue Konsultation',
+    'newEmergency': 'Neuer Notfall',
   }
 };
