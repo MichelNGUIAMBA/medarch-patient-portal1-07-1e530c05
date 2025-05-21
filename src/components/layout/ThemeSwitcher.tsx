@@ -15,7 +15,7 @@ const ThemeSwitcher = () => {
       size="icon" 
       onClick={toggleTheme} 
       title={theme === 'dark' ? t('lightMode') : t('darkMode')} 
-      className="rounded-full w-9 h-9 relative overflow-hidden transition-all duration-300 hover:bg-primary/10 dark:hover:bg-primary/20"
+      className="rounded-full w-10 h-10 relative overflow-hidden transition-all duration-300 hover:bg-primary/10 dark:hover:bg-primary/20"
       aria-label={theme === 'dark' ? t('lightMode') : t('darkMode')}
     >
       <AnimatePresence mode="wait">

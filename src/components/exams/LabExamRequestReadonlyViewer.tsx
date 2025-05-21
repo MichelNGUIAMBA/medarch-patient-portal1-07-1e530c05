@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTheme } from '@/hooks/useTheme';
 
 interface LabExamRequestReadonlyViewerProps {
   selectedExams: Record<string, boolean>;
@@ -17,6 +18,7 @@ const LabExamRequestReadonlyViewer = ({
   date 
 }: LabExamRequestReadonlyViewerProps) => {
   const { t } = useLanguage();
+  const { theme } = useTheme();
   
   // Format the date appropriately
   const formattedDate = date 
@@ -25,7 +27,7 @@ const LabExamRequestReadonlyViewer = ({
 
   return (
     <Card className="w-full border-blue-200 dark:border-blue-900 mt-6">
-      <CardHeader className="bg-blue-50 dark:bg-blue-950">
+      <CardHeader className="bg-blue-50/50 dark:bg-blue-950/20">
         <CardTitle className="text-xl text-blue-700 dark:text-blue-400">
           {t('labExamRequest')} - {t('readOnlyMode')}
         </CardTitle>
@@ -34,7 +36,7 @@ const LabExamRequestReadonlyViewer = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* HEMATOLOGIE */}
           <div className="space-y-4">
-            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
+            <div className="bg-muted/50 dark:bg-muted/20 px-3 py-2 font-semibold text-center rounded">
               {t('hematology')}
             </div>
             
@@ -56,7 +58,7 @@ const LabExamRequestReadonlyViewer = ({
             </div>
             
             {/* COAGULATION */}
-            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
+            <div className="bg-muted/50 dark:bg-muted/20 px-3 py-2 font-semibold text-center rounded">
               {t('coagulation')}
             </div>
             
@@ -73,7 +75,7 @@ const LabExamRequestReadonlyViewer = ({
             </div>
             
             {/* Bacteriology section */}
-            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
+            <div className="bg-muted/50 dark:bg-muted/20 px-3 py-2 font-semibold text-center rounded">
               {t('bacteriology')}
             </div>
             <div className="space-y-2">
@@ -103,7 +105,7 @@ const LabExamRequestReadonlyViewer = ({
           
           {/* BIOCHIMIE */}
           <div className="space-y-4">
-            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
+            <div className="bg-muted/50 dark:bg-muted/20 px-3 py-2 font-semibold text-center rounded">
               {t('biochemistry')}
             </div>
             
@@ -135,7 +137,7 @@ const LabExamRequestReadonlyViewer = ({
             </div>
             
             {/* Fonction rénale */}
-            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
+            <div className="bg-muted/50 dark:bg-muted/20 px-3 py-2 font-semibold text-center rounded">
               {t('kidneyFunction')}
             </div>
             <div className="space-y-2">
@@ -164,7 +166,7 @@ const LabExamRequestReadonlyViewer = ({
           
           {/* IMMUNOLOGIE */}
           <div className="space-y-4">
-            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
+            <div className="bg-muted/50 dark:bg-muted/20 px-3 py-2 font-semibold text-center rounded">
               {t('immunology')}
             </div>
             
@@ -186,7 +188,7 @@ const LabExamRequestReadonlyViewer = ({
             </div>
             
             {/* Hépatites */}
-            <div className="bg-muted px-3 py-2 font-semibold text-center rounded mt-4">
+            <div className="bg-muted/50 dark:bg-muted/20 px-3 py-2 font-semibold text-center rounded mt-4">
               {t('hepatitisB')}
             </div>
             <div className="space-y-2">
@@ -209,12 +211,12 @@ const LabExamRequestReadonlyViewer = ({
         <div className="mt-6 grid grid-cols-2 gap-4">
           <div className="col-span-1">
             <p className="text-sm font-medium text-muted-foreground">{t('date')}</p>
-            <p className="p-2 border rounded mt-1 bg-muted/60">{formattedDate}</p>
+            <p className="p-2 border rounded mt-1 bg-muted/30 dark:bg-muted/10">{formattedDate}</p>
           </div>
           
           <div className="col-span-1">
             <p className="text-sm font-medium text-muted-foreground">{t('signature')}</p>
-            <p className="p-2 border rounded mt-1 bg-muted/60">{signature || t('notSigned')}</p>
+            <p className="p-2 border rounded mt-1 bg-muted/30 dark:bg-muted/10">{signature || t('notSigned')}</p>
           </div>
         </div>
       </CardContent>
@@ -226,7 +228,7 @@ const LabExamRequestReadonlyViewer = ({
 const ExamCheckbox = ({ checked, label }: { checked: boolean; label: string }) => {
   return (
     <div className="flex items-center space-x-2">
-      <div className={`w-4 h-4 border rounded-sm flex items-center justify-center ${checked ? 'bg-primary text-primary-foreground' : 'bg-muted dark:bg-muted'}`}>
+      <div className={`w-4 h-4 border rounded-sm flex items-center justify-center ${checked ? 'bg-primary text-primary-foreground' : 'bg-muted/30 dark:bg-muted/10'}`}>
         {checked && '✓'}
       </div>
       <span>{label}</span>

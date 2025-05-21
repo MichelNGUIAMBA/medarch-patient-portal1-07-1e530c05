@@ -31,10 +31,10 @@ const ServiceFormReadonlyViewer = ({
   const [isServiceCompleted, setIsServiceCompleted] = useState(false);
   
   useEffect(() => {
-    // Si on a déjà reçu des données via props, utilisons-les
+    // If we already received data via props, use them
     if (Object.keys(serviceData).length > 0) {
       setData(serviceData);
-      // Vérifier si le service est complété basé sur la présence de serviceDateTime
+      // Check if the service is completed based on the presence of serviceDateTime
       setIsServiceCompleted(!!serviceData.serviceDateTime);
       console.log("Using service data from props:", serviceData);
       return;
@@ -46,7 +46,7 @@ const ServiceFormReadonlyViewer = ({
       try {
         const parsed = JSON.parse(storedData);
         setData(parsed);
-        // Vérifier si le service est complété basé sur la présence de serviceDateTime
+        // Check if the service is completed based on the presence of serviceDateTime
         setIsServiceCompleted(!!parsed.serviceDateTime);
         console.log("Service data loaded from sessionStorage:", parsed);
       } catch (e) {
@@ -62,7 +62,7 @@ const ServiceFormReadonlyViewer = ({
     return format(new Date(dateString), 'dd/MM/yyyy à HH:mm', { locale: fr });
   };
 
-  // Vérifier si des examens de laboratoire ont été demandés
+  // Check if lab exams were requested
   const hasLabExams = data.labExams && Object.values(data.labExams).some((value: any) => value === true);
 
   // Render the appropriate viewer based on service type
@@ -79,12 +79,12 @@ const ServiceFormReadonlyViewer = ({
     }
   };
 
-  // Si aucune donnée n'est disponible, ne pas afficher le composant
+  // If no data is available, don't display the component
   if (Object.keys(data).length === 0) {
     return null;
   }
   
-  // Si le service n'est pas complété, ne pas afficher le composant
+  // If the service is not completed, don't display the component
   if (!isServiceCompleted) {
     return null;
   }
@@ -92,13 +92,13 @@ const ServiceFormReadonlyViewer = ({
   return (
     <>
       <Card className="w-full mb-6">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className={`flex flex-row items-center justify-between ${patient.service === 'Ug' ? 'bg-red-50/50 dark:bg-red-950/20' : ''}`}>
           <CardTitle className={getServiceColor(patient.service)}>
             {t('dataOf')} {getServiceName(patient.service)}
           </CardTitle>
           
           {displayDateTime && data.serviceDateTime && (
-            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center text-sm text-muted-foreground">
               <Clock className="h-4 w-4 mr-1" />
               {formatDateTime(data.serviceDateTime)}
             </div>
@@ -109,7 +109,7 @@ const ServiceFormReadonlyViewer = ({
         </CardContent>
       </Card>
       
-      {/* Affichage des examens de laboratoire si présent */}
+      {/* Display lab exam requests if present */}
       {hasLabExams && (
         <LabExamRequestReadonlyViewer
           selectedExams={data.labExams || {}}

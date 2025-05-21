@@ -2,32 +2,37 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useLanguage } from '@/hooks/useLanguage';
+import { useTheme } from '@/hooks/useTheme';
 
 interface EmergencyDataViewerProps {
   serviceData: any;
 }
 
 const EmergencyDataViewer = ({ serviceData }: EmergencyDataViewerProps) => {
-  // Détecter le type de formulaire d'urgence
+  const { t } = useLanguage();
+  const { theme } = useTheme();
+  
+  // Detect the form type
   const formType = serviceData.formType || 'standard';
   
-  // Afficher la fiche de surveillance
+  // Display surveillance sheet
   if (formType === 'surveillance') {
     return (
       <div className="space-y-4">
-        <div className="text-xl font-bold text-center mb-4">FICHE DE SURVEILLANCE</div>
+        <div className="text-xl font-bold text-center mb-4 text-red-600 dark:text-red-400">FICHE DE SURVEILLANCE</div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="border rounded-md p-3 bg-gray-50">
-            <p className="text-sm font-medium text-gray-500">NOM ET PRÉNOM</p>
+          <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+            <p className="text-sm font-medium text-muted-foreground">NOM ET PRÉNOM</p>
             <p>{serviceData.patientName || 'Non spécifié'}</p>
           </div>
-          <div className="border rounded-md p-3 bg-gray-50">
-            <p className="text-sm font-medium text-gray-500">CHAMBRE</p>
+          <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+            <p className="text-sm font-medium text-muted-foreground">CHAMBRE</p>
             <p>{serviceData.room || 'Non spécifiée'}</p>
           </div>
-          <div className="border rounded-md p-3 bg-gray-50">
-            <p className="text-sm font-medium text-gray-500">LIT</p>
+          <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+            <p className="text-sm font-medium text-muted-foreground">LIT</p>
             <p>{serviceData.bed || 'Non spécifié'}</p>
           </div>
         </div>
@@ -68,74 +73,146 @@ const EmergencyDataViewer = ({ serviceData }: EmergencyDataViewerProps) => {
             </TableBody>
           </Table>
         </div>
+        
+        {/* Display additional surveillance data if available */}
+        {serviceData.patientStatus && (
+          <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10 mt-4">
+            <p className="text-sm font-medium text-muted-foreground">ÉTAT DU PATIENT</p>
+            <p>{serviceData.patientStatus === 'stable' ? 'Stable' : 
+               serviceData.patientStatus === 'critical' ? 'Critique' : 
+               serviceData.patientStatus === 'improving' ? 'En amélioration' : 
+               serviceData.patientStatus === 'deteriorating' ? 'En dégradation' : 'Non spécifié'}</p>
+          </div>
+        )}
+        
+        {serviceData.vitalSignsTrend && (
+          <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+            <p className="text-sm font-medium text-muted-foreground">ÉVOLUTION DES SIGNES VITAUX</p>
+            <p className="whitespace-pre-wrap">{serviceData.vitalSignsTrend}</p>
+          </div>
+        )}
+        
+        {serviceData.nurseObservations && (
+          <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+            <p className="text-sm font-medium text-muted-foreground">OBSERVATIONS DE L'INFIRMIER(E)</p>
+            <p className="whitespace-pre-wrap">{serviceData.nurseObservations}</p>
+          </div>
+        )}
       </div>
     );
   }
   
-  // Afficher la fiche d'observation
+  // Display observation sheet
   else if (formType === 'observation') {
     return (
       <div className="space-y-4">
-        <div className="text-sm text-center text-gray-600">Poste de Médecine du Travail</div>
-        <div className="text-xl font-bold text-center mb-4">FICHE D'OBSERVATION</div>
+        <div className="text-sm text-center text-muted-foreground">Poste de Médecine du Travail</div>
+        <div className="text-xl font-bold text-center mb-4 text-red-600 dark:text-red-400">FICHE D'OBSERVATION</div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="border rounded-md p-3 bg-gray-50">
-            <p className="text-sm font-medium text-gray-500">NOM ET PRÉNOM</p>
+          <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+            <p className="text-sm font-medium text-muted-foreground">NOM ET PRÉNOM</p>
             <p>{serviceData.patientName || 'Non spécifié'}</p>
           </div>
-          <div className="border rounded-md p-3 bg-gray-50">
-            <p className="text-sm font-medium text-gray-500">CHAMBRE</p>
+          <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+            <p className="text-sm font-medium text-muted-foreground">CHAMBRE</p>
             <p>{serviceData.room || 'Non spécifiée'}</p>
           </div>
-          <div className="border rounded-md p-3 bg-gray-50">
-            <p className="text-sm font-medium text-gray-500">LIT</p>
+          <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+            <p className="text-sm font-medium text-muted-foreground">LIT</p>
             <p>{serviceData.bed || 'Non spécifié'}</p>
           </div>
         </div>
         
-        <div className="border rounded-md p-4 bg-gray-50 min-h-[300px]">
-          <p className="text-sm font-medium text-gray-500 mb-2">OBSERVATIONS</p>
+        {serviceData.observationTime && (
+          <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+            <p className="text-sm font-medium text-muted-foreground">HEURE D'OBSERVATION</p>
+            <p>{serviceData.observationTime}</p>
+          </div>
+        )}
+        
+        {serviceData.consciousnessLevel && (
+          <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+            <p className="text-sm font-medium text-muted-foreground">NIVEAU DE CONSCIENCE</p>
+            <p>{serviceData.consciousnessLevel === 'alert' ? 'Alerte' : 
+               serviceData.consciousnessLevel === 'confused' ? 'Confus' : 
+               serviceData.consciousnessLevel === 'drowsy' ? 'Somnolent' : 
+               serviceData.consciousnessLevel === 'unconscious' ? 'Inconscient' : 
+               'Non spécifié'}</p>
+          </div>
+        )}
+        
+        <div className="border rounded-md p-4 bg-muted/30 dark:bg-muted/10 min-h-[200px]">
+          <p className="text-sm font-medium text-muted-foreground mb-2">OBSERVATIONS</p>
           <div className="whitespace-pre-wrap">
-            {serviceData.observations || 'Aucune observation enregistrée.'}
+            {serviceData.observations || serviceData.physicalExamination || 'Aucune observation enregistrée.'}
+          </div>
+        </div>
+        
+        {/* Symptoms section */}
+        <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+          <p className="text-sm font-medium text-muted-foreground mb-2">SYMPTÔMES OBSERVÉS</p>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center space-x-2">
+              <div className={`w-4 h-4 rounded-sm flex items-center justify-center ${serviceData.painSymptom ? 'bg-primary text-primary-foreground' : 'border'}`}>
+                {serviceData.painSymptom && '✓'}
+              </div>
+              <span>Douleur</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className={`w-4 h-4 rounded-sm flex items-center justify-center ${serviceData.feverSymptom ? 'bg-primary text-primary-foreground' : 'border'}`}>
+                {serviceData.feverSymptom && '✓'}
+              </div>
+              <span>Fièvre</span>
+            </div>
           </div>
         </div>
       </div>
     );
   }
   
-  // Formulaire standard d'urgence
+  // Standard emergency form
   else {
     return (
       <Tabs defaultValue="assessment" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="assessment">Évaluation initiale</TabsTrigger>
-          <TabsTrigger value="treatment">Traitement</TabsTrigger>
+        <TabsList className="mb-4 bg-muted/50 dark:bg-muted/20">
+          <TabsTrigger 
+            value="assessment"
+            className="data-[state=active]:bg-background"
+          >
+            Évaluation initiale
+          </TabsTrigger>
+          <TabsTrigger 
+            value="treatment"
+            className="data-[state=active]:bg-background"
+          >
+            Traitement
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="assessment" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="border rounded-md p-3 bg-gray-50">
-              <p className="text-sm font-medium text-gray-500">Sévérité</p>
+            <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">Sévérité</p>
               <p>{serviceData.emergencySeverity === 'high' ? 'Élevée' : serviceData.emergencySeverity === 'medium' ? 'Moyenne' : 'Basse'}</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
-              <p className="text-sm font-medium text-gray-500">Plainte principale</p>
+            <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">Plainte principale</p>
               <p>{serviceData.mainComplaint || 'Non spécifié'}</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
-              <p className="text-sm font-medium text-gray-500">État de conscience</p>
+            <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">État de conscience</p>
               <p>{serviceData.consciousness === 'alert' ? 'Alerte' : serviceData.consciousness === 'verbal' ? 'Réponse verbale' : serviceData.consciousness === 'pain' ? 'Réponse à la douleur' : 'Non réactif'}</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
-              <p className="text-sm font-medium text-gray-500">Signes vitaux</p>
+            <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">Signes vitaux</p>
               <p>Température: {serviceData.temperature} °C<br />
                 Pression: {serviceData.bloodPressureSys}/{serviceData.bloodPressureDia} mmHg<br />
                 Pouls: {serviceData.heartRate} bpm<br />
                 SpO2: {serviceData.oxygenSaturation} %</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
-              <p className="text-sm font-medium text-gray-500">Notes de triage</p>
+            <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">Notes de triage</p>
               <p>{serviceData.triageNotes || 'Aucune'}</p>
             </div>
           </div>
@@ -143,30 +220,30 @@ const EmergencyDataViewer = ({ serviceData }: EmergencyDataViewerProps) => {
         
         <TabsContent value="treatment" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="border rounded-md p-3 bg-gray-50">
-              <p className="text-sm font-medium text-gray-500">Actions immédiates</p>
-              <p>{serviceData.immediateActions || 'Aucune'}</p>
+            <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">Actions immédiates</p>
+              <p className="whitespace-pre-wrap">{serviceData.immediateActions || 'Aucune'}</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
-              <p className="text-sm font-medium text-gray-500">Médicaments administrés</p>
-              <p>{serviceData.medications || 'Aucun'}</p>
+            <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">Médicaments administrés</p>
+              <p className="whitespace-pre-wrap">{serviceData.medications || 'Aucun'}</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
-              <p className="text-sm font-medium text-gray-500">Procédures effectuées</p>
-              <p>{serviceData.procedures || 'Aucune'}</p>
+            <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">Procédures effectuées</p>
+              <p className="whitespace-pre-wrap">{serviceData.procedures || 'Aucune'}</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
-              <p className="text-sm font-medium text-gray-500">Réponse au traitement</p>
-              <p>{serviceData.responseToTreatment || 'Non évaluée'}</p>
+            <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">Réponse au traitement</p>
+              <p className="whitespace-pre-wrap">{serviceData.responseToTreatment || 'Non évaluée'}</p>
             </div>
-            <div className="border rounded-md p-3 bg-gray-50">
-              <p className="text-sm font-medium text-gray-500">Actions supplémentaires</p>
-              <p>
-                {serviceData.furtherActions || 'Aucune'}<br />
-                {serviceData.referralToSpecialist && 'Référé à un spécialiste'}<br />
-                {serviceData.hospitalization && 'Hospitalisation requise'}<br />
-                {serviceData.monitoringRequired && 'Surveillance requise'}
-              </p>
+            <div className="border rounded-md p-3 bg-muted/30 dark:bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">Actions supplémentaires</p>
+              <div>
+                <p className="whitespace-pre-wrap">{serviceData.furtherActions || 'Aucune'}</p>
+                {serviceData.referralToSpecialist && <p>✓ Référé à un spécialiste</p>}
+                {serviceData.hospitalization && <p>✓ Hospitalisation requise</p>}
+                {serviceData.monitoringRequired && <p>✓ Surveillance requise</p>}
+              </div>
             </div>
           </div>
         </TabsContent>
