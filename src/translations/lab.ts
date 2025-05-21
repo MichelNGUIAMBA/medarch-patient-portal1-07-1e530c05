@@ -1,3 +1,4 @@
+
 import { TranslationRecord } from './types';
 
 export const labTranslations: Record<string, TranslationRecord> = {

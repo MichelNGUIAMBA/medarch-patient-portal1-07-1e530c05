@@ -1,3 +1,4 @@
+
 import { BaseTranslations } from './base';
 
 export interface DashboardTranslations extends BaseTranslations {
