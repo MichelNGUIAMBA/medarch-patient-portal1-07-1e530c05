@@ -7,7 +7,8 @@ import { toast } from '@/components/ui/sonner';
 import { useLanguage } from '@/hooks/useLanguage';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Clock } from 'lucide-react';
+import { Clock, FileSearch } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 // Import the refactored service viewers
 import ConsultationDataViewer from './viewers/ConsultationDataViewer';
@@ -29,6 +30,7 @@ const ServiceFormReadonlyViewer = ({
   const { t } = useLanguage();
   const [data, setData] = useState<any>(serviceData || {});
   const [isServiceCompleted, setIsServiceCompleted] = useState(false);
+  const [showLabExams, setShowLabExams] = useState(true);
   
   useEffect(() => {
     // If we already received data via props, use them
@@ -64,6 +66,11 @@ const ServiceFormReadonlyViewer = ({
 
   // Check if lab exams were requested
   const hasLabExams = data.labExams && Object.values(data.labExams).some((value: any) => value === true);
+
+  // Toggle lab exam display
+  const toggleLabExams = () => {
+    setShowLabExams(!showLabExams);
+  };
 
   // Render the appropriate viewer based on service type
   const renderServiceDataViewer = () => {
@@ -106,11 +113,26 @@ const ServiceFormReadonlyViewer = ({
         </CardHeader>
         <CardContent className="pt-6">
           {renderServiceDataViewer()}
+          
+          {/* Afficher le bouton pour les examens de laboratoire seulement s'il y a des examens demandés */}
+          {hasLabExams && (
+            <div className="mt-6 flex justify-end">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={toggleLabExams}
+                className="flex items-center gap-2"
+              >
+                <FileSearch className="h-4 w-4" />
+                {showLabExams ? t('hideLabExamRequest') : t('showLabExamRequest')}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
       
-      {/* Display lab exam requests if present */}
-      {hasLabExams && (
+      {/* Display lab exam requests if present and showLabExams is true */}
+      {hasLabExams && showLabExams && (
         <LabExamRequestReadonlyViewer
           selectedExams={data.labExams || {}}
           signature={data.labSignature || ''}
