@@ -1,4 +1,3 @@
-
 import { TranslationRecord } from './types';
 
 export const labTranslations: Record<string, TranslationRecord> = {
@@ -98,6 +97,14 @@ export const labTranslations: Record<string, TranslationRecord> = {
     'error': 'Erreur',
     'errorRequestingExams': 'Erreur lors de la demande d\'examens',
     'mustBeLoggedIn': 'Vous devez être connecté pour effectuer cette action',
+    'hepatitisB': 'HÉPATITE B',
+    'hepatitisC': 'HÉPATITE C',
+    'hbsAntigen': 'Antigène HBs',
+    'hbsAntibody': 'Anticorps anti-HBs',
+    'hbcAntibody': 'Anticorps anti-HBc',
+    'cmvAntibody': 'Anticorps anti-CMV',
+    'hcvAntibody': 'Anticorps anti-HCV',
+    'hivAntibody': 'Anticorps anti-HIV',
   },
   en: {
     'laboratoryExams': 'Laboratory Exams',
@@ -159,7 +166,7 @@ export const labTranslations: Record<string, TranslationRecord> = {
     'export': 'Export',
     'readOnlyMode': 'Read-only mode',
     'albumineGlucose': 'Albumin / Glucose',
-    'leucocytesBiluribine': 'Leukocytes / Bilirubin',
+    'leucocytesBiluribine': 'Leukozyten / Bilirubin',
     'cetonesNitritesSang': 'Ketones / Nitrites Blood',
     'antibiogram': 'Antibiogram',
     'parasitology': 'PARASITOLOGY',
@@ -195,6 +202,14 @@ export const labTranslations: Record<string, TranslationRecord> = {
     'error': 'Error',
     'errorRequestingExams': 'Error requesting exams',
     'mustBeLoggedIn': 'You must be logged in to perform this action',
+    'hepatitisB': 'HEPATITIS B',
+    'hepatitisC': 'HEPATITIS C',
+    'hbsAntigen': 'HBs Antigen',
+    'hbsAntibody': 'Anti-HBs Antibody',
+    'hbcAntibody': 'Anti-HBc Antibody',
+    'cmvAntibody': 'Anti-CMV Antibody',
+    'hcvAntibody': 'Anti-HCV Antibody',
+    'hivAntibody': 'Anti-HIV Antibody',
   },
   de: {
     'laboratoryExams': 'Laboruntersuchungen',
@@ -292,5 +307,13 @@ export const labTranslations: Record<string, TranslationRecord> = {
     'error': 'Fehler',
     'errorRequestingExams': 'Fehler beim Anfordern von Untersuchungen',
     'mustBeLoggedIn': 'Sie müssen angemeldet sein, um diese Aktion auszuführen',
+    'hepatitisB': 'HEPATITIS B',
+    'hepatitisC': 'HEPATITIS C',
+    'hbsAntigen': 'HBs-Antigen',
+    'hbsAntibody': 'Anti-HBs-Antikörper',
+    'hbcAntibody': 'Anti-HBc-Antikörper',
+    'cmvAntibody': 'Anti-CMV-Antikörper',
+    'hcvAntibody': 'Anti-HCV-Antikörper',
+    'hivAntibody': 'Anti-HIV-Antikörper',
   }
 };

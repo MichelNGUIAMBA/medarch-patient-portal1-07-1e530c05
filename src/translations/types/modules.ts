@@ -157,4 +157,12 @@ export interface LabTranslations extends BaseTranslations {
   date: string;
   signature: string;
   notSigned: string;
+  hepatitisB: string;
+  hepatitisC: string;
+  hbsAntigen: string;
+  hbsAntibody: string;
+  hbcAntibody: string;
+  cmvAntibody: string;
+  hcvAntibody: string;
+  hivAntibody: string;
 }

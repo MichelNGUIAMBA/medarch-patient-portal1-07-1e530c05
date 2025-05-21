@@ -76,7 +76,29 @@ const LabExamRequestReadonlyViewer = ({
             <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
               {t('bacteriology')}
             </div>
-            {/* ... more exams would go here ... */}
+            <div className="space-y-2">
+              <div className="font-medium mb-1">URINE S</div>
+              <ExamCheckbox 
+                checked={!!selectedExams.albumineGlucose} 
+                label={t('albumineGlucose')} 
+              />
+              <ExamCheckbox 
+                checked={!!selectedExams.leucocytesBiluribine} 
+                label={t('leucocytesBiluribine')} 
+              />
+              <ExamCheckbox 
+                checked={!!selectedExams.cetonesNitritesSang} 
+                label={t('cetonesNitritesSang')} 
+              />
+              <ExamCheckbox 
+                checked={!!selectedExams.ecbu} 
+                label="E.C.B.U." 
+              />
+              <ExamCheckbox 
+                checked={!!selectedExams.antibiogramme} 
+                label={t('antibiogram')} 
+              />
+            </div>
           </div>
           
           {/* BIOCHIMIE */}
@@ -111,6 +133,33 @@ const LabExamRequestReadonlyViewer = ({
                 label={t('transaminases')} 
               />
             </div>
+            
+            {/* Fonction rénale */}
+            <div className="bg-muted px-3 py-2 font-semibold text-center rounded">
+              {t('kidneyFunction')}
+            </div>
+            <div className="space-y-2">
+              <ExamCheckbox 
+                checked={!!selectedExams.uree} 
+                label={t('urea')} 
+              />
+              <ExamCheckbox 
+                checked={!!selectedExams.creatine} 
+                label={t('creatine')} 
+              />
+              <ExamCheckbox 
+                checked={!!selectedExams.proteinesSériques} 
+                label={t('serumProteins')} 
+              />
+              <ExamCheckbox 
+                checked={!!selectedExams.ionoSangNaK} 
+                label={t('bloodIonogram')} 
+              />
+              <ExamCheckbox 
+                checked={!!selectedExams.ionoUrines} 
+                label={t('urinaryIonogram')} 
+              />
+            </div>
           </div>
           
           {/* IMMUNOLOGIE */}
@@ -133,6 +182,25 @@ const LabExamRequestReadonlyViewer = ({
               <ExamCheckbox 
                 checked={!!selectedExams.serologie} 
                 label={t('serology')} 
+              />
+            </div>
+            
+            {/* Hépatites */}
+            <div className="bg-muted px-3 py-2 font-semibold text-center rounded mt-4">
+              {t('hepatitisB')}
+            </div>
+            <div className="space-y-2">
+              <ExamCheckbox 
+                checked={!!selectedExams.antigeneHbs} 
+                label={t('hbsAntigen')} 
+              />
+              <ExamCheckbox 
+                checked={!!selectedExams.anticorpsHbs} 
+                label={t('hbsAntibody')} 
+              />
+              <ExamCheckbox 
+                checked={!!selectedExams.anticorpsHbc} 
+                label={t('hbcAntibody')} 
               />
             </div>
           </div>

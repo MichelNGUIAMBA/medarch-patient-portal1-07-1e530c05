@@ -13,7 +13,7 @@ import { Clock } from 'lucide-react';
 import ConsultationDataViewer from './viewers/ConsultationDataViewer';
 import MedicalVisitDataViewer from './viewers/MedicalVisitDataViewer';
 import EmergencyDataViewer from './viewers/EmergencyDataViewer';
-import LabExamRequestReadonlyViewer from './viewers/LabExamRequestReadonlyViewer';
+import LabExamRequestReadonlyViewer from '@/components/exams/LabExamRequestReadonlyViewer';
 
 interface ServiceFormReadonlyViewerProps {
   patient: Patient;
