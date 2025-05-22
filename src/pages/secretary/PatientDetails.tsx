@@ -7,20 +7,27 @@ import { useAuth } from '@/hooks/use-auth-context';
 import { toast } from '@/components/ui/sonner';
 import { Pencil } from 'lucide-react';
 import BackButton from '@/components/shared/BackButton';
-import PatientPersonalInfoCard from '@/components/secretary/PatientPersonalInfoCard';
-import ConsultationInfoCard from '@/components/secretary/ConsultationInfoCard';
+import PatientPersonalInfoCard from '@/components/patient/PatientPersonalInfoCard';
+import ServiceInfoCard from '@/components/patient/ServiceInfoCard';
 import ModificationHistoryTable from '@/components/secretary/ModificationHistoryTable';
 import PatientEditDialog from '@/components/secretary/PatientEditDialog';
+import ServicesHistoryViewer from '@/components/consultations/ServicesHistoryViewer';
+import PatientActionButtons from '@/components/patient/PatientActionButtons';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const PatientDetails = () => {
   const { id } = useParams<{ id: string }>();
   const patients = usePatientStore((state) => state.patients);
   const updatePatient = usePatientStore((state) => state.updatePatient);
   const { user } = useAuth();
+  const { t } = useLanguage();
+  const navigate = useNavigate();
   
   const patient = patients.find(p => p.id === id);
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showServiceHistory, setShowServiceHistory] = useState(false);
   const [editForm, setEditForm] = useState({
     firstName: '',
     lastName: '',
@@ -38,13 +45,13 @@ const PatientDetails = () => {
   if (!patient) {
     return (
       <div className="container mx-auto py-6">
-        <h1 className="text-2xl font-bold mb-6">Patient non trouvé</h1>
+        <h1 className="text-2xl font-bold mb-6">{t('patientNotFound')}</h1>
         <BackButton />
       </div>
     );
   }
 
-  const handleOpenEditDialog = () => {
+  const handleEdit = () => {
     setEditForm({
       firstName: patient.firstName,
       lastName: patient.lastName,
@@ -78,7 +85,7 @@ const PatientDetails = () => {
   
   const handleSaveChanges = () => {
     if (!user) {
-      toast.error("Vous devez être connecté pour modifier un patient");
+      toast.error(t('mustBeLoggedInToModifyPatient'));
       return;
     }
     
@@ -100,8 +107,21 @@ const PatientDetails = () => {
       { name: user.name, role: user.role }
     );
     
-    toast.success("Informations du patient mises à jour");
+    toast.success(t('patientInfoUpdated'));
     setIsDialogOpen(false);
+  };
+  
+  const handleToggleHistory = () => {
+    setShowHistory(!showHistory);
+  };
+  
+  const handleToggleServiceHistory = () => {
+    setShowServiceHistory(!showServiceHistory);
+  };
+
+  const handleCompleteEdit = () => {
+    // This is a placeholder for future implementation
+    toast.info(t('completeEditFeatureComingSoon'));
   };
 
   return (
@@ -109,25 +129,30 @@ const PatientDetails = () => {
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <BackButton />
-          <h1 className="text-2xl font-bold">Détails du patient</h1>
-        </div>
-        <div className="flex space-x-2">
-          <Button 
-            onClick={handleOpenEditDialog}
-            className="flex items-center gap-1"
-          >
-            <Pencil className="h-4 w-4" />
-            Modifier
-          </Button>
+          <h1 className="text-2xl font-bold">{t('patientDetails')}</h1>
         </div>
       </div>
 
+      <PatientActionButtons 
+        patient={patient}
+        onEdit={handleEdit}
+        onCompleteEdit={handleCompleteEdit}
+        onToggleHistory={handleToggleHistory}
+        showHistory={showHistory}
+        onToggleServiceHistory={handleToggleServiceHistory}
+        showServiceHistory={showServiceHistory}
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <PatientPersonalInfoCard patient={patient} />
-        <ConsultationInfoCard patient={patient} />
+        <ServiceInfoCard patient={patient} />
       </div>
       
-      <ModificationHistoryTable patient={patient} />
+      {showHistory && <ModificationHistoryTable patient={patient} />}
+      
+      {showServiceHistory && patient.serviceHistory && patient.serviceHistory.length > 0 && (
+        <ServicesHistoryViewer patient={patient} />
+      )}
 
       <PatientEditDialog 
         isOpen={isDialogOpen}

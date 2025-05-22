@@ -6,6 +6,7 @@ import SearchBar from '@/components/secretary/SearchBar';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { differenceInYears } from 'date-fns';
 import BackButton from '@/components/shared/BackButton';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const SearchPatient = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const SearchPatient = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('time');
   const [activeFilters, setActiveFilters] = useState<string[]>(['name']);
+  const { t } = useLanguage();
 
   const filteredAndSortedPatients = useMemo(() => {
     let result = [...patients];
@@ -62,7 +64,7 @@ const SearchPatient = () => {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <BackButton />
-        <h1 className="text-2xl font-bold">Recherche de patients</h1>
+        <h1 className="text-2xl font-bold">{t('searchPatients')}</h1>
       </div>
 
       {/* Barre de recherche avec filtres */}
@@ -79,17 +81,17 @@ const SearchPatient = () => {
           <table className="w-full">
             <thead>
               <tr className="text-xs font-medium text-gray-500 bg-gray-50 border-b">
-                <th className="px-6 py-3 text-left">ID</th>
-                <th className="px-6 py-3 text-left">Nom</th>
-                <th className="px-6 py-3 text-left">Entreprise</th>
-                <th className="px-6 py-3 text-left">Service</th>
-                <th className="px-6 py-3 text-left">Statut</th>
-                <th className="px-6 py-3 text-left">Actions</th>
+                <th className="px-6 py-3 text-left">{t('id')}</th>
+                <th className="px-6 py-3 text-left">{t('name')}</th>
+                <th className="px-6 py-3 text-left">{t('company')}</th>
+                <th className="px-6 py-3 text-left">{t('service')}</th>
+                <th className="px-6 py-3 text-left">{t('status')}</th>
+                <th className="px-6 py-3 text-left">{t('actions')}</th>
               </tr>
             </thead>
             <tbody>
               {filteredAndSortedPatients.map((patient) => (
-                <tr key={patient.id} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/dashboard/patient/${patient.id}`)}>
+                <tr key={patient.id} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/dashboard/secretary/patient/${patient.id}`)}>
                   <td className="px-6 py-4 whitespace-nowrap">{patient.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap font-medium">{patient.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{patient.company}</td>
@@ -118,10 +120,10 @@ const SearchPatient = () => {
                       className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/dashboard/patient/${patient.id}`);
+                        navigate(`/dashboard/secretary/patient/${patient.id}`);
                       }}
                     >
-                      Voir détails
+                      {t('viewDetails')}
                     </button>
                   </td>
                 </tr>

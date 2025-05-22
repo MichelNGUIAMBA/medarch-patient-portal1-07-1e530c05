@@ -60,6 +60,7 @@ const PatientActionButtons = ({
         {t('edit')} {getServiceName(patient.service).toLowerCase()}
       </Button>
       <Button variant="secondary" onClick={onToggleHistory}>
+        <History className="h-4 w-4 mr-2" />
         {showHistory ? t('hideHistory') : t('showHistory')}
       </Button>
       

@@ -16,7 +16,7 @@ const PatientsTable = ({
   const navigate = useNavigate();
   const { t } = useLanguage();
   
-  // Trier les patients par ordre d'arrivée (le plus récent en premier)
+  // Sort patients by registration time (most recent first)
   const sortedPatients = [...patients].sort((a, b) => {
     return new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime();
   });
@@ -81,7 +81,7 @@ const PatientsTable = ({
                     variant="ghost" 
                     size="sm" 
                     className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20" 
-                    onClick={() => navigate(`/dashboard/patient/${patient.id}`)}
+                    onClick={() => navigate(`/dashboard/secretary/patient/${patient.id}`)}
                   >
                     {t('show')}
                   </Button>

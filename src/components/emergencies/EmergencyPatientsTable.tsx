@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, FileEdit, Eye } from 'lucide-react';
+import { Edit, FileEdit, Eye, History } from 'lucide-react';
 import { Patient } from '@/types/patient';
 import ModificationHistory from '@/components/nurse/ModificationHistory';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface EmergencyPatientsTableProps {
   patients: Patient[];
@@ -20,9 +21,10 @@ const EmergencyPatientsTable = ({
 }: EmergencyPatientsTableProps) => {
   const navigate = useNavigate();
   const [showHistory, setShowHistory] = useState<string | null>(null);
+  const { t } = useLanguage();
   
   const handleViewDetails = (patient: Patient) => {
-    navigate(`/dashboard/patient-details/${patient.id}`, { state: { patientData: patient } });
+    navigate(`/dashboard/secretary/patient/${patient.id}`);
   };
   
   const toggleHistory = (patientId: string) => {
@@ -38,7 +40,7 @@ const EmergencyPatientsTable = ({
       <Card>
         <CardContent className="py-8">
           <p className="text-center text-muted-foreground">
-            Aucune urgence traitée pour le moment.
+            {t('noEmergenciesTreated')}
           </p>
         </CardContent>
       </Card>
@@ -48,19 +50,19 @@ const EmergencyPatientsTable = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Patients ayant reçu un traitement d'urgence</CardTitle>
+        <CardTitle>{t('patientsReceivedEmergencyTreatment')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="text-xs font-medium text-gray-500 bg-gray-50 border-b">
-                <th className="px-4 py-2 text-left">ID</th>
-                <th className="px-4 py-2 text-left">Nom</th>
-                <th className="px-4 py-2 text-left">Entreprise</th>
-                <th className="px-4 py-2 text-left">Pris en charge par</th>
-                <th className="px-4 py-2 text-left">Statut</th>
-                <th className="px-4 py-2 text-left">Actions</th>
+                <th className="px-4 py-2 text-left">{t('id')}</th>
+                <th className="px-4 py-2 text-left">{t('name')}</th>
+                <th className="px-4 py-2 text-left">{t('company')}</th>
+                <th className="px-4 py-2 text-left">{t('takenCareBy')}</th>
+                <th className="px-4 py-2 text-left">{t('status')}</th>
+                <th className="px-4 py-2 text-left">{t('actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -88,7 +90,7 @@ const EmergencyPatientsTable = ({
                           onClick={() => onEdit(patient)}
                         >
                           <Edit className="h-4 w-4 mr-1" />
-                          Modif. simple
+                          {t('simpleModification')}
                         </Button>
                         <Button
                           variant="default"
@@ -97,7 +99,7 @@ const EmergencyPatientsTable = ({
                           className="bg-red-600 hover:bg-red-700"
                         >
                           <FileEdit className="h-4 w-4 mr-1" />
-                          Modif. complète
+                          {t('completeModification')}
                         </Button>
                         <Button
                           variant="secondary"
@@ -105,14 +107,15 @@ const EmergencyPatientsTable = ({
                           onClick={() => handleViewDetails(patient)}
                         >
                           <Eye className="h-4 w-4 mr-1" />
-                          Afficher
+                          {t('show')}
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => toggleHistory(patient.id)}
                         >
-                          {showHistory === patient.id ? 'Masquer' : 'Historique'}
+                          <History className="h-4 w-4 mr-1" />
+                          {showHistory === patient.id ? t('hide') : t('history')}
                         </Button>
                       </div>
                     </td>
