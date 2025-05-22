@@ -6,6 +6,7 @@ import { Patient } from '@/types/patient';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useNavigate } from 'react-router-dom';
 import { getServiceColor, getServiceName } from './utils/patientDetailUtils';
+import { useAuth } from '@/hooks/use-auth-context';
 
 interface PatientActionButtonsProps {
   patient: Patient;
@@ -28,6 +29,7 @@ const PatientActionButtons = ({
 }: PatientActionButtonsProps) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   // Utiliser la navigation programmatique plutôt que des balises <a>
   const handleServiceEdit = () => {
@@ -46,19 +48,24 @@ const PatientActionButtons = ({
         <Edit className="h-4 w-4 mr-2" />
         {t('edit')} {t('patientInfo').toLowerCase()}
       </Button>
-      <Button 
-        onClick={handleServiceEdit}
-        className={`${
-          patient.service === 'Ug' 
-            ? 'bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800' 
-            : patient.service === 'VM'
-            ? 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800'
-            : 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800'
-        }`}
-      >
-        <FileEdit className="h-4 w-4 mr-2" />
-        {t('edit')} {getServiceName(patient.service).toLowerCase()}
-      </Button>
+      
+      {/* Show service edit button only for nurse role */}
+      {user?.role === 'nurse' && (
+        <Button 
+          onClick={handleServiceEdit}
+          className={`${
+            patient.service === 'Ug' 
+              ? 'bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800' 
+              : patient.service === 'VM'
+              ? 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800'
+              : 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800'
+          }`}
+        >
+          <FileEdit className="h-4 w-4 mr-2" />
+          {t('edit')} {getServiceName(patient.service).toLowerCase()}
+        </Button>
+      )}
+      
       <Button variant="secondary" onClick={onToggleHistory}>
         <History className="h-4 w-4 mr-2" />
         {showHistory ? t('hideHistory') : t('showHistory')}
