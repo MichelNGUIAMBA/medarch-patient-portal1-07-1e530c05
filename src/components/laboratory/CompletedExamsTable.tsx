@@ -8,6 +8,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { format } from 'date-fns';
 import { Textarea } from "@/components/ui/textarea";
+import { Eye } from 'lucide-react';
 
 export const CompletedExamsTable = ({ searchTerm = "" }) => {
   const { t } = useLanguage();
@@ -44,7 +45,6 @@ export const CompletedExamsTable = ({ searchTerm = "" }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t('id')}</TableHead>
             <TableHead>{t('patient')}</TableHead>
             <TableHead>{t('examType')}</TableHead>
             <TableHead>{t('requestedAt')}</TableHead>
@@ -56,7 +56,7 @@ export const CompletedExamsTable = ({ searchTerm = "" }) => {
         <TableBody>
           {filteredPatients.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground">
+              <TableCell colSpan={6} className="text-center text-muted-foreground">
                 {t('noExamsCompleted')}
               </TableCell>
             </TableRow>
@@ -64,19 +64,18 @@ export const CompletedExamsTable = ({ searchTerm = "" }) => {
             filteredPatients.flatMap((patient) => 
               patient.completedLabExams?.map((exam, index) => (
                 <TableRow key={`${patient.id}-${index}`} className="border-b hover:bg-gray-50">
-                  <TableCell>{patient.id}</TableCell>
                   <TableCell>
                     <div>
                       <p className="font-medium">{patient.name}</p>
-                      <p className="text-xs text-muted-foreground">{patient.company}</p>
+                      <p className="text-xs text-muted-foreground">{patient.id}</p>
                     </div>
                   </TableCell>
                   <TableCell>{t(exam.type)}</TableCell>
                   <TableCell>
-                    {format(new Date(exam.requestedAt), 'dd/MM/yyyy')}
+                    {format(new Date(exam.requestedAt), 'dd/MM/yyyy HH:mm')}
                   </TableCell>
                   <TableCell>
-                    {exam.completedAt && format(new Date(exam.completedAt), 'dd/MM/yyyy')}
+                    {exam.completedAt && format(new Date(exam.completedAt), 'dd/MM/yyyy HH:mm')}
                   </TableCell>
                   <TableCell>
                     {exam.completedBy?.name}
@@ -86,7 +85,9 @@ export const CompletedExamsTable = ({ searchTerm = "" }) => {
                       size="sm" 
                       variant="outline"
                       onClick={() => handleViewResults(patient, exam)}
+                      className="flex items-center gap-2"
                     >
+                      <Eye className="h-4 w-4" />
                       {t('viewResults')}
                     </Button>
                   </TableCell>
@@ -115,7 +116,7 @@ export const CompletedExamsTable = ({ searchTerm = "" }) => {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">{t('requestedAt')}</p>
-                <p>{selectedExam?.requestedAt && format(new Date(selectedExam.requestedAt), 'dd/MM/yyyy')}</p>
+                <p>{selectedExam?.requestedAt && format(new Date(selectedExam.requestedAt), 'dd/MM/yyyy HH:mm')}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">{t('completedBy')}</p>
@@ -123,7 +124,7 @@ export const CompletedExamsTable = ({ searchTerm = "" }) => {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">{t('completedAt')}</p>
-                <p>{selectedExam?.completedAt && format(new Date(selectedExam.completedAt), 'dd/MM/yyyy')}</p>
+                <p>{selectedExam?.completedAt && format(new Date(selectedExam.completedAt), 'dd/MM/yyyy HH:mm')}</p>
               </div>
             </div>
 

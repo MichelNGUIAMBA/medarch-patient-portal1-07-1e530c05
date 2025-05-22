@@ -13,6 +13,7 @@ import MedicalVisitForm from "./pages/nurse/MedicalVisitForm";
 import MedicalVisitTypeSelector from "./pages/nurse/MedicalVisitTypeSelector";
 import UserManagement from "./pages/admin/UserManagement";
 import LabExams from "./pages/laboratory/LabExams";
+import ExamHistory from "./pages/laboratory/ExamHistory";
 import { AuthProvider, useAuth } from "./hooks/use-auth-context";
 import UnderConstructionPage from "./pages/UnderConstructionPage";
 import WaitingLists from "./pages/secretary/WaitingLists";
@@ -90,10 +91,10 @@ const App = () => (
                   <Route path="patient-details/:patientId" element={<PatientDetailView />} />
                   <Route path="exams" element={<ExamsRequestPage />} />
                   
-                  {/* Lab routes */}
-                  <Route path="pending-exams" element={<LabExams />} />
+                  {/* Lab routes - Updated */}
+                  <Route path="laboratory" element={<LabExams />} />
+                  <Route path="exam-history" element={<ExamHistory />} />
                   <Route path="perform-exams/:patientId" element={<PerformExams />} />
-                  <Route path="exam-history" element={<UnderConstructionPage />} />
                   
                   {/* Admin routes */}
                   <Route path="users" element={<UserManagement />} />

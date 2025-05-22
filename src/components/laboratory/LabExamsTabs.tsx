@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClipboardCheck, FileText } from "lucide-react";
 import { useLanguage } from '@/hooks/useLanguage';
@@ -17,8 +16,8 @@ export const LabExamsTabs = ({ searchTerm, activeTab, setActiveTab }: LabExamsTa
   const { t } = useLanguage();
 
   return (
-    <Tabs defaultValue="pending" value={activeTab} onValueChange={setActiveTab}>
-      <TabsList>
+    <Tabs defaultValue="pending" value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <TabsList className="w-full justify-start mb-4">
         <TabsTrigger value="pending" className="flex items-center">
           <ClipboardCheck className="mr-2 h-4 w-4" />
           {t('pendingExams')}
@@ -29,26 +28,12 @@ export const LabExamsTabs = ({ searchTerm, activeTab, setActiveTab }: LabExamsTa
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="pending" className="pt-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('pendingExams')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PendingExamsTable searchTerm={searchTerm} />
-          </CardContent>
-        </Card>
+      <TabsContent value="pending" className="pt-2">
+        <PendingExamsTable searchTerm={searchTerm} />
       </TabsContent>
 
-      <TabsContent value="completed" className="pt-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('completedExams')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CompletedExamsTable searchTerm={searchTerm} />
-          </CardContent>
-        </Card>
+      <TabsContent value="completed" className="pt-2">
+        <CompletedExamsTable searchTerm={searchTerm} />
       </TabsContent>
     </Tabs>
   );

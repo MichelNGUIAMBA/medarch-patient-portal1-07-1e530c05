@@ -1,4 +1,3 @@
-
 import { TranslationRecord } from './types';
 
 export const labTranslations: Record<string, TranslationRecord> = {
@@ -106,6 +105,16 @@ export const labTranslations: Record<string, TranslationRecord> = {
     'cmvAntibody': 'Anticorps anti-CMV',
     'hcvAntibody': 'Anticorps anti-HCV',
     'hivAntibody': 'Anticorps anti-HIV',
+    'laboratoryDashboard': 'Tableau de bord du laboratoire',
+    'examHistory': 'Historique des examens',
+    'allCompletedExams': 'Tous les examens complétés',
+    'close': 'Fermer',
+    'date': 'Date',
+    'requestedBy': 'Demandé par',
+    'actions': 'Actions',
+    'viewDetails': 'Voir détails',
+    'showLabExamRequest': 'Afficher la demande d\'examens',
+    'hideLabExamRequest': 'Masquer la demande d\'examens',
   },
   en: {
     'laboratoryExams': 'Laboratory Exams',
@@ -211,6 +220,16 @@ export const labTranslations: Record<string, TranslationRecord> = {
     'cmvAntibody': 'Anti-CMV Antibody',
     'hcvAntibody': 'Anti-HCV Antibody',
     'hivAntibody': 'Anti-HIV Antibody',
+    'laboratoryDashboard': 'Laboratory Dashboard',
+    'examHistory': 'Exam History',
+    'allCompletedExams': 'All Completed Exams',
+    'close': 'Close',
+    'date': 'Date',
+    'requestedBy': 'Requested by',
+    'actions': 'Actions',
+    'viewDetails': 'View details',
+    'showLabExamRequest': 'Show lab exam request',
+    'hideLabExamRequest': 'Hide lab exam request',
   },
   de: {
     'laboratoryExams': 'Laboruntersuchungen',
@@ -316,5 +335,15 @@ export const labTranslations: Record<string, TranslationRecord> = {
     'cmvAntibody': 'Anti-CMV-Antikörper',
     'hcvAntibody': 'Anti-HCV-Antikörper',
     'hivAntibody': 'Anti-HIV-Antikörper',
+    'laboratoryDashboard': 'Labor Dashboard',
+    'examHistory': 'Untersuchungsverlauf',
+    'allCompletedExams': 'Alle abgeschlossenen Untersuchungen',
+    'close': 'Schließen',
+    'date': 'Datum',
+    'requestedBy': 'Angefordert von',
+    'actions': 'Aktionen',
+    'viewDetails': 'Details anzeigen',
+    'showLabExamRequest': 'Laboruntersuchungsanfrage anzeigen',
+    'hideLabExamRequest': 'Laboruntersuchungsanfrage ausblenden',
   }
 };
