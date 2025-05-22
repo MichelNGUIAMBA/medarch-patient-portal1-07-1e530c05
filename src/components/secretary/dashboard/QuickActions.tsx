@@ -15,7 +15,7 @@ const QuickActions = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <Button 
           variant="outline" 
-          onClick={() => navigate('/dashboard/new-patient')} 
+          onClick={() => navigate('/dashboard/secretary/new-patient')} 
           className="h-auto py-6 flex flex-col items-center justify-center border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <UserPlus className="h-8 w-8 text-primary mb-2" />
@@ -24,7 +24,7 @@ const QuickActions = () => {
 
         <Button 
           variant="outline" 
-          onClick={() => navigate('/dashboard/search-patient')} 
+          onClick={() => navigate('/dashboard/secretary/search-patient')} 
           className="h-auto py-6 flex flex-col items-center justify-center border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <Users className="h-8 w-8 text-primary mb-2" />

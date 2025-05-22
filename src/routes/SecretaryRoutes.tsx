@@ -20,5 +20,3 @@ const SecretaryRoutes = () => {
 };
 
 export default SecretaryRoutes;
-
-// We'll integrate the standalone routes directly in the main routes file
