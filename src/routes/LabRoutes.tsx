@@ -8,7 +8,7 @@ import PerformExams from "@/pages/laboratory/PerformExams";
 const LabRoutes = () => {
   return (
     <Routes>
-      <Route path="laboratory" element={<LabExams />} />
+      <Route path="" element={<LabExams />} />
       <Route path="exam-history" element={<ExamHistory />} />
       <Route path="perform-exams/:patientId" element={<PerformExams />} />
     </Routes>
