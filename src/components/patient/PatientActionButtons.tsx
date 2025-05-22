@@ -32,10 +32,10 @@ const PatientActionButtons = ({
   // Utiliser la navigation programmatique plutôt que des balises <a>
   const handleServiceEdit = () => {
     const route = patient.service === 'VM' 
-      ? `/medical-visits/${patient.id}/edit` 
+      ? `/dashboard/nurse/medical-visits/${patient.id}/edit` 
       : patient.service === 'Cons' 
-      ? `/consultations/${patient.id}/edit` 
-      : `/emergencies/${patient.id}/edit`;
+      ? `/dashboard/nurse/consultations/${patient.id}/edit` 
+      : `/dashboard/nurse/emergencies/${patient.id}/edit`;
     
     navigate(route);
   };

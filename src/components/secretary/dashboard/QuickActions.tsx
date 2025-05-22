@@ -36,7 +36,7 @@ const QuickActions = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Button 
           variant="outline" 
-          onClick={() => navigate('/medical-visit-type')} 
+          onClick={() => navigate('/dashboard/nurse/medical-visit-type')} 
           className="h-auto py-4 flex flex-col items-center justify-center border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-400 mb-1" />
@@ -45,7 +45,7 @@ const QuickActions = () => {
         
         <Button 
           variant="outline" 
-          onClick={() => navigate('/new-consultation')} 
+          onClick={() => navigate('/dashboard/secretary/new-consultation')} 
           className="h-auto py-4 flex flex-col items-center justify-center border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <ClipboardCheck className="h-6 w-6 text-green-600 dark:text-green-400 mb-1" />
@@ -54,7 +54,7 @@ const QuickActions = () => {
         
         <Button 
           variant="outline" 
-          onClick={() => navigate('/emergency-forms')} 
+          onClick={() => navigate('/dashboard/nurse/emergency-forms')} 
           className="h-auto py-4 flex flex-col items-center justify-center border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <Hospital className="h-6 w-6 text-red-600 dark:text-red-400 mb-1" />

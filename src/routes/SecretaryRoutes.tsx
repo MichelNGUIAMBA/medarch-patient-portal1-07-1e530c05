@@ -15,6 +15,8 @@ const SecretaryRoutes = () => {
       <Route path="waiting-lists" element={<WaitingLists />} />
       <Route path="patient/:id" element={<PatientDetails />} />
       <Route path="search-patient" element={<SearchPatient />} />
+      <Route path="new-consultation" element={<NewConsultationSelector />} />
+      <Route path="select-patient" element={<SelectPatientForConsultation />} />
     </Routes>
   );
 };

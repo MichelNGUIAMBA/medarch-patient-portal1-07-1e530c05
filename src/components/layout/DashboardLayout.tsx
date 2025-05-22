@@ -44,6 +44,10 @@ const DashboardLayout = () => {
         url: "/dashboard/secretary/new-patient",
         icon: User
       }, {
+        title: t('searchPatient'),
+        url: "/dashboard/secretary/search-patient",
+        icon: Search
+      }, {
         title: t('waitingLists'),
         url: "/dashboard/secretary/waiting-lists",
         icon: ClipboardCheck
@@ -70,8 +74,12 @@ const DashboardLayout = () => {
         icon: ClipboardCheck
       }],
       lab: [{
-        title: t('pendingExams'),
-        url: "/dashboard/laboratory/laboratory",
+        title: t('dashboard'),
+        url: "/dashboard/laboratory",
+        icon: FileText
+      }, {
+        title: t('exams'),
+        url: "/dashboard/laboratory/exams",
         icon: ClipboardCheck
       }, {
         title: t('examHistory'),

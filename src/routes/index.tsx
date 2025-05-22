@@ -28,6 +28,7 @@ import PerformExams from "@/pages/laboratory/PerformExams";
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Login />} />
+    <Route path="/index" element={<Index />} />
     
     {/* Dashboard routes */}
     <Route 
@@ -40,7 +41,7 @@ const AppRoutes = () => (
     >
       <Route index element={<Dashboard />} />
       
-      {/* Role-specific routes - using the components as elements, not as Route components */}
+      {/* Role-specific routes */}
       <Route path="secretary/*" element={<SecretaryRoutes />} />
       <Route path="nurse/*" element={<NurseRoutes />} />
       <Route path="laboratory/*" element={<LabRoutes />} />
@@ -48,19 +49,103 @@ const AppRoutes = () => (
       <Route path="doctor/*" element={<DoctorRoutes />} />
     </Route>
     
-    {/* Standalone routes */}
-    <Route path="/new-consultation" element={<NewConsultationSelector />} />
-    <Route path="/select-patient-for-consultation" element={<SelectPatientForConsultation />} />
-    <Route path="/medical-visits/:patientId" element={<MedicalVisitForm />} />
-    <Route path="/medical-visits/:patientId/edit" element={<MedicalVisitForm />} />
-    <Route path="/medical-visit-type" element={<MedicalVisitTypeSelector />} />
-    <Route path="/consultations/:patientId" element={<ConsultationForm />} />
-    <Route path="/consultations/:patientId/edit" element={<ConsultationForm />} />
-    <Route path="/emergencies/:patientId" element={<EmergencyForm />} />
-    <Route path="/emergencies/:patientId/edit" element={<EmergencyForm />} />
-    <Route path="/emergency-forms" element={<EmergencyFormSelector />} />
-    <Route path="/patient-details/:patientId" element={<PatientDetailView />} />
-    <Route path="/perform-exams/:patientId" element={<PerformExams />} />
+    {/* Standalone routes - protected by their respective components */}
+    <Route 
+      path="/new-consultation" 
+      element={
+        <ProtectedRoute>
+          <NewConsultationSelector />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/select-patient-for-consultation" 
+      element={
+        <ProtectedRoute>
+          <SelectPatientForConsultation />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/medical-visit-type" 
+      element={
+        <ProtectedRoute>
+          <MedicalVisitTypeSelector />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/medical-visits/:patientId" 
+      element={
+        <ProtectedRoute>
+          <MedicalVisitForm />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/medical-visits/:patientId/edit" 
+      element={
+        <ProtectedRoute>
+          <MedicalVisitForm />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/consultations/:patientId" 
+      element={
+        <ProtectedRoute>
+          <ConsultationForm />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/consultations/:patientId/edit" 
+      element={
+        <ProtectedRoute>
+          <ConsultationForm />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/emergencies/:patientId" 
+      element={
+        <ProtectedRoute>
+          <EmergencyForm />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/emergencies/:patientId/edit" 
+      element={
+        <ProtectedRoute>
+          <EmergencyForm />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/emergency-forms" 
+      element={
+        <ProtectedRoute>
+          <EmergencyFormSelector />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/patient-details/:patientId" 
+      element={
+        <ProtectedRoute>
+          <PatientDetailView />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/perform-exams/:patientId" 
+      element={
+        <ProtectedRoute>
+          <PerformExams />
+        </ProtectedRoute>
+      } 
+    />
     
     {/* Catch-all route */}
     <Route path="*" element={<NotFound />} />
