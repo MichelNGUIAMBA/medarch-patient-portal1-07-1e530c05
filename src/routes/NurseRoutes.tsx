@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import MedicalVisitForm from "@/pages/nurse/MedicalVisitForm";
 import MedicalVisitTypeSelector from "@/pages/nurse/MedicalVisitTypeSelector";
 import WaitingPatients from "@/pages/nurse/WaitingPatients";
@@ -15,7 +15,7 @@ import ExamsRequestPage from "@/pages/nurse/ExamsRequestPage";
 
 const NurseRoutes = () => {
   return (
-    <>
+    <Routes>
       <Route path="waiting-patients" element={<WaitingPatients />} />
       <Route path="medical-visits/:patientId" element={<MedicalVisitForm />} />
       <Route path="medical-visits/:patientId/edit" element={<MedicalVisitForm />} />
@@ -30,24 +30,8 @@ const NurseRoutes = () => {
       <Route path="emergency-forms" element={<EmergencyFormSelector />} />
       <Route path="patient-details/:patientId" element={<PatientDetailView />} />
       <Route path="exams" element={<ExamsRequestPage />} />
-    </>
+    </Routes>
   );
 };
 
 export default NurseRoutes;
-
-export const StandaloneNurseRoutes = () => {
-  return (
-    <>
-      <Route path="/medical-visits/:patientId" element={<MedicalVisitForm />} />
-      <Route path="/medical-visits/:patientId/edit" element={<MedicalVisitForm />} />
-      <Route path="/medical-visit-type" element={<MedicalVisitTypeSelector />} />
-      <Route path="/consultations/:patientId" element={<ConsultationForm />} />
-      <Route path="/consultations/:patientId/edit" element={<ConsultationForm />} />
-      <Route path="/emergencies/:patientId" element={<EmergencyForm />} />
-      <Route path="/emergencies/:patientId/edit" element={<EmergencyForm />} />
-      <Route path="/emergency-forms" element={<EmergencyFormSelector />} />
-      <Route path="/patient-details/:patientId" element={<PatientDetailView />} />
-    </>
-  );
-};

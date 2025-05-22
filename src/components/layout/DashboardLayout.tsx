@@ -32,59 +32,59 @@ const DashboardLayout = () => {
     const roleBasedItems = {
       admin: [{
         title: t('users'),
-        url: "/dashboard/users",
+        url: "/dashboard/admin/users",
         icon: Users
       }, {
         title: t('settings'),
-        url: "/dashboard/settings",
+        url: "/dashboard/admin/settings",
         icon: Database
       }],
       secretary: [{
         title: t('newPatient'),
-        url: "/dashboard/new-patient",
+        url: "/dashboard/secretary/new-patient",
         icon: User
       }, {
         title: t('waitingLists'),
-        url: "/dashboard/waiting-lists",
+        url: "/dashboard/secretary/waiting-lists",
         icon: ClipboardCheck
       }],
       nurse: [{
         title: t('waitingPatients'),
-        url: "/dashboard/waiting-patients",
+        url: "/dashboard/nurse/waiting-patients",
         icon: Users
       }, {
         title: t('medicalVisits'),
-        url: "/dashboard/medical-visits",
+        url: "/dashboard/nurse/medical-visits",
         icon: Calendar
       }, {
         title: t('consultations'),
-        url: "/dashboard/consultations",
+        url: "/dashboard/nurse/consultations",
         icon: MessageSquare
       }, {
         title: t('emergencies'),
-        url: "/dashboard/emergencies",
+        url: "/dashboard/nurse/emergencies",
         icon: Ambulance
       }, {
         title: t('exams'),
-        url: "/dashboard/exams",
+        url: "/dashboard/nurse/exams",
         icon: ClipboardCheck
       }],
       lab: [{
         title: t('pendingExams'),
-        url: "/dashboard/pending-exams",
+        url: "/dashboard/laboratory/laboratory",
         icon: ClipboardCheck
       }, {
         title: t('examHistory'),
-        url: "/dashboard/exam-history",
+        url: "/dashboard/laboratory/exam-history",
         icon: FileText
       }],
       doctor: [{
         title: t('patientsToSee'),
-        url: "/dashboard/patients-to-see",
+        url: "/dashboard/doctor/patients-to-see",
         icon: UserCheck
       }, {
         title: t('medicalRecords'),
-        url: "/dashboard/medical-records",
+        url: "/dashboard/doctor/medical-records",
         icon: FileText
       }]
     };
@@ -155,4 +155,5 @@ const DashboardLayout = () => {
       </div>
     </SidebarProvider>;
 };
+
 export default DashboardLayout;
