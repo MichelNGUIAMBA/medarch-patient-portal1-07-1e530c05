@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Textarea } from "@/components/ui/textarea";
 import { Eye } from 'lucide-react';
 import { Patient, LabExam } from '@/types/patient';
+import { Badge } from "@/components/ui/badge";
 
 const ExamHistory = () => {
   const { t } = useLanguage();
@@ -20,27 +21,47 @@ const ExamHistory = () => {
   const [selectedExam, setSelectedExam] = useState<LabExam | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  // Collect all completed exams across all patients
-  const allCompletedExams = patients.flatMap(patient => 
-    (patient.completedLabExams || []).map(exam => ({
-      patient,
-      exam
-    }))
-  );
-
-  // Filter exams based on search term
-  const filteredExams = allCompletedExams.filter(({ patient, exam }) => 
-    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  // Regrouper les examens par patient
+  const patientExams = React.useMemo(() => {
+    const examsMap: Record<string, { patient: Patient; exams: LabExam[] }> = {};
+    
+    patients.forEach(patient => {
+      if (patient.completedLabExams && patient.completedLabExams.length > 0) {
+        if (!examsMap[patient.id]) {
+          examsMap[patient.id] = {
+            patient,
+            exams: [...patient.completedLabExams]
+          };
+        } else {
+          examsMap[patient.id].exams.push(...patient.completedLabExams);
+        }
+      }
+    });
+    
+    return Object.values(examsMap);
+  }, [patients]);
+  
+  // Filtrer les examens par terme de recherche
+  const filteredPatientExams = patientExams.filter(({ patient, exams }) => 
+    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    exam.type.toLowerCase().includes(searchTerm.toLowerCase())
+    exams.some(exam => exam.type.toLowerCase().includes(searchTerm.toLowerCase()))
   );
   
-  // Sort exams by completion date (newest first)
-  const sortedExams = [...filteredExams].sort((a, b) => 
-    new Date(b.exam.completedAt || '').getTime() - new Date(a.exam.completedAt || '').getTime()
-  );
+  // Déterminer le type de formulaire utilisé pour la demande
+  const getExamFormType = (examType: string): string => {
+    if (['bloodTest', 'hemogramme', 'groupeSanguin'].includes(examType)) {
+      return 'EL';
+    } else if (examType === 'bloodPressure') {
+      return 'TA';
+    } else if (examType === 'glycemie') {
+      return 'GL';
+    } else {
+      return 'PE';
+    }
+  };
 
-  // Handle viewing exam results
+  // Afficher les résultats d'un examen
   const handleViewResults = (patient: Patient, exam: LabExam) => {
     setSelectedPatient(patient);
     setSelectedExam(exam);
@@ -59,59 +80,67 @@ const ExamHistory = () => {
           <CardTitle>{t('allCompletedExams')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('date')}</TableHead>
-                <TableHead>{t('patient')}</TableHead>
-                <TableHead>{t('examType')}</TableHead>
-                <TableHead>{t('requestedBy')}</TableHead>
-                <TableHead>{t('completedBy')}</TableHead>
-                <TableHead>{t('actions')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedExams.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
-                    {t('noExamsFound')}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                sortedExams.map(({ patient, exam }, index) => (
-                  <TableRow key={`${patient.id}-${index}`} className="border-b hover:bg-gray-50">
-                    <TableCell>
-                      {exam.completedAt && format(new Date(exam.completedAt), 'dd/MM/yyyy HH:mm')}
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{patient.name}</p>
-                        <p className="text-xs text-muted-foreground">{patient.id}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>{t(exam.type)}</TableCell>
-                    <TableCell>{exam.requestedBy.name}</TableCell>
-                    <TableCell>{exam.completedBy?.name}</TableCell>
-                    <TableCell>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => handleViewResults(patient, exam)}
-                        className="flex items-center gap-2"
-                      >
-                        <Eye className="h-4 w-4" />
-                        {t('viewResults')}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          {filteredPatientExams.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {t('noExamsCompleted')}
+            </div>
+          ) : (
+            filteredPatientExams.map(({ patient, exams }) => (
+              <div key={patient.id} className="mb-8 border rounded-lg overflow-hidden">
+                <div className="bg-muted p-4 flex justify-between items-center">
+                  <div>
+                    <h3 className="font-semibold text-lg">{patient.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {patient.id} - {patient.company}
+                    </p>
+                  </div>
+                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t('date')}</TableHead>
+                      <TableHead>{t('examType')}</TableHead>
+                      <TableHead>{t('formType')}</TableHead>
+                      <TableHead>{t('requestedBy')}</TableHead>
+                      <TableHead>{t('completedBy')}</TableHead>
+                      <TableHead>{t('actions')}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {exams.sort((a, b) => new Date(b.completedAt || '').getTime() - new Date(a.completedAt || '').getTime())
+                      .map((exam, index) => (
+                        <TableRow key={index}>
+                          <TableCell>
+                            {exam.completedAt && format(new Date(exam.completedAt), 'dd/MM/yyyy HH:mm')}
+                          </TableCell>
+                          <TableCell>{t(exam.type)}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{getExamFormType(exam.type)}</Badge>
+                          </TableCell>
+                          <TableCell>{exam.requestedBy.name}</TableCell>
+                          <TableCell>{exam.completedBy?.name}</TableCell>
+                          <TableCell>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => handleViewResults(patient, exam)}
+                              className="flex items-center gap-2"
+                            >
+                              <Eye className="h-4 w-4" />
+                              {t('viewResults')}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ))
+          )}
         </CardContent>
       </Card>
 
-      {/* Dialog to view exam results */}
+      {/* Dialog pour afficher les résultats d'examen */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>

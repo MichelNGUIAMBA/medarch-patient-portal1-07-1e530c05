@@ -9,6 +9,7 @@ import { Patient } from '@/types/patient';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { format } from 'date-fns';
+import { Beaker, Calendar, Clock } from 'lucide-react';
 
 export const PendingExamsTable = ({ searchTerm = "" }) => {
   const { t } = useLanguage();
@@ -44,27 +45,41 @@ export const PendingExamsTable = ({ searchTerm = "" }) => {
   // Handle perform exams
   const handlePerformExams = (patientId: string) => {
     setIsDialogOpen(false);
-    navigate(`/dashboard/perform-exams/${patientId}`);
+    navigate(`/dashboard/laboratory/perform-exams/${patientId}`);
   };
 
   // Determine exam priority
   const getExamPriority = (patient: Patient) => {
     // Priority logic: Urgent for emergency cases, normal for others
     if (patient.service === "Ug") {
-      return { label: "Urgent", variant: "destructive" as const };
+      return { label: t("highPriority"), variant: "destructive" as const };
     }
-    return { label: "Normal", variant: "secondary" as const };
+    return { label: t("normalPriority"), variant: "secondary" as const };
+  };
+  
+  // Déterminer le type de formulaire utilisé pour la demande
+  const getExamFormType = (examType: string): string => {
+    if (['bloodTest', 'hemogramme', 'groupeSanguin'].includes(examType)) {
+      return 'EL';
+    } else if (examType === 'bloodPressure') {
+      return 'TA';
+    } else if (examType === 'glycemie') {
+      return 'GL';
+    } else {
+      return 'PE';
+    }
   };
 
   return (
     <>
-      <Table>
-        <TableHeader>
+      <Table className="border rounded-md">
+        <TableHeader className="bg-muted">
           <TableRow>
-            <TableHead>{t('id')}</TableHead>
+            <TableHead className="w-[80px]">{t('id')}</TableHead>
             <TableHead>{t('patient')}</TableHead>
             <TableHead>{t('service')}</TableHead>
             <TableHead>{t('exams')}</TableHead>
+            <TableHead>{t('formType')}</TableHead>
             <TableHead>{t('requestedBy')}</TableHead>
             <TableHead>{t('date')}</TableHead>
             <TableHead>{t('priority')}</TableHead>
@@ -74,30 +89,47 @@ export const PendingExamsTable = ({ searchTerm = "" }) => {
         <TableBody>
           {filteredPatients.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center text-muted-foreground">
+              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                 {t('noExamsPending')}
               </TableCell>
             </TableRow>
           ) : (
             filteredPatients.map((patient) => {
               const priority = getExamPriority(patient);
-              const latestExamDate = patient.pendingLabExams?.length 
-                ? new Date(patient.pendingLabExams[0].requestedAt) 
+              const latestExam = patient.pendingLabExams?.[0];
+              const latestExamDate = latestExam 
+                ? new Date(latestExam.requestedAt) 
                 : new Date();
               
+              const formType = latestExam ? getExamFormType(latestExam.type) : '';
+              
               return (
-                <TableRow key={patient.id} className="border-b hover:bg-gray-50">
-                  <TableCell>{patient.id}</TableCell>
+                <TableRow key={patient.id} className="hover:bg-muted/50">
+                  <TableCell className="font-medium">{patient.id}</TableCell>
                   <TableCell>
                     <div>
                       <p className="font-medium">{patient.name}</p>
                       <p className="text-xs text-muted-foreground">{patient.company}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{t(patient.service)}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{t(patient.service)}</Badge>
+                  </TableCell>
                   <TableCell>{patient.pendingLabExams?.length || 0}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{formType}</Badge>
+                  </TableCell>
                   <TableCell>{patient.takenCareBy?.name}</TableCell>
-                  <TableCell>{format(latestExamDate, 'dd/MM/yyyy')}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <div className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      {format(latestExamDate, 'dd/MM/yyyy')}
+                    </div>
+                    <div className="flex items-center text-xs text-muted-foreground">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {format(latestExamDate, 'HH:mm')}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Badge variant={priority.variant}>
                       {priority.label}
@@ -107,8 +139,9 @@ export const PendingExamsTable = ({ searchTerm = "" }) => {
                     <Button 
                       size="sm" 
                       onClick={() => handlePatientSelect(patient)}
-                      className="bg-blue-600 hover:bg-blue-700"
+                      className="bg-blue-600 hover:bg-blue-700 flex items-center gap-1"
                     >
+                      <Beaker className="h-4 w-4" />
                       {t('viewExams')}
                     </Button>
                   </TableCell>
@@ -131,16 +164,33 @@ export const PendingExamsTable = ({ searchTerm = "" }) => {
 
           <div className="py-4">
             <h3 className="font-semibold mb-2">{t('requestedExams')}:</h3>
-            <ul className="list-disc pl-5 space-y-1">
-              {selectedPatient?.pendingLabExams?.map((exam, index) => (
-                <li key={index} className="flex justify-between items-center">
-                  <span>{t(exam.type)}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {format(new Date(exam.requestedAt), 'dd/MM/yyyy')}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <div className="rounded-lg border overflow-hidden">
+              <Table>
+                <TableHeader className="bg-muted">
+                  <TableRow>
+                    <TableHead>{t('examType')}</TableHead>
+                    <TableHead>{t('formType')}</TableHead>
+                    <TableHead>{t('date')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {selectedPatient?.pendingLabExams?.map((exam, index) => {
+                    const formType = getExamFormType(exam.type);
+                    return (
+                      <TableRow key={index}>
+                        <TableCell>{t(exam.type)}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{formType}</Badge>
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          {format(new Date(exam.requestedAt), 'dd/MM/yyyy HH:mm')}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           </div>
 
           <DialogFooter>

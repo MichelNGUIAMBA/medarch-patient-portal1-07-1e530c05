@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import LabExams from "@/pages/laboratory/LabExams";
+import LabDashboard from "@/pages/laboratory/LabDashboard";
 import ExamHistory from "@/pages/laboratory/ExamHistory";
 import PerformExams from "@/pages/laboratory/PerformExams";
 
 const LabRoutes = () => {
   return (
     <Routes>
-      <Route path="" element={<LabExams />} />
+      <Route path="" element={<LabDashboard />} />
       <Route path="exam-history" element={<ExamHistory />} />
       <Route path="perform-exams/:patientId" element={<PerformExams />} />
     </Routes>
