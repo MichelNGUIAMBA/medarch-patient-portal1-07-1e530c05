@@ -12,7 +12,7 @@ const PatientPersonalInfoCard = ({
   const {
     t
   } = useLanguage();
-  return <Card className="my-[15px] py-[15px] mx-[25px] px-0">
+  return <Card className="my-[15px] py-[15px] px-0 mx-0">
       <CardHeader>
         <CardTitle>{t('patientInfo')}</CardTitle>
       </CardHeader>
