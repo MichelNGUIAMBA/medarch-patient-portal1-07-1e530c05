@@ -29,11 +29,16 @@ const AppRoutes = () => (
     >
       <Route index element={<Dashboard />} />
       
-      {/* Role-specific routes */}
+      {/* Role-specific routes - using the direct routes instead of the components */}
+      {/* Secretary Routes */}
       <SecretaryRoutes />
+      {/* Nurse Routes */}
       <NurseRoutes />
+      {/* Lab Routes */}
       <LabRoutes />
+      {/* Admin Routes */}
       <AdminRoutes />
+      {/* Doctor Routes */}
       <DoctorRoutes />
     </Route>
     
