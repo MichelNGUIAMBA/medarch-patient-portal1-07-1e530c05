@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { toast } from '@/components/ui/sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -136,7 +135,6 @@ const NewPatientForm: React.FC<NewPatientFormProps> = ({ activeTab, setActiveTab
       addPatient({
         firstName: formData.firstName,
         lastName: formData.lastName,
-        name: `${formData.firstName} ${formData.lastName}`,
         birthDate: formData.birthDate,
         gender: formData.gender,
         company: formData.company,
