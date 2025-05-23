@@ -22,7 +22,7 @@ export interface PatientState {
 
 export interface PatientStore {
   patients: Patient[];
-  addPatient: (patient: Patient) => void;
+  addPatient: (patient: Omit<Patient, "id" | "status" | "registeredAt" | "name">) => void;
   updatePatient: (id: string, updates: Partial<Patient>, user: { name: string, role: string }) => void;
   duplicatePatientWithService: (
     originalPatientId: string,
