@@ -76,7 +76,7 @@ export const useServiceFormSubmit = (patient: Patient, onClose: () => void) => {
       { name: user.name, role: user.role }
     );
     
-    // Ajouter l'entrée dans l'historique des services
+    // Ajouter l'entrée dans l'historique des services avec modifiedBy
     addServiceRecord(
       patient.id,
       serviceData,

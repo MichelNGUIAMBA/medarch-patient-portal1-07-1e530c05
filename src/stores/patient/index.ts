@@ -5,7 +5,7 @@ import { PatientSlice, createPatientSlice } from './patientActions';
 import { initialPatientState } from './initialState';
 
 export type { ModificationRecord } from './types';
-export type { PatientStore } from './types';
+export type { PatientStore, PatientSlice } from './types';
 
 export const usePatientStore = create<PatientSlice>()(
   persist(

@@ -1,5 +1,5 @@
 
-import { PatientState, PatientSlice } from './types';
+import { PatientState, PatientStore } from './types';
 import { StateCreator } from 'zustand';
 import { BasicPatientSlice, createBasicPatientSlice } from './slices/basicPatientSlice';
 import { PatientStatusSlice, createPatientStatusSlice } from './slices/patientStatusSlice';
