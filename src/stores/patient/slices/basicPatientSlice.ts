@@ -4,7 +4,7 @@ import { ModificationRecord, PatientState } from '../types';
 import { StateCreator } from 'zustand';
 
 export interface BasicPatientSlice {
-  addPatient: (patient: Omit<Patient, "id" | "status" | "registeredAt">) => void;
+  addPatient: (patient: Omit<Patient, "id" | "status" | "registeredAt" | "name">) => void;
   updatePatient: (id: string, updatedData: Partial<Patient>, modifiedBy: { name: string; role: string }) => void;
   addPatientsFromCSV: (patientsData: Array<Omit<Patient, "id" | "status" | "registeredAt" | "name">>) => void;
 }
@@ -47,6 +47,8 @@ export const createBasicPatientSlice: StateCreator<
           newValue: String(updatedData[fieldName] || ''),
           modifiedBy,
           timestamp: new Date().toISOString(),
+          user: modifiedBy.name,
+          role: modifiedBy.role,
           changedFields: [fieldName]
         });
       }
