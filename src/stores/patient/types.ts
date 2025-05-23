@@ -6,6 +6,17 @@ export interface ModificationRecord {
   user: string;
   role: string;
   changedFields: string[];
+  field?: string;
+  oldValue?: string;
+  newValue?: string;
+  modifiedBy?: {
+    name: string;
+    role: string;
+  };
+}
+
+export interface PatientState {
+  patients: Patient[];
 }
 
 export interface PatientStore {

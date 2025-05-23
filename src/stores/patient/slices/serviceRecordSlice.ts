@@ -3,6 +3,11 @@ import { StateCreator } from 'zustand';
 import { PatientSlice } from '../types';
 import { ServiceRecord } from '@/types/patient';
 
+export interface ServiceRecordSlice {
+  addServiceRecord: (patientId: string, record: ServiceRecord) => void;
+  updateServiceRecord: (patientId: string, date: string, serviceData: any) => void;
+}
+
 export const createServiceRecordSlice: StateCreator<PatientSlice> = (set, get) => ({
   addServiceRecord: (patientId, record) => {
     set((state) => {
