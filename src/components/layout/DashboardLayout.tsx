@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth-context";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ const DashboardLayout = () => {
     navigate("/");
   };
   
-  const getNavigationItems = () => {
+  const navigationItems = useMemo(() => {
     const commonItems = [{
       title: t('dashboard'),
       url: "/dashboard",
@@ -74,10 +74,6 @@ const DashboardLayout = () => {
         icon: ClipboardCheck
       }],
       lab: [{
-        title: t('dashboard'),
-        url: "/dashboard/laboratory",
-        icon: FileText
-      }, {
         title: t('exams'),
         url: "/dashboard/laboratory/exams",
         icon: ClipboardCheck
@@ -98,7 +94,7 @@ const DashboardLayout = () => {
     };
     
     return user?.role && roleBasedItems[user.role] ? [...commonItems, ...roleBasedItems[user.role]] : commonItems;
-  };
+  }, [t, user?.role]); // Dépendances correctement déclarées
   
   return <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
@@ -111,7 +107,7 @@ const DashboardLayout = () => {
             <SidebarGroup>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {getNavigationItems().map(item => <SidebarMenuItem key={item.title}>
+                  {navigationItems.map(item => <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton onClick={() => navigate(item.url)} className="flex items-center gap-3 cursor-pointer">
                         <item.icon className="h-5 w-5" />
                         <span className="text-inherit">{item.title}</span>

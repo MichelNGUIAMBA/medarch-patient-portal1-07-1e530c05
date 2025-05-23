@@ -28,6 +28,9 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'back': 'Retour',
     'goBack': 'Retour',
     'exams': 'Examens',
+    'examHistory': 'Historique des examens',
+    'patientsToSee': 'Patients à voir',
+    'medicalRecords': 'Dossiers médicaux',
   },
   en: {
     'dashboard': 'Dashboard',
@@ -55,6 +58,9 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'back': 'Back',
     'goBack': 'Go Back',
     'exams': 'Exams',
+    'examHistory': 'Exam History',
+    'patientsToSee': 'Patients to see',
+    'medicalRecords': 'Medical records',
   },
   de: {
     'dashboard': 'Dashboard',
@@ -82,5 +88,8 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'back': 'Zurück',
     'goBack': 'Zurück',
     'exams': 'Untersuchungen',
+    'examHistory': 'Untersuchungsverlauf',
+    'patientsToSee': 'Zu behandelnde Patienten',
+    'medicalRecords': 'Krankenakten',
   }
 };
