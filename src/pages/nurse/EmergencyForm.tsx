@@ -82,10 +82,11 @@ const EmergencyForm = () => {
     }
 
     // Ajouter la date et l'heure actuelles aux données du formulaire
+    const now = new Date().toISOString();
     const updatedFormData = {
       ...formData,
       formType: formType, // Assurez-vous que le type de formulaire est inclus
-      serviceDateTime: new Date().toISOString()
+      serviceDateTime: now
     };
 
     // Sauvegarder les données du formulaire
@@ -139,7 +140,8 @@ const EmergencyForm = () => {
         patient.id,
         {
           serviceType: "Ug",
-          serviceData: updatedFormData
+          serviceData: updatedFormData,
+          date: now
         },
         { name: user.name, role: user.role }
       );

@@ -44,7 +44,8 @@ export const useServiceFormSubmit = (patient: Patient, onClose: () => void) => {
         };
         serviceData = {
           serviceType: "VM",
-          serviceData: formWithTimestamp
+          serviceData: formWithTimestamp,
+          date: now.toISOString()
         };
         break;
       case 'Cons':
@@ -54,7 +55,8 @@ export const useServiceFormSubmit = (patient: Patient, onClose: () => void) => {
         };
         serviceData = {
           serviceType: "Cons",
-          serviceData: formWithTimestamp
+          serviceData: formWithTimestamp,
+          date: now.toISOString()
         };
         break;
       case 'Ug':
@@ -64,7 +66,8 @@ export const useServiceFormSubmit = (patient: Patient, onClose: () => void) => {
         };
         serviceData = {
           serviceType: "Ug",
-          serviceData: formWithTimestamp
+          serviceData: formWithTimestamp,
+          date: now.toISOString()
         };
         break;
     }

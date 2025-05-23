@@ -3,9 +3,6 @@ import { Patient, ServiceRecord, LabExam } from '@/types/patient';
 
 export interface ModificationRecord {
   timestamp: string;
-  user: string;
-  role: string;
-  changedFields: string[];
   field?: string;
   oldValue?: string;
   newValue?: string;
@@ -13,6 +10,10 @@ export interface ModificationRecord {
     name: string;
     role: string;
   };
+  // These properties are for backward compatibility
+  user?: string;
+  role?: string;
+  changedFields?: string[];
 }
 
 export interface PatientState {

@@ -9,7 +9,12 @@ export interface BasicPatientSlice {
   addPatientsFromCSV: (patientsData: Array<Omit<Patient, "id" | "status" | "registeredAt" | "name">>) => void;
 }
 
-export const createBasicPatientSlice: StateCreator<BasicPatientSlice & PatientState> = (set) => ({
+export const createBasicPatientSlice: StateCreator<
+  BasicPatientSlice & PatientState,
+  [],
+  [],
+  BasicPatientSlice
+> = (set) => ({
   patients: [], // Ajout de la propriété patients requise par PatientState
   
   addPatient: (patient) => set((state) => ({
@@ -41,7 +46,8 @@ export const createBasicPatientSlice: StateCreator<BasicPatientSlice & PatientSt
           oldValue: String(currentPatient[fieldName] || ''),
           newValue: String(updatedData[fieldName] || ''),
           modifiedBy,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          changedFields: [fieldName]
         });
       }
     });

@@ -56,9 +56,10 @@ const EmergencyFormSelector = () => {
     }
 
     // Ajouter la date et l'heure actuelles aux données
+    const now = new Date().toISOString();
     const updatedFormData = {
       ...formData,
-      serviceDateTime: new Date().toISOString()
+      serviceDateTime: now
     };
 
     // Créer un titre et des détails en fonction du type de formulaire
@@ -75,7 +76,8 @@ const EmergencyFormSelector = () => {
       selectedPatientId,
       {
         serviceType: "Ug",
-        serviceData: updatedFormData
+        serviceData: updatedFormData,
+        date: now
       },
       { name: user.name, role: user.role }
     );

@@ -65,9 +65,10 @@ const ConsultationForm = () => {
     }
 
     // Ajouter la date et l'heure actuelles aux données du formulaire
+    const now = new Date().toISOString();
     const updatedFormData = {
       ...formData,
-      serviceDateTime: new Date().toISOString()
+      serviceDateTime: now
     };
 
     // Sauvegarder les données du formulaire complètes dans sessionStorage
@@ -106,7 +107,8 @@ const ConsultationForm = () => {
         patient.id,
         {
           serviceType: "Cons",
-          serviceData: updatedFormData
+          serviceData: updatedFormData,
+          date: now
         },
         { name: user.name, role: user.role }
       );

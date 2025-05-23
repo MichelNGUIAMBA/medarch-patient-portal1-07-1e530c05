@@ -21,8 +21,12 @@ export interface LabExam {
 
 export interface ServiceRecord {
   serviceType: "VM" | "Cons" | "Ug";
-  date: string;
   serviceData: any;
+  date?: string; // Make date optional since it's sometimes added automatically
+  modifiedBy?: {
+    name: string;
+    role: string;
+  };
 }
 
 export interface Patient {

@@ -8,7 +8,12 @@ export interface LabExamsSlice {
   completeLabExams: (patientId: string, examResults: { index: number; results: string }[], completedBy: { name: string; role: string }) => void;
 }
 
-export const createLabExamsSlice: StateCreator<LabExamsSlice & PatientState> = (set) => ({
+export const createLabExamsSlice: StateCreator<
+  LabExamsSlice & PatientState,
+  [],
+  [],
+  LabExamsSlice
+> = (set) => ({
   patients: [], // Ajout de la propriété patients requise par PatientState
   
   requestLabExams: (patientId, exams, requestedBy) => set((state) => {
@@ -37,7 +42,10 @@ export const createLabExamsSlice: StateCreator<LabExamsSlice & PatientState> = (
           oldValue: "None",
           newValue: `${newExams.length} exams requested`,
           modifiedBy: requestedBy,
-          timestamp: requestedAt
+          timestamp: requestedAt,
+          user: requestedBy.name,
+          role: requestedBy.role,
+          changedFields: ["pendingLabExams"]
         },
         ...(currentPatient.modificationHistory || [])
       ]
@@ -85,7 +93,10 @@ export const createLabExamsSlice: StateCreator<LabExamsSlice & PatientState> = (
           oldValue: `${currentPatient.completedLabExams?.length || 0} exams`,
           newValue: `${(currentPatient.completedLabExams?.length || 0) + newCompletedExams.length} exams`,
           modifiedBy: completedBy,
-          timestamp: completedAt
+          timestamp: completedAt,
+          user: completedBy.name,
+          role: completedBy.role,
+          changedFields: ["completedLabExams"]
         },
         ...(currentPatient.modificationHistory || [])
       ]

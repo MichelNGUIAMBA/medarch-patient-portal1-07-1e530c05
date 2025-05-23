@@ -1,3 +1,4 @@
+
 import { StateCreator } from 'zustand';
 import { PatientSlice } from '../types';
 import { ServiceRecord } from '@/types/patient';
@@ -7,7 +8,12 @@ export interface ServiceRecordSlice {
   updateServiceRecord: (patientId: string, date: string, serviceData: any) => void;
 }
 
-export const createServiceRecordSlice: StateCreator<PatientSlice> = (set, get) => ({
+export const createServiceRecordSlice: StateCreator<
+  PatientSlice, 
+  [], 
+  [], 
+  ServiceRecordSlice
+> = (set, get) => ({
   addServiceRecord: (patientId, record, modifiedBy) => {
     set((state) => {
       const patientIndex = state.patients.findIndex((p) => p.id === patientId);
@@ -19,10 +25,16 @@ export const createServiceRecordSlice: StateCreator<PatientSlice> = (set, get) =
       // Create or update service history array
       const serviceHistory = patient.serviceHistory ? [...patient.serviceHistory] : [];
       
+      // Add date if not present
+      const recordWithDate = {
+        ...record,
+        date: record.date || new Date().toISOString()
+      };
+      
       // Add modifiedBy information to the record if provided
       const recordWithModifier = modifiedBy 
-        ? { ...record, modifiedBy } 
-        : record;
+        ? { ...recordWithDate, modifiedBy } 
+        : recordWithDate;
         
       serviceHistory.push(recordWithModifier);
 
@@ -36,9 +48,10 @@ export const createServiceRecordSlice: StateCreator<PatientSlice> = (set, get) =
       };
     });
   },
+  
   updateServiceRecord: (patientId, date, serviceData) => {
     set((state) => {
-      const patientIndex = state.patients.findIndex((p) => p.id === patientId);
+      const patientIndex = state.patients.findIndex(p => p.id === patientId);
       if (patientIndex === -1) return state;
 
       const patient = state.patients[patientIndex];

@@ -9,7 +9,12 @@ export interface PatientStatusSlice {
   addServiceToExistingPatient: (patientId: string, service: "VM" | "Cons" | "Ug") => void;
 }
 
-export const createPatientStatusSlice: StateCreator<PatientStatusSlice & PatientState> = (set) => ({
+export const createPatientStatusSlice: StateCreator<
+  PatientStatusSlice & PatientState,
+  [],
+  [],
+  PatientStatusSlice
+> = (set) => ({
   patients: [], // Ajout de la propriété patients requise par PatientState
   
   takeCharge: (id, nurse) => set((state) => {
@@ -27,7 +32,10 @@ export const createPatientStatusSlice: StateCreator<PatientStatusSlice & Patient
           oldValue: "En attente",
           newValue: "En cours",
           modifiedBy: nurse,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          user: nurse.name,
+          role: nurse.role,
+          changedFields: ["status"]
         },
         ...(updatedPatients[patientIndex].modificationHistory || [])
       ]
@@ -51,7 +59,10 @@ export const createPatientStatusSlice: StateCreator<PatientStatusSlice & Patient
           oldValue: updatedPatients[patientIndex].status,
           newValue: "Terminé",
           modifiedBy: caregiver,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          user: caregiver.name,
+          role: caregiver.role,
+          changedFields: ["status"]
         },
         ...(updatedPatients[patientIndex].modificationHistory || [])
       ]
