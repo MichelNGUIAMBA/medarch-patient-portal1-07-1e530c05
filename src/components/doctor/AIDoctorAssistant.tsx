@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Brain, Copy, FileText, AlertTriangle, RefreshCw, MessageCircle } from 'lucide-react';
+import { Brain, Copy, FileText, AlertTriangle, RefreshCw, MessageCircle, Zap } from 'lucide-react';
 import { Patient } from '@/types/patient';
 import { useToast } from '@/components/ui/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -346,11 +346,23 @@ const AIDoctorAssistant: React.FC<AIDoctorAssistantProps> = ({ patient }) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <Tabs defaultValue="diagnostic" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4">
-            <TabsTrigger value="diagnostic">{t('diagnostic')}</TabsTrigger>
-            <TabsTrigger value="risks">{t('riskAnalysis')}</TabsTrigger>
-            <TabsTrigger value="treatment">{t('treatmentSuggestions')}</TabsTrigger>
-            <TabsTrigger value="interpretation">{t('resultsInterpretation')}</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="diagnostic" className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">{t('diagnostic')}</span>
+              <span className="inline sm:hidden">Diag</span>
+            </TabsTrigger>
+            <TabsTrigger value="risks" className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">{t('riskAnalysis')}</span>
+              <span className="inline sm:hidden">Risk</span>
+            </TabsTrigger>
+            <TabsTrigger value="treatment" className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">{t('treatmentSuggestions')}</span>
+              <span className="inline sm:hidden">Treat</span>
+            </TabsTrigger>
+            <TabsTrigger value="interpretation" className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">{t('resultsInterpretation')}</span>
+              <span className="inline sm:hidden">Interp</span>
+            </TabsTrigger>
           </TabsList>
           
           <div className="mt-4">
@@ -361,28 +373,55 @@ const AIDoctorAssistant: React.FC<AIDoctorAssistantProps> = ({ patient }) => {
             
             {renderSampleQueries()}
             
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Textarea
                 placeholder={t('askAIAssistant')}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="min-h-24"
+                className="min-h-24 flex-grow"
               />
               
-              <div className="flex justify-end">
+              <div className="flex sm:flex-col justify-end gap-2">
                 <Button 
                   onClick={handleSubmit}
                   disabled={isProcessing || !query.trim()}
+                  className="w-full sm:w-auto"
                 >
                   {isProcessing ? (
                     <>
                       <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                      {t('processing')}
+                      <span className="hidden sm:inline">{t('processing')}</span>
+                      <span className="inline sm:hidden">...</span>
                     </>
                   ) : (
-                    t('analyze')
+                    <>
+                      <Zap className="h-4 w-4 mr-1" />
+                      <span className="hidden sm:inline">{t('analyze')}</span>
+                      <span className="inline sm:hidden">Go</span>
+                    </>
                   )}
                 </Button>
+                
+                {aiResponse && (
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={handleCopyToClipboard}
+                      title={t('textCopiedToClipboard')}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={handleClearResponse}
+                      title={t('clearResponse')}
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
             
