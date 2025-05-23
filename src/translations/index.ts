@@ -1,47 +1,66 @@
 
-import { Language, TranslationRecord } from './types';
-import { authTranslations } from './auth';
+import { TranslationRecord } from './types';
 import { navigationTranslations } from './navigation';
-import { patientTranslations } from './patient';
-import { statusTranslations } from './status';
-import { serviceTranslations } from './services';
-import { formTranslations } from './forms';
-import { historyTranslations } from './history';
-import { chatbotTranslations } from './chatbot';
+import { baseFormsTranslations } from './base-forms';
 import { uiTranslations } from './ui';
+import { patientTranslations } from './patient';
+import { authTranslations } from './auth';
 import { dashboardTranslations } from './dashboard';
+import { statusTranslations } from './status';
+import { servicesTranslations } from './services';
+import { formsTranslations } from './forms';
+import { serviceFormsTranslations } from './service-forms';
+import { patientFormsTranslations } from './patient-forms';
+import { historyTranslations } from './history';
+import { validationFormsTranslations } from './validation-forms';
 import { medicalTranslations } from './medical';
 import { labTranslations } from './lab';
-import { aiTranslations } from './ai';
-import { recordsTranslations } from './records';
 import { copyrightTranslations } from './copyright';
+import { chatbotTranslations } from './chatbot';
+import { recordsTranslations } from './records';
+import { aiTranslations } from './ai';
+import { doctorTranslations } from './doctor';
 
-// Merge all translation categories for each language
-const createMergedTranslations = (): Record<Language, TranslationRecord> => {
-  const languages: Language[] = ['fr', 'en', 'de'];
-  const mergedTranslations: Record<Language, TranslationRecord> = {} as Record<Language, TranslationRecord>;
-  
-  languages.forEach(lang => {
-    mergedTranslations[lang] = {
-      ...authTranslations[lang],
-      ...navigationTranslations[lang],
-      ...patientTranslations[lang],
-      ...statusTranslations[lang],
-      ...serviceTranslations[lang],
-      ...formTranslations[lang],
-      ...historyTranslations[lang],
-      ...chatbotTranslations[lang],
-      ...uiTranslations[lang],
-      ...dashboardTranslations[lang],
-      ...medicalTranslations[lang],
-      ...labTranslations[lang],
-      ...aiTranslations[lang],
-      ...recordsTranslations[lang],
-      ...copyrightTranslations[lang]
-    };
-  });
-  
-  return mergedTranslations;
+const mergeTranslations = (lang: string) => {
+  const translations: Record<string, string> = {};
+
+  const addTranslationSet = (set: Record<string, TranslationRecord>) => {
+    if (set[lang]) {
+      Object.entries(set[lang]).forEach(([key, value]) => {
+        translations[key] = value;
+      });
+    }
+  };
+
+  // Add all translation sets for the language
+  addTranslationSet(navigationTranslations);
+  addTranslationSet(baseFormsTranslations);
+  addTranslationSet(uiTranslations);
+  addTranslationSet(patientTranslations);
+  addTranslationSet(authTranslations);
+  addTranslationSet(dashboardTranslations);
+  addTranslationSet(statusTranslations);
+  addTranslationSet(serviceFormsTranslations);
+  addTranslationSet(patientFormsTranslations);
+  addTranslationSet(servicesTranslations);
+  addTranslationSet(formsTranslations);
+  addTranslationSet(historyTranslations);
+  addTranslationSet(validationFormsTranslations);
+  addTranslationSet(medicalTranslations);
+  addTranslationSet(labTranslations);
+  addTranslationSet(copyrightTranslations);
+  addTranslationSet(chatbotTranslations);
+  addTranslationSet(recordsTranslations);
+  addTranslationSet(aiTranslations);
+  addTranslationSet(doctorTranslations);
+
+  return translations;
 };
 
-export const translations = createMergedTranslations();
+export const translations = {
+  fr: mergeTranslations('fr'),
+  en: mergeTranslations('en'),
+  de: mergeTranslations('de')
+};
+
+export const DEFAULT_LANGUAGE = 'fr';

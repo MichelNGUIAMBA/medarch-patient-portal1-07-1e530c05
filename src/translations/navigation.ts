@@ -31,6 +31,7 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'examHistory': 'Historique des examens',
     'patientsToSee': 'Patients à voir',
     'medicalRecords': 'Dossiers médicaux',
+    'statistics': 'Statistiques',
   },
   en: {
     'dashboard': 'Dashboard',
@@ -61,6 +62,7 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'examHistory': 'Exam History',
     'patientsToSee': 'Patients to see',
     'medicalRecords': 'Medical records',
+    'statistics': 'Statistics',
   },
   de: {
     'dashboard': 'Dashboard',
@@ -91,5 +93,6 @@ export const navigationTranslations: Record<string, TranslationRecord> = {
     'examHistory': 'Untersuchungsverlauf',
     'patientsToSee': 'Zu behandelnde Patienten',
     'medicalRecords': 'Krankenakten',
+    'statistics': 'Statistiken',
   }
 };

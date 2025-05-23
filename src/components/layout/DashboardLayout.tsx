@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/use-auth-context";
 import { Button } from "@/components/ui/button";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Hospital, User, Users, Database, ClipboardCheck, LogOut, FileText, Calendar, UserCheck, Search, MessageSquare, Ambulance } from "lucide-react";
+import { Hospital, User, Users, Database, ClipboardCheck, LogOut, FileText, Calendar, UserCheck, Search, MessageSquare, Ambulance, BarChart } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import ThemeSwitcher from "./ThemeSwitcher";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -90,6 +90,10 @@ const DashboardLayout = () => {
         title: t('medicalRecords'),
         url: "/dashboard/doctor/medical-records",
         icon: FileText
+      }, {
+        title: t('statistics'),
+        url: "/dashboard/doctor/stats",
+        icon: BarChart
       }]
     };
     
