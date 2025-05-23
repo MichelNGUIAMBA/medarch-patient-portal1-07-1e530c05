@@ -55,4 +55,7 @@ export interface Patient {
   pendingLabExams?: LabExam[];
   completedLabExams?: LabExam[];
   serviceHistory?: ServiceRecord[]; // Nouvel attribut pour l'historique des services
+  tags?: string[]; // Tags associés au patient pour la classification et le filtrage
+  priority?: number; // Priorité calculée pour les patients en attente
+  waitTime?: number; // Temps d'attente en minutes
 }

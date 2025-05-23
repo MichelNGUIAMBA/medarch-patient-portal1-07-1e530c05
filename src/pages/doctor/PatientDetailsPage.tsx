@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, BookOpen, Brain, FileText, MessageSquare, Save } from 'lucide-react';
+import { ArrowLeft, BookOpen, Brain, FileText, MessageSquare, Save, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { toast } from '@/components/ui/sonner';
+import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/use-auth-context';
 import PatientInfoCard from '@/components/consultations/PatientInfoCard';
 import ServicesHistoryViewer from '@/components/consultations/ServicesHistoryViewer';
@@ -32,6 +32,7 @@ const PatientDetailsPage: React.FC = () => {
   const [recommendations, setRecommendations] = useState('');
   const [prescription, setPrescription] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [showAiSidebar, setShowAiSidebar] = useState(true);
 
   // Trouver le patient par ID
   const patient = patients.find(p => p.id === patientId);
@@ -78,7 +79,10 @@ const PatientDetailsPage: React.FC = () => {
       
       // If there's no service history, we can't add a doctor review
       if (!latestService) {
-        toast.error(t('noServiceHistoryForReview'));
+        toast({
+          title: t('noServiceHistoryForReview'),
+          variant: "destructive"
+        });
         setIsSaving(false);
         return;
       }
@@ -99,10 +103,15 @@ const PatientDetailsPage: React.FC = () => {
       // Update the service record
       updateServiceHistory(patient.id, latestService.date, updatedServiceData);
       
-      toast.success(t('doctorReviewSaved'));
+      toast({
+        title: t('doctorReviewSaved'),
+      });
     } catch (error) {
       console.error('Error saving doctor review:', error);
-      toast.error(t('errorSavingDoctorReview'));
+      toast({
+        title: t('errorSavingDoctorReview'),
+        variant: "destructive"
+      });
     } finally {
       setIsSaving(false);
     }
@@ -119,23 +128,34 @@ const PatientDetailsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" size="icon" onClick={handleBack}>
-          <ArrowLeft className="h-4 w-4" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" onClick={handleBack}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold">{t('patientDetails')}</h1>
+        </div>
+        
+        <Button 
+          variant="outline" 
+          className="flex items-center gap-2"
+          onClick={() => setShowAiSidebar(!showAiSidebar)}
+        >
+          <Brain className="h-4 w-4" />
+          {showAiSidebar ? t('hideAiAssistant') : t('showAiAssistant')}
         </Button>
-        <h1 className="text-2xl font-bold">{t('patientDetails')}</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-6">
+        <div className={showAiSidebar ? "md:col-span-2" : "md:col-span-3"}>
           {/* Patient info cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <PatientPersonalInfoCard patient={patient} />
             <ServiceInfoCard patient={patient} />
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <FileText className="w-4 h-4" />
                 {t('overview')}
@@ -143,10 +163,6 @@ const PatientDetailsPage: React.FC = () => {
               <TabsTrigger value="doctor-review" className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4" />
                 {t('doctorReview')}
-              </TabsTrigger>
-              <TabsTrigger value="ai-assistant" className="flex items-center gap-2">
-                <Brain className="w-4 h-4" />
-                {t('aiAssistant')}
               </TabsTrigger>
             </TabsList>
 
@@ -157,8 +173,14 @@ const PatientDetailsPage: React.FC = () => {
 
             <TabsContent value="doctor-review" className="space-y-4 pt-4">
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>{t('doctorReview')}</CardTitle>
+                  {patient.completedLabExams && patient.completedLabExams.length > 0 && (
+                    <div className="flex items-center text-sm text-green-600 dark:text-green-500">
+                      <AlertCircle className="w-4 h-4 mr-1" />
+                      {t('labResultsAvailable')}
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -202,52 +224,61 @@ const PatientDetailsPage: React.FC = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-
-            <TabsContent value="ai-assistant" className="pt-4">
-              <AIDoctorAssistant patient={patient} />
-            </TabsContent>
           </Tabs>
         </div>
 
-        <div className="space-y-6">
-          <PatientInfoCard patient={patient} />
+        {showAiSidebar && (
+          <div className="space-y-6">
+            <PatientInfoCard patient={patient} />
 
-          {/* Patient history summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" />
-                {t('serviceSummary')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{t('lastService')}</p>
-                  <p>{patient.serviceHistory && patient.serviceHistory.length > 0
-                    ? formatDate(patient.serviceHistory[patient.serviceHistory.length - 1].date)
-                    : t('noServiceRecorded')}
-                  </p>
-                </div>
+            <div className="hidden md:block">
+              <AIDoctorAssistant patient={patient} />
+            </div>
 
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{t('totalServices')}</p>
-                  <p>{patient.serviceHistory?.length || 0}</p>
-                </div>
+            {/* Patient history summary for mobile (shown below when AI sidebar is active) */}
+            <Card className="md:hidden">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4" />
+                  {t('serviceSummary')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{t('lastService')}</p>
+                    <p>{patient.serviceHistory && patient.serviceHistory.length > 0
+                      ? formatDate(patient.serviceHistory[patient.serviceHistory.length - 1].date)
+                      : t('noServiceRecorded')}
+                    </p>
+                  </div>
 
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{t('completedExams')}</p>
-                  <p>{patient.completedLabExams?.length || 0}</p>
-                </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{t('totalServices')}</p>
+                    <p>{patient.serviceHistory?.length || 0}</p>
+                  </div>
 
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{t('pendingExams')}</p>
-                  <p>{patient.pendingLabExams?.length || 0}</p>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{t('completedExams')}</p>
+                    <p>{patient.completedLabExams?.length || 0}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{t('pendingExams')}</p>
+                    <p>{patient.pendingLabExams?.length || 0}</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+        
+        {/* Display AI Assistant below on mobile when sidebar is active */}
+        {showAiSidebar && (
+          <div className="md:hidden col-span-3">
+            <AIDoctorAssistant patient={patient} />
+          </div>
+        )}
       </div>
     </div>
   );

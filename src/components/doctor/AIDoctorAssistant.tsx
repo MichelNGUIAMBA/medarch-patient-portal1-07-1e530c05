@@ -1,24 +1,33 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
-import { Patient } from '@/types/patient';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { toast } from '@/components/ui/sonner';
-import { 
-  Brain, 
-  FileText, 
-  MessageSquare, 
-  AlertTriangle,
-  Stethoscope,
-  BadgeAlert,
-  Pill,
-  Search
-} from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Brain, Copy, FileText, AlertTriangle, RefreshCw, MessageCircle } from 'lucide-react';
+import { Patient } from '@/types/patient';
+import { useToast } from '@/components/ui/use-toast';
+import { Badge } from '@/components/ui/badge';
+
+// Types pour les requêtes au modèle IA
+type AIRequest = {
+  type: 'diagnostic' | 'risks' | 'treatment' | 'interpretation';
+  prompt: string;
+};
+
+// Types pour les réponses du modèle IA
+type AIResponse = {
+  content: string;
+  metadata?: {
+    confidence?: number;
+    recommendations?: string[];
+    alert?: {
+      message: string;
+      level: 'info' | 'warning' | 'critical';
+    };
+  };
+};
 
 interface AIDoctorAssistantProps {
   patient: Patient;
@@ -26,381 +35,417 @@ interface AIDoctorAssistantProps {
 
 const AIDoctorAssistant: React.FC<AIDoctorAssistantProps> = ({ patient }) => {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState('diagnostic');
-  const [prompt, setPrompt] = useState('');
-  const [aiResponse, setAiResponse] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  
+  const [activeTab, setActiveTab] = useState<string>('diagnostic');
+  const [query, setQuery] = useState<string>('');
+  const [aiResponse, setAiResponse] = useState<AIResponse | null>(null);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [patientSummary, setPatientSummary] = useState<string>('');
 
-  // Créer un résumé du patient pour l'IA
+  // Génère un résumé du patient pour le contexte de l'IA
+  useEffect(() => {
+    if (patient) {
+      generatePatientSummary();
+    }
+  }, [patient]);
+
   const generatePatientSummary = () => {
-    let summary = `Patient: ${patient.lastName} ${patient.firstName}, `;
-    summary += `${patient.gender === 'M' ? 'Homme' : 'Femme'}, `;
+    let summary = `Patient: ${patient.lastName} ${patient.firstName}, ${patient.gender}, `;
     
-    // Calculer l'âge approximatif
-    const birthDate = new Date(patient.birthDate);
-    const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
-    summary += `${age} ans.\n\n`;
-    
-    // Ajouter des informations sur les services
-    if (patient.serviceHistory && patient.serviceHistory.length > 0) {
-      summary += "Historique des services:\n";
-      
-      patient.serviceHistory.forEach((service, index) => {
-        const date = new Date(service.date).toLocaleDateString('fr-FR');
-        summary += `- ${date}: ${service.serviceType === 'VM' ? 'Visite médicale' : 
-                              service.serviceType === 'Cons' ? 'Consultation' : 'Urgence'}\n`;
-                              
-        // Ajouter des données spécifiques selon le type de service
-        if (service.serviceData) {
-          if (service.serviceType === 'VM' && service.serviceData.vitalSigns) {
-            summary += `  Signes vitaux: `;
-            if (service.serviceData.vitalSigns.temperature) 
-              summary += `Temp: ${service.serviceData.vitalSigns.temperature}°C, `;
-            if (service.serviceData.vitalSigns.bloodPressure) 
-              summary += `TA: ${service.serviceData.vitalSigns.bloodPressure}, `;
-            if (service.serviceData.vitalSigns.pulse) 
-              summary += `Pouls: ${service.serviceData.vitalSigns.pulse}bpm`;
-            summary += `\n`;
-          }
-          
-          if (service.serviceType === 'Cons' && service.serviceData.diagnosis) {
-            summary += `  Diagnostic: ${service.serviceData.diagnosis}\n`;
-          }
-        }
-      });
-      summary += "\n";
+    // Ajouter l'âge si la date de naissance est disponible
+    if (patient.birthDate) {
+      const birthYear = new Date(patient.birthDate).getFullYear();
+      const currentYear = new Date().getFullYear();
+      summary += `${currentYear - birthYear} ans, `;
     }
     
-    // Ajouter des informations sur les examens
+    summary += `${patient.company}\n`;
+    
+    // Ajouter le service actuel
+    summary += `Service actuel: ${patient.service === 'VM' ? 'Visite Médicale' : 
+                           patient.service === 'Cons' ? 'Consultation' : 
+                           patient.service === 'Ug' ? 'Urgence' : patient.service}\n`;
+    
+    // Ajouter les examens complétés
     if (patient.completedLabExams && patient.completedLabExams.length > 0) {
-      summary += "Examens complétés:\n";
-      
+      summary += 'Examens réalisés:\n';
       patient.completedLabExams.forEach(exam => {
-        summary += `- ${exam.type}: ${exam.results || 'Pas de résultats'}\n`;
+        summary += `- ${exam.type}${exam.results ? ': ' + exam.results : ''}\n`;
       });
     }
     
-    return summary;
+    // Ajouter l'historique des services
+    if (patient.serviceHistory && patient.serviceHistory.length > 0) {
+      summary += `\nHistorique des services (${patient.serviceHistory.length}):\n`;
+      // Montrer seulement les 3 derniers services pour la concision
+      for (let i = Math.max(0, patient.serviceHistory.length - 3); i < patient.serviceHistory.length; i++) {
+        const service = patient.serviceHistory[i];
+        summary += `- ${service.serviceType} (${new Date(service.date).toLocaleDateString()})\n`;
+      }
+    }
+    
+    setPatientSummary(summary);
   };
 
-  // Générer différents types de prompts selon l'onglet actif
-  const generatePrompt = (type: string) => {
-    const patientSummary = generatePatientSummary();
-    let systemPrompt = '';
+  // Fonction pour simuler l'appel à l'IA (dans un cas réel, ce serait un appel API)
+  const requestAIAnalysis = async (request: AIRequest): Promise<AIResponse> => {
+    setIsProcessing(true);
     
-    switch (type) {
+    // Simuler un délai de traitement
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    let response: AIResponse;
+    
+    // Créer des réponses simulées basées sur le type de requête
+    switch (request.type) {
       case 'diagnostic':
-        systemPrompt = "Tu es un assistant médical expert qui aide les médecins à établir des diagnostics. Analyse les informations du patient et suggère des diagnostics possibles avec leur probabilité. Présente tes réponses de manière claire, structurée et professionnelle.";
-        return `${systemPrompt}\n\nInformations du patient:\n${patientSummary}\n\nSuggère des diagnostics possibles basés sur ces informations.`;
+        response = {
+          content: `Basé sur les informations du patient ${patient.firstName} ${patient.lastName} et les résultats d'examens disponibles, les diagnostics possibles à considérer sont:\n\n` +
+                  `1. Hypertension artérielle légère (probabilité élevée)\n` +
+                  `   - Relevés de tension artérielle élevés lors des 3 dernières visites\n` +
+                  `   - Antécédents familiaux notés dans le dossier\n\n` +
+                  `2. Stress chronique lié au travail (probabilité moyenne-élevée)\n` +
+                  `   - Symptômes rapportés: fatigue, troubles du sommeil\n` +
+                  `   - Environnement professionnel à risque\n\n` +
+                  `3. Surmenage professionnel (probabilité moyenne)\n` +
+                  `   - Horaires de travail étendus mentionnés lors de la consultation\n` +
+                  `   - Symptômes associés présents\n\n` +
+                  `Recommandations supplémentaires: Un suivi régulier de la tension artérielle est conseillé. Envisager un bilan cardiaque complet si les valeurs restent élevées lors de la prochaine visite.`,
+          metadata: {
+            confidence: 0.87,
+            recommendations: [
+              'Suivi tension artérielle hebdomadaire',
+              'Bilan cardiaque à programmer',
+              'Évaluation du stress professionnel'
+            ],
+            alert: {
+              message: 'Valeurs de tension au-dessus des seuils recommandés',
+              level: 'warning'
+            }
+          }
+        };
+        break;
         
-      case 'risk':
-        systemPrompt = "Tu es un assistant médical spécialisé dans l'évaluation des risques. Analyse les données du patient et identifie les facteurs de risque potentiels. Classe ces risques par niveau de gravité (faible, moyen, élevé).";
-        return `${systemPrompt}\n\nInformations du patient:\n${patientSummary}\n\nIdentifie et évalue les facteurs de risque pour ce patient.`;
+      case 'risks':
+        response = {
+          content: `Évaluation des facteurs de risque pour ${patient.firstName} ${patient.lastName}:\n\n` +
+                  `Risques cardiovasculaires:\n` +
+                  `- Risque modéré à élevé basé sur le profil tensionnel\n` +
+                  `- Score SCORE estimé: 3-5% (risque à 10 ans d'événement cardiovasculaire fatal)\n\n` +
+                  `Risques professionnels:\n` +
+                  `- Exposition aux facteurs de stress chronique\n` +
+                  `- Travail en horaires irréguliers mentionné dans le dossier\n\n` +
+                  `Risques métaboliques:\n` +
+                  `- Risque faible de diabète type 2 (basé sur les valeurs de glycémie à jeun)\n` +
+                  `- Profil lipidique dans les normes avec légère tendance à l'hypercholestérolémie\n\n` +
+                  `Recommandations de prévention:\n` +
+                  `- Activité physique régulière (150 minutes/semaine minimum)\n` +
+                  `- Gestion du stress (techniques de relaxation)\n` +
+                  `- Réévaluation dans 6 mois avec bilan lipidique complet`,
+          metadata: {
+            confidence: 0.82,
+            recommendations: [
+              'Activité physique régulière',
+              'Techniques de gestion du stress',
+              'Contrôle diététique'
+            ]
+          }
+        };
+        break;
         
       case 'treatment':
-        systemPrompt = "Tu es un assistant médical spécialisé dans les recommandations de traitement. En te basant sur les informations du patient, suggère des options de traitement appropriées. Inclus des médicaments potentiels, des dosages et des alternatives.";
-        return `${systemPrompt}\n\nInformations du patient:\n${patientSummary}\n\nRecommande des options de traitement pour ce patient.`;
+        response = {
+          content: `Propositions thérapeutiques pour ${patient.firstName} ${patient.lastName}:\n\n` +
+                  `Approche non-médicamenteuse:\n` +
+                  `1. Modifications du style de vie:\n` +
+                  `   - Régime alimentaire: Réduction du sodium (<5g/jour), augmentation des fruits et légumes\n` +
+                  `   - Activité physique: 30 minutes d'exercice modéré 5 fois par semaine\n` +
+                  `   - Gestion du stress: Techniques de respiration, mindfulness\n\n` +
+                  `2. Surveillance:\n` +
+                  `   - Auto-mesure tensionnelle: 2 fois par jour pendant 1 semaine par mois\n` +
+                  `   - Journal de stress/symptômes\n\n` +
+                  `Approche médicamenteuse (à discuter):\n` +
+                  `   - En cas de persistance de l'hypertension malgré les mesures non-médicamenteuses:\n` +
+                  `   - Inhibiteur de l'enzyme de conversion (IEC) ou Antagoniste des récepteurs de l'angiotensine II (ARA II) en première intention\n` +
+                  `   - Dose initiale faible avec titration progressive`,
+          metadata: {
+            confidence: 0.89,
+            recommendations: [
+              'Régime hyposodé',
+              'Activité physique régulière',
+              'Suivi tensionnel ambulatoire'
+            ],
+            alert: {
+              message: 'Vérifier les interactions médicamenteuses avant prescription',
+              level: 'info'
+            }
+          }
+        };
+        break;
         
-      case 'search':
+      case 'interpretation':
+        response = {
+          content: `Interprétation des résultats pour ${patient.firstName} ${patient.lastName}:\n\n` +
+                  `Analyses biologiques:\n` +
+                  `- Glycémie à jeun: 5.4 mmol/L - Dans les normes (VN: 3.9-5.5 mmol/L)\n` +
+                  `- HbA1c: 5.6% - Limite supérieure des normes (VN: <5.7%)\n` +
+                  `- Créatinine: 82 μmol/L - Dans les normes (VN: 62-106 μmol/L)\n` +
+                  `- DFG estimé: 94 mL/min/1,73m² - Fonction rénale préservée\n\n` +
+                  `Paramètres cliniques:\n` +
+                  `- PA moyenne: 142/88 mmHg - Hypertension grade 1 (VN: <140/90 mmHg)\n` +
+                  `- FC repos: 76 bpm - Dans les normes\n` +
+                  `- IMC: 27.3 kg/m² - Surpoids (VN: 18.5-25 kg/m²)\n\n` +
+                  `Évolution temporelle:\n` +
+                  `- Augmentation progressive de la PA sur les 3 dernières visites\n` +
+                  `- Stabilité des paramètres biologiques\n\n` +
+                  `Synthèse:\n` +
+                  `Les résultats indiquent une hypertension artérielle légère avec surpoids associé. Les paramètres métaboliques restent dans les normes mais montrent une tendance à la limite supérieure pour la glycémie. La fonction rénale est préservée.`,
+          metadata: {
+            confidence: 0.94
+          }
+        };
+        break;
+        
       default:
-        return prompt || `Informations sur le patient:\n${patientSummary}\n\n`;
+        response = {
+          content: 'Je ne peux pas analyser cette requête. Veuillez essayer avec un autre type d\'analyse.',
+          metadata: {
+            confidence: 0.5
+          }
+        };
     }
+    
+    setIsProcessing(false);
+    return response;
   };
 
-  const handleAIRequest = async () => {
-    setIsLoading(true);
+  const handleSubmit = async () => {
+    if (!query.trim()) return;
+    
+    const request: AIRequest = {
+      type: activeTab as 'diagnostic' | 'risks' | 'treatment' | 'interpretation',
+      prompt: query
+    };
     
     try {
-      // Simuler une réponse d'IA avec un délai
-      // Dans un environnement de production, ce serait un appel API réel
-      // à un modèle d'IA comme OpenAI, Anthropic, etc.
-      
-      const currentPrompt = activeTab === 'search' ? prompt : generatePrompt(activeTab);
-      
-      setTimeout(() => {
-        let response = '';
-        
-        switch (activeTab) {
-          case 'diagnostic':
-            response = `### Analyse diagnostique
-
-Basé sur les informations fournies pour le patient ${patient.lastName} ${patient.firstName}, voici mon analyse diagnostique:
-
-#### Diagnostics possibles:
-1. **Hypertension artérielle** (Probabilité: Élevée)
-   - Justification: Tension artérielle documentée élevée sur plusieurs visites
-   - Recommandation: Suivi régulier de la tension, évaluation des facteurs de risque cardiovasculaires
-
-2. **Syndrome métabolique** (Probabilité: Moyenne-élevée)
-   - Justification: Combinaison de facteurs de risque observés, notamment l'hypertension et les résultats de glycémie
-   - Recommandation: Bilan lipidique complet, test d'hémoglobine glycquée
-
-3. **Stress chronique** (Probabilité: Moyenne)
-   - Justification: Fluctuations de tension et de pouls notées
-   - Recommandation: Évaluation psychologique, techniques de gestion du stress
-
-#### Examens complémentaires recommandés:
-- ECG de repos
-- Bilan lipidique complet
-- Exploration fonctionnelle respiratoire
-- Échographie cardiaque
-
-Je suggère également de vérifier les antécédents familiaux particulièrement concernant les maladies cardiovasculaires et métaboliques.`;
-            break;
-          
-          case 'risk':
-            response = `### Évaluation des facteurs de risque
-
-#### Risques cardio-vasculaires:
-- **Niveau de risque: MOYEN à ÉLEVÉ**
-- Facteurs contributifs:
-  * Tension artérielle élevée documentée
-  * Âge ${patient.gender === 'M' ? 'du patient' : 'de la patiente'}
-  * Indice de masse corporelle (si disponible)
-
-#### Risques métaboliques:
-- **Niveau de risque: MOYEN**
-- Facteurs contributifs:
-  * Résultats de glycémie à jeun à surveiller
-  * Possibilité de résistance à l'insuline
-
-#### Risques liés au mode de vie:
-- **Niveau de risque: À DÉTERMINER**
-- Recommandations:
-  * Évaluer l'activité physique quotidienne
-  * Examiner les habitudes alimentaires
-  * Vérifier la consommation d'alcool et le statut tabagique
-
-#### Plan de suivi recommandé:
-1. Rendez-vous de contrôle dans 3 mois
-2. Surveillance ambulatoire de la tension artérielle (MAPA) à envisager
-3. Éducation thérapeutique sur les modifications du mode de vie
-4. Consultation diététique
-
-Cette évaluation des risques doit être interprétée en tenant compte du contexte clinique global ${patient.gender === 'M' ? 'du patient' : 'de la patiente'}.`;
-            break;
-          
-          case 'treatment':
-            response = `### Recommandations thérapeutiques
-
-#### Approche pharmacologique:
-1. **Traitement anti-hypertenseur**:
-   - Option première ligne: Inhibiteur de l'enzyme de conversion (IEC)
-     * Exemple: Ramipril 5mg, 1 comprimé par jour
-     * Alternative: Perindopril 5mg, 1 comprimé par jour
-   - Option alternative: Antagoniste des récepteurs de l'angiotensine II (ARA-II)
-     * Exemple: Losartan 50mg, 1 comprimé par jour
-   - Diurétique thiazidique en complément si nécessaire:
-     * Hydrochlorothiazide 12.5mg, 1 comprimé le matin
-
-2. **Traitement préventif cardiovasculaire**:
-   - Acide acétylsalicylique à faible dose (75-100mg/j) à envisager selon le niveau de risque cardiovasculaire global
-
-#### Approche non pharmacologique:
-1. **Modifications du mode de vie**:
-   - Régime alimentaire: Approche DASH (Dietary Approaches to Stop Hypertension)
-   - Réduction de la consommation de sodium (<5g de sel par jour)
-   - Activité physique régulière: 30 minutes d'activité modérée, 5 fois par semaine
-   - Gestion du stress: techniques de relaxation, méditation
-
-2. **Suivi recommandé**:
-   - Auto-mesure tensionnelle à domicile
-   - Journal alimentaire
-   - Contrôle biologique dans 3 mois (fonction rénale, ionogramme, glycémie)
-
-#### Objectifs thérapeutiques:
-- Tension artérielle cible: <140/90 mmHg
-- Fréquence cardiaque de repos: 60-70 bpm
-- Amélioration des paramètres métaboliques`;
-            break;
-          
-          case 'search':
-          default:
-            response = `### Recherche médicale personnalisée
-
-En réponse à votre requête concernant ${patient.lastName} ${patient.firstName}, j'ai analysé les informations disponibles et effectué une recherche documentaire adaptée.
-
-#### Publications pertinentes:
-1. **"Prise en charge optimale de l'hypertension chez l'adulte d'âge moyen"**
-   - Journal of Hypertension, 2023
-   - Résumé: Cette méta-analyse de 42 essais cliniques montre l'efficacité comparative des différentes classes d'antihypertenseurs selon les profils de patients.
-
-2. **"Approche multidisciplinaire du syndrome métabolique"**
-   - New England Journal of Medicine, 2024
-   - Résumé: Nouvelles recommandations sur l'approche intégrée combinant traitement pharmacologique et interventions sur le mode de vie.
-
-3. **"Impact du stress chronique sur la régulation tensionnelle"**
-   - European Heart Journal, 2023
-   - Résumé: Étude longitudinale sur 5 ans démontrant les mécanismes par lesquels le stress chronique contribue à l'hypertension résistante.
-
-#### Applications pratiques:
-- La combinaison d'un IEC avec un diurétique thiazidique à faible dose montre une efficacité supérieure avec un profil d'effets secondaires favorable pour des patients présentant ce profil clinique.
-- Une approche cognitive-comportementale de la gestion du stress a démontré des réductions significatives de la tension artérielle (5-7 mmHg en moyenne).
-
-Ces données pourraient orienter votre stratégie thérapeutique en tenant compte des spécificités cliniques ${patient.gender === 'M' ? 'du patient' : 'de la patiente'}.`;
-            break;
-        }
-        
-        setAiResponse(response);
-        setIsLoading(false);
-      }, 2000);
-      
+      const response = await requestAIAnalysis(request);
+      setAiResponse(response);
     } catch (error) {
-      console.error('AI assistant error:', error);
-      toast.error(t('aiAssistantError'));
-      setIsLoading(false);
+      console.error('Error requesting AI analysis:', error);
+      toast({
+        title: t('aiRequestError'),
+        description: t('errorProcessingRequest'),
+        variant: 'destructive',
+      });
     }
   };
 
-  const copyToReview = (text: string) => {
-    // Cette fonction simulerait la copie du texte de l'IA vers le formulaire de révision du docteur
-    // Dans une implémentation réelle, cela interagirait avec la page parent
-    toast.success(t('textCopiedToClipboard'));
+  const handleCopyToClipboard = () => {
+    if (!aiResponse) return;
     
-    // Copier dans le presse-papiers
-    navigator.clipboard.writeText(text).catch(err => {
-      console.error('Failed to copy text: ', err);
-    });
+    navigator.clipboard.writeText(aiResponse.content)
+      .then(() => {
+        toast({
+          title: t('textCopiedToClipboard'),
+          description: t('textCopiedToClipboardDescription'),
+        });
+      })
+      .catch((error) => {
+        console.error('Error copying text to clipboard:', error);
+        toast({
+          title: t('copyError'),
+          description: t('errorCopyingToClipboard'),
+          variant: 'destructive',
+        });
+      });
+  };
+
+  const handleClearResponse = () => {
+    setAiResponse(null);
+    setQuery('');
+  };
+
+  const renderSampleQueries = () => {
+    const samples = {
+      diagnostic: [
+        "Analyser les symptômes d'hypertension et de fatigue chronique",
+        "Évaluer les risques cardiovasculaires d'après les résultats des examens"
+      ],
+      risks: [
+        "Évaluer le risque cardiovasculaire à 10 ans",
+        "Analyser les facteurs de risque professionnels"
+      ],
+      treatment: [
+        "Proposer un traitement pour l'hypertension légère",
+        "Suggestions thérapeutiques non-médicamenteuses pour stress professionnel"
+      ],
+      interpretation: [
+        "Interpréter les résultats de la glycémie et HbA1c",
+        "Analyser l'évolution de la tension artérielle sur les dernières visites"
+      ]
+    };
+    
+    return (
+      <div className="mb-4 space-y-2">
+        <p className="text-sm font-medium text-muted-foreground">{t('sampleQueries')}:</p>
+        <div className="flex flex-wrap gap-2">
+          {samples[activeTab as keyof typeof samples].map((sample, index) => (
+            <Button 
+              key={index}
+              variant="outline" 
+              size="sm"
+              onClick={() => setQuery(sample)}
+              className="text-xs"
+            >
+              {sample}
+            </Button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const getAlertBadge = (level: 'info' | 'warning' | 'critical') => {
+    switch (level) {
+      case 'critical':
+        return (
+          <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300 flex items-center gap-1 mb-2">
+            <AlertTriangle className="h-3 w-3" />
+            {t('criticalAlert')}
+          </Badge>
+        );
+      case 'warning':
+        return (
+          <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300 flex items-center gap-1 mb-2">
+            <AlertTriangle className="h-3 w-3" />
+            {t('warningAlert')}
+          </Badge>
+        );
+      case 'info':
+      default:
+        return (
+          <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300 flex items-center gap-1 mb-2">
+            <MessageCircle className="h-3 w-3" />
+            {t('infoAlert')}
+          </Badge>
+        );
+    }
   };
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Brain className="h-5 w-5" />
           {t('aiAssistant')}
         </CardTitle>
+        <CardDescription>
+          {t('aiMedicalDisclaimer')}
+        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="diagnostic" className="flex items-center gap-2">
-              <Stethoscope className="w-4 h-4" />
-              {t('aiDiagnosticHelper')}
-            </TabsTrigger>
-            <TabsTrigger value="risk" className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4" />
-              {t('aiRiskPrediction')}
-            </TabsTrigger>
-            <TabsTrigger value="treatment" className="flex items-center gap-2">
-              <Pill className="w-4 h-4" />
-              {t('aiSuggestedTreatment')}
-            </TabsTrigger>
-            <TabsTrigger value="search" className="flex items-center gap-2">
-              <Search className="w-4 h-4" />
-              {t('searchMedicalLiterature')}
-            </TabsTrigger>
+      <CardContent className="space-y-4">
+        <Tabs defaultValue="diagnostic" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid grid-cols-4">
+            <TabsTrigger value="diagnostic">{t('diagnostic')}</TabsTrigger>
+            <TabsTrigger value="risks">{t('riskAnalysis')}</TabsTrigger>
+            <TabsTrigger value="treatment">{t('treatmentSuggestions')}</TabsTrigger>
+            <TabsTrigger value="interpretation">{t('resultsInterpretation')}</TabsTrigger>
           </TabsList>
-
-          <div className="pt-4">
-            {activeTab === 'search' && (
+          
+          <div className="mt-4">
+            <div className="mb-4 p-3 bg-muted/50 rounded-md text-xs">
+              <p className="font-medium mb-1">{t('patientContext')}:</p>
+              <pre className="whitespace-pre-wrap font-mono text-xs">{patientSummary}</pre>
+            </div>
+            
+            {renderSampleQueries()}
+            
+            <div className="flex flex-col gap-4">
               <Textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder={t('enterSearchQuery')}
-                className="mb-4 min-h-[100px]"
+                placeholder={t('askAIAssistant')}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="min-h-24"
               />
-            )}
-
-            {!aiResponse && (
-              <Alert className="mb-4">
-                <AlertDescription className="flex flex-col gap-2">
-                  <div>{t('howCanAIHelp')}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {t('aiWillAnalyzePatientData')}
+              
+              <div className="flex justify-end">
+                <Button 
+                  onClick={handleSubmit}
+                  disabled={isProcessing || !query.trim()}
+                >
+                  {isProcessing ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      {t('processing')}
+                    </>
+                  ) : (
+                    t('analyze')
+                  )}
+                </Button>
+              </div>
+            </div>
+            
+            {isProcessing && (
+              <div className="mt-4 p-4 border rounded-lg bg-muted/20">
+                <div className="flex items-center space-x-2 text-muted-foreground">
+                  <div className="flex space-x-1">
+                    <div className="animate-bounce h-2 w-2 rounded-full bg-blue-600"></div>
+                    <div className="animate-bounce delay-100 h-2 w-2 rounded-full bg-blue-600"></div>
+                    <div className="animate-bounce delay-200 h-2 w-2 rounded-full bg-blue-600"></div>
                   </div>
-                </AlertDescription>
-              </Alert>
+                  <div>{t('aiIsThinking')}</div>
+                </div>
+              </div>
             )}
-
-            {isLoading ? (
-              <div className="flex items-center justify-center py-10">
-                <div className="flex space-x-2">
-                  <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600 [animation-delay:-0.3s]"></div>
-                  <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600 [animation-delay:-0.15s]"></div>
-                  <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600"></div>
+            
+            {aiResponse && !isProcessing && (
+              <div className="mt-4 border rounded-lg overflow-hidden">
+                <div className="bg-muted p-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    <span className="font-medium">{t('aiResponse')}</span>
+                    {aiResponse.metadata?.confidence && (
+                      <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
+                        {t('confidence')}: {Math.round(aiResponse.metadata.confidence * 100)}%
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="icon" onClick={handleCopyToClipboard}>
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={handleClearResponse}>
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <span className="ml-2">{t('aiIsThinking')}</span>
-              </div>
-            ) : aiResponse ? (
-              <div className="bg-muted/50 rounded-lg p-4 overflow-auto max-h-[400px]">
-                <div className="prose dark:prose-invert max-w-none">
+                <div className="p-4 bg-white dark:bg-gray-950">
+                  {aiResponse.metadata?.alert && (
+                    getAlertBadge(aiResponse.metadata.alert.level)
+                  )}
                   <pre className="whitespace-pre-wrap font-sans text-sm">
-                    {aiResponse}
+                    {aiResponse.content}
                   </pre>
-                </div>
-                <div className="flex justify-end mt-4 gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => copyToReview(aiResponse)}
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    {t('copyToReview')}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setAiResponse('')}
-                  >
-                    {t('clearResponse')}
-                  </Button>
+                  
+                  {aiResponse.metadata?.recommendations && (
+                    <div className="mt-4 pt-4 border-t">
+                      <h4 className="font-medium mb-2">{t('keyRecommendations')}:</h4>
+                      <ul className="list-disc list-inside space-y-1">
+                        {aiResponse.metadata.recommendations.map((rec, i) => (
+                          <li key={i}>{rec}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
-            ) : null}
-
-            {!aiResponse && !isLoading && (
-              <Button onClick={handleAIRequest} className="w-full mt-2">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                {activeTab === 'search' 
-                  ? t('search') 
-                  : activeTab === 'diagnostic' 
-                    ? t('getAIDiagnostic') 
-                    : activeTab === 'risk' 
-                      ? t('analyzeRisks') 
-                      : t('suggestTreatment')}
-              </Button>
             )}
           </div>
-
-          {isLoading || aiResponse ? null : (
-            <Accordion type="single" collapsible className="mt-4">
-              <AccordionItem value="examples">
-                <AccordionTrigger>{t('sampleQueries')}</AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full justify-start"
-                      onClick={() => {
-                        setActiveTab('search');
-                        setPrompt("Quelles sont les dernières recommandations pour le traitement de l'hypertension chez un patient avec des antécédents de problèmes rénaux?");
-                      }}
-                    >
-                      {t('queryHypertensionKidneyIssues')}
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full justify-start"
-                      onClick={() => {
-                        setActiveTab('search');
-                        setPrompt("Interactions médicamenteuses potentielles entre les antihypertenseurs et les anti-inflammatoires?");
-                      }}
-                    >
-                      {t('queryDrugInteractions')}
-                    </Button>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          )}
         </Tabs>
       </CardContent>
-      <CardFooter className="flex flex-col items-start text-sm text-muted-foreground">
-        <p>{t('aiMedicalDisclaimer')}</p>
+      <CardFooter className="text-xs text-muted-foreground border-t pt-4">
+        {t('aiPoweredByHealthbert')}
       </CardFooter>
     </Card>
   );
