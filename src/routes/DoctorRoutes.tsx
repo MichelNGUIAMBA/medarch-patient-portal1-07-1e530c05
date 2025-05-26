@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import PatientsToSeePage from "@/pages/doctor/PatientsToSeePage";
 import MedicalRecordsPage from "@/pages/doctor/MedicalRecordsPage";
 import MedicalRecordsCompletePage from "@/pages/doctor/MedicalRecordsCompletePage";
@@ -10,6 +10,8 @@ import StatsOverviewPage from "@/pages/doctor/StatsOverviewPage";
 const DoctorRoutes = () => {
   return (
     <Routes>
+      {/* Default redirect to patients-to-see */}
+      <Route index element={<Navigate to="patients-to-see" replace />} />
       <Route path="patients-to-see" element={<PatientsToSeePage />} />
       <Route path="medical-records" element={<MedicalRecordsPage />} />
       <Route path="medical-records-complete" element={<MedicalRecordsCompletePage />} />

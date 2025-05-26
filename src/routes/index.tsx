@@ -27,10 +27,12 @@ import PerformExams from "@/pages/laboratory/PerformExams";
 
 const AppRoutes = () => (
   <Routes>
+    {/* Auth routes */}
     <Route path="/" element={<Login />} />
+    <Route path="/login" element={<Login />} />
     <Route path="/index" element={<Index />} />
     
-    {/* Dashboard routes */}
+    {/* Dashboard routes with nested routing */}
     <Route 
       path="/dashboard" 
       element={
@@ -41,7 +43,7 @@ const AppRoutes = () => (
     >
       <Route index element={<Dashboard />} />
       
-      {/* Role-specific routes */}
+      {/* Role-specific nested routes */}
       <Route path="secretary/*" element={<SecretaryRoutes />} />
       <Route path="nurse/*" element={<NurseRoutes />} />
       <Route path="laboratory/*" element={<LabRoutes />} />
@@ -147,7 +149,7 @@ const AppRoutes = () => (
       } 
     />
     
-    {/* Catch-all route */}
+    {/* Catch-all route for 404 */}
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
