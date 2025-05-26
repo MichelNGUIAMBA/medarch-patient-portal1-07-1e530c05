@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePatientStore } from '@/stores/patient';
@@ -17,16 +18,23 @@ import StandardDecisionButtons, { StandardDecision } from '@/components/doctor/d
 import ElectronicSignature, { SignatureData } from '@/components/doctor/signature/ElectronicSignature';
 import { toast } from '@/components/ui/use-toast';
 
+// Extended Patient type for local use with computed properties
+interface PatientWithAI extends Patient {
+  priority: number;
+  waitTime: number;
+  aiSummary: string[];
+}
+
 const PatientsToSeePage: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { user } = useAuth();
   const patients = usePatientStore((state) => state.patients);
-  const updateServiceHistory = usePatientStore((state) => state.updateServiceHistory);
+  const updateServiceRecord = usePatientStore((state) => state.updateServiceRecord);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('priority');
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<PatientWithAI | null>(null);
   const [isQuickConsultation, setIsQuickConsultation] = useState(false);
   const [quickDecision, setQuickDecision] = useState<StandardDecision | null>(null);
 
@@ -112,7 +120,7 @@ const PatientsToSeePage: React.FC = () => {
       priority: calculatePatientPriority(patient),
       waitTime: differenceInMinutes(new Date(), new Date(patient.registeredAt)),
       aiSummary: generateAISummary(patient)
-    }));
+    })) as PatientWithAI[];
   }, [patients]);
 
   // Filter patients based on search term
@@ -154,7 +162,7 @@ const PatientsToSeePage: React.FC = () => {
     navigate(`/dashboard/doctor/patient/${patientId}`);
   };
 
-  const handleQuickConsultation = (patient: Patient) => {
+  const handleQuickConsultation = (patient: PatientWithAI) => {
     setSelectedPatient(patient);
     setIsQuickConsultation(true);
   };
@@ -169,10 +177,10 @@ const PatientsToSeePage: React.FC = () => {
     // Sauvegarder la décision avec signature électronique
     const latestService = selectedPatient.serviceHistory ? 
       [...selectedPatient.serviceHistory].sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
+        new Date(b.date || '').getTime() - new Date(a.date || '').getTime()
       )[0] : null;
     
-    if (latestService) {
+    if (latestService && latestService.date) {
       const updatedServiceData = {
         ...latestService.serviceData,
         doctorReview: {
@@ -187,7 +195,7 @@ const PatientsToSeePage: React.FC = () => {
         }
       };
       
-      updateServiceHistory(selectedPatient.id, latestService.date, updatedServiceData);
+      updateServiceRecord(selectedPatient.id, latestService.date, updatedServiceData);
       
       toast({
         title: t('quickConsultationCompleted'),
