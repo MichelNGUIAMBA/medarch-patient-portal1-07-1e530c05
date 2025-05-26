@@ -13,6 +13,7 @@ import PatientEditDialog from '@/components/secretary/PatientEditDialog';
 import ServicesHistoryViewer from '@/components/consultations/ServicesHistoryViewer';
 import PatientActionButtons from '@/components/patient/PatientActionButtons';
 import { useLanguage } from '@/hooks/useLanguage';
+
 const PatientDetails = () => {
   const {
     id
@@ -121,7 +122,14 @@ const PatientDetails = () => {
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <BackButton />
-          <h1 className="text-2xl font-bold">{t('patientDetails')}</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-primary">
+              {patient.firstName} {patient.lastName}
+            </h1>
+            <p className="text-lg text-muted-foreground mt-1">
+              {t('patientDetails')} - ID: {patient.id}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -139,4 +147,5 @@ const PatientDetails = () => {
       <PatientEditDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} editForm={editForm} handleInputChange={handleInputChange} handleSelectChange={handleSelectChange} handleSaveChanges={handleSaveChanges} />
     </div>;
 };
+
 export default PatientDetails;

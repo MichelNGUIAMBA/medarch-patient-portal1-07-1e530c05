@@ -1,155 +1,115 @@
-
-import React, { useState, useEffect } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { usePatientStore } from '@/stores/usePatientStore';
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from '@/components/ui/sonner';
-import { Patient } from '@/types/patient';
-import PatientInfoCard from '@/components/consultations/PatientInfoCard';
-import ServiceFormReadonlyViewer from '@/components/consultations/ServiceFormReadonlyViewer';
-import ServicesHistoryViewer from '@/components/consultations/ServicesHistoryViewer';
-import { useLanguage } from '@/hooks/useLanguage';
-import PatientEditDialog from '@/components/nurse/PatientEditDialog';
-import { CompletePatientEditDialog } from '@/components/nurse/patientEdit';
-import ModificationHistory from '@/components/nurse/ModificationHistory';
+import { usePatientStore } from '@/stores/patient';
+import { useAuth } from '@/hooks/use-auth-context';
+import { toast } from '@/components/ui/use-toast';
+import { ArrowLeft, Pencil } from 'lucide-react';
 import PatientPersonalInfoCard from '@/components/patient/PatientPersonalInfoCard';
 import ServiceInfoCard from '@/components/patient/ServiceInfoCard';
-import PatientActionButtons from '@/components/patient/PatientActionButtons';
-import BackButton from '@/components/shared/BackButton';
-import { getServiceColor, getServiceName } from '@/components/patient/utils/patientDetailUtils';
+import ModificationHistory from '@/components/nurse/ModificationHistory';
+import PatientEditDialog from '@/components/nurse/PatientEditDialog';
+import ServicesHistoryViewer from '@/components/consultations/ServicesHistoryViewer';
+import { usePatientDialog } from '@/hooks/usePatientDialog';
+import { CompletePatientEditDialog } from '@/components/nurse/patientEdit';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const PatientDetailView = () => {
-  const { patientId } = useParams();
-  const location = useLocation();
+  const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
-  const { t } = useLanguage();
-  
-  // Fix: Separate state selectors to prevent infinite re-renders
   const patients = usePatientStore((state) => state.patients);
-  
-  // Récupérer le patient des paramètres ou de l'état passé via la navigation
-  const patient = location.state?.patientData || 
-                  patients.find(p => p.id === patientId);
+  const { t } = useLanguage();
+  const patient = patients.find(p => p.id === patientId);
   
   const [showHistory, setShowHistory] = useState(false);
   const [showServiceHistory, setShowServiceHistory] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isCompleteEditOpen, setIsCompleteEditOpen] = useState(false);
-  const [serviceData, setServiceData] = useState<any>({});
-  const [serviceCompleted, setServiceCompleted] = useState(false);
   
-  // Récupérer les données précédentes lors du montage du composant
-  useEffect(() => {
-    if (patient) {
-      // Vérifier s'il y a des données de service enregistrées pour ce patient
-      const storedServiceData = sessionStorage.getItem(`service-data-${patient.id}`);
-      if (storedServiceData) {
-        try {
-          const parsedData = JSON.parse(storedServiceData);
-          setServiceData(parsedData);
-          // Vérifier si le service est complété basé sur la présence de serviceDateTime
-          setServiceCompleted(!!parsedData.serviceDateTime);
-          console.log("Service data loaded:", parsedData);
-        } catch (e) {
-          console.error("Erreur lors du parsing des données de service:", e);
-        }
-      }
-    }
-  }, [patient]);
-  
+  const {
+    selectedPatient,
+    isDialogOpen,
+    isCompleteEditOpen,
+    handleEdit,
+    handleCompleteEdit,
+    handleCloseDialog,
+    handleCloseCompleteEdit
+  } = usePatientDialog();
+
   if (!patient) {
-    toast.error(t('patientNotFound'));
-    navigate('/dashboard');
-    return null;
+    return (
+      <div className="container mx-auto py-6">
+        <div className="flex items-center gap-4 mb-6">
+          <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold">{t('patientNotFound')}</h1>
+        </div>
+      </div>
+    );
   }
-  
-  const handleEdit = () => {
-    setIsDialogOpen(true);
-  };
-  
-  const handleCompleteEdit = () => {
-    setIsCompleteEditOpen(true);
-  };
-  
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
-  };
-  
-  const handleCloseCompleteEdit = () => {
-    setIsCompleteEditOpen(false);
-  };
-  
-  const toggleHistory = () => {
-    setShowHistory(!showHistory);
-  };
-  
-  const toggleServiceHistory = () => {
-    setShowServiceHistory(!showServiceHistory);
-  };
-  
+
   return (
     <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">
-          <span className={getServiceColor(patient.service)}>
-            {getServiceName(patient.service)}
-          </span> - {patient.name}
-        </h1>
-        <BackButton />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-primary">
+              {patient.firstName} {patient.lastName}
+            </h1>
+            <p className="text-lg text-muted-foreground mt-1">
+              {t('patientDetails')} - ID: {patient.id}
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex gap-2">
+          <Button onClick={() => handleEdit(patient)} className="flex items-center gap-2">
+            <Pencil className="h-4 w-4" />
+            {t('quickEdit')}
+          </Button>
+          <Button 
+            onClick={() => handleCompleteEdit(patient)} 
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Pencil className="h-4 w-4" />
+            {t('completeEdit')}
+          </Button>
+        </div>
       </div>
-      
-      <PatientInfoCard patient={patient} />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 py-0 px-0 mx-[2px]">
         <PatientPersonalInfoCard patient={patient} />
         <ServiceInfoCard patient={patient} />
       </div>
-      
-      {/* Service Data Viewer - Only show if service data exists AND service is completed */}
-      {Object.keys(serviceData).length > 0 && serviceCompleted && (
-        <ServiceFormReadonlyViewer 
-          patient={patient} 
-          serviceData={serviceData} 
-          displayDateTime 
-        />
-      )}
-      
-      {/* Afficher l'historique des services du patient si disponible */}
+
+      <div className="mb-4">
+        <Button onClick={() => setShowHistory(!showHistory)}>
+          {showHistory ? t('hideHistory') : t('showHistory')}
+        </Button>
+        <Button onClick={() => setShowServiceHistory(!showServiceHistory)}>
+          {showServiceHistory ? t('hideServiceHistory') : t('showServiceHistory')}
+        </Button>
+      </div>
+
+      {showHistory && <ModificationHistory patient={patient} />}
+
       {showServiceHistory && patient.serviceHistory && patient.serviceHistory.length > 0 && (
         <ServicesHistoryViewer patient={patient} />
       )}
-      
-      <PatientActionButtons
-        patient={patient}
-        onEdit={handleEdit}
-        onCompleteEdit={handleCompleteEdit}
-        onToggleHistory={toggleHistory}
-        showHistory={showHistory}
-        onToggleServiceHistory={toggleServiceHistory}
-        showServiceHistory={showServiceHistory}
-      />
-      
-      {showHistory && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>{t('modificationHistory')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ModificationHistory patient={patient} />
-          </CardContent>
-        </Card>
-      )}
-      
-      <PatientEditDialog 
-        patient={patient}
+
+      <PatientEditDialog
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
+        patient={selectedPatient}
       />
+
       <CompletePatientEditDialog
-        patient={patient}
         isOpen={isCompleteEditOpen}
         onClose={handleCloseCompleteEdit}
+        patient={selectedPatient}
       />
     </div>
   );

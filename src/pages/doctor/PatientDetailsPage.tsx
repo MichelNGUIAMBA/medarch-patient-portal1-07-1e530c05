@@ -270,7 +270,14 @@ const PatientDetailsPage: React.FC = () => {
           <Button variant="outline" size="icon" onClick={handleBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold">{t('patientDetails')}</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-primary">
+              {patient.firstName} {patient.lastName}
+            </h1>
+            <p className="text-lg text-muted-foreground mt-1">
+              {t('patientDetails')} - ID: {patient.id} - {patient.company}
+            </p>
+          </div>
         </div>
         
         <Button 
