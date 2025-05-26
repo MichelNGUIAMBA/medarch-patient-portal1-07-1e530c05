@@ -1,9 +1,11 @@
-
 import React, { useMemo } from 'react';
 import { usePatientStore } from '@/stores/patient';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   BarChart, 
   Bar, 
@@ -21,8 +23,11 @@ import {
 } from 'recharts';
 import { format, subDays, isSameDay, parseISO, startOfWeek, startOfMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { FileText, Download, AlertTriangle, TrendingUp, Activity } from 'lucide-react';
 import { Patient, ServiceRecord } from '@/types/patient';
 import { PatientStats } from '@/types/dashboardTypes';
+import PredictiveWorkloadChart from '@/components/doctor/analytics/PredictiveWorkloadChart';
+import ServiceHeatmap from '@/components/doctor/heatmap/ServiceHeatmap';
 
 const StatsOverviewPage: React.FC = () => {
   const { t } = useLanguage();
@@ -33,14 +38,11 @@ const StatsOverviewPage: React.FC = () => {
     const stats = [];
     const today = new Date();
     
-    // Pour chaque jour des 7 derniers jours
     for (let i = 6; i >= 0; i--) {
       const date = subDays(today, i);
       const formattedDate = format(date, 'dd/MM');
       
-      // Compter les patients par type de service pour ce jour
       const patientsForDay = patients.filter(patient => {
-        // Vérifier si le patient a été enregistré ce jour-là
         const registeredDate = new Date(patient.registeredAt);
         return isSameDay(registeredDate, date);
       });
@@ -91,7 +93,6 @@ const StatsOverviewPage: React.FC = () => {
   
   // Statistiques sur les examens de laboratoire
   const labExamStats = useMemo(() => {
-    // Compter tous les examens
     let totalRequested = 0;
     let totalCompleted = 0;
     
@@ -101,11 +102,10 @@ const StatsOverviewPage: React.FC = () => {
       }
       if (patient.completedLabExams) {
         totalCompleted += patient.completedLabExams.length;
-        totalRequested += patient.completedLabExams.length; // Les examens complétés ont aussi été demandés
+        totalRequested += patient.completedLabExams.length;
       }
     });
     
-    // Calculer le taux de complétion
     const completionRate = totalRequested > 0 
       ? Math.round((totalCompleted / totalRequested) * 100) 
       : 0;
@@ -117,10 +117,150 @@ const StatsOverviewPage: React.FC = () => {
       pending: totalRequested - totalCompleted
     };
   }, [patients]);
-  
+
+  // Détection d'alertes proactives
+  const proactiveAlerts = useMemo(() => {
+    const alerts = [];
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    // Analyser les tendances par entreprise
+    const companyHealthTrends = {};
+    patients.forEach(patient => {
+      if (!companyHealthTrends[patient.company]) {
+        companyHealthTrends[patient.company] = {
+          musculoskeletal: 0,
+          cardiovascular: 0,
+          respiratory: 0,
+          total: 0
+        };
+      }
+      companyHealthTrends[patient.company].total++;
+      
+      // Simulation de détection de pathologies (dans un vrai système, cela viendrait de l'IA)
+      const patientHash = patient.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      if (patientHash % 10 > 7) companyHealthTrends[patient.company].musculoskeletal++;
+      if (patientHash % 15 > 12) companyHealthTrends[patient.company].cardiovascular++;
+      if (patientHash % 12 > 9) companyHealthTrends[patient.company].respiratory++;
+    });
+    
+    // Générer des alertes pour les entreprises avec des tendances préoccupantes
+    Object.entries(companyHealthTrends).forEach(([company, trends]: [string, any]) => {
+      if (trends.total > 5) { // Minimum de patients pour analyse statistique
+        const musculoskeletalRate = (trends.musculoskeletal / trends.total) * 100;
+        const cardiovascularRate = (trends.cardiovascular / trends.total) * 100;
+        
+        if (musculoskeletalRate > 40) {
+          alerts.push({
+            type: 'warning',
+            company,
+            message: `Augmentation de ${Math.round(musculoskeletalRate)}% des troubles musculo-squelettiques chez ${company} ce mois`,
+            recommendation: 'Évaluation ergonomique du poste de travail recommandée'
+          });
+        }
+        
+        if (cardiovascularRate > 30) {
+          alerts.push({
+            type: 'critical',
+            company,
+            message: `Pic de troubles cardiovasculaires chez ${company}: ${Math.round(cardiovascularRate)}% des patients`,
+            recommendation: 'Campagne de prévention cardiovasculaire urgente'
+          });
+        }
+      }
+    });
+    
+    return alerts;
+  }, [patients]);
+
+  // Pathologies dominantes par entreprise
+  const pathologyMap = useMemo(() => {
+    const map = {};
+    
+    patients.forEach(patient => {
+      if (!map[patient.company]) {
+        map[patient.company] = {
+          company: patient.company,
+          totalPatients: 0,
+          dominantPathology: 'Troubles généraux',
+          pathologyCount: 0,
+          riskLevel: 'normal'
+        };
+      }
+      
+      map[patient.company].totalPatients++;
+      
+      // Simulation de pathologie dominante (basée sur l'ID patient)
+      const patientHash = patient.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      if (patientHash % 8 > 5) {
+        map[patient.company].pathologyCount++;
+        map[patient.company].dominantPathology = 'Troubles musculo-squelettiques';
+        map[patient.company].riskLevel = 'elevated';
+      }
+    });
+    
+    return Object.values(map);
+  }, [patients]);
+
+  const generateHASReport = () => {
+    // Simulation de génération de rapport HAS
+    const reportData = {
+      date: new Date().toISOString(),
+      totalPatients: patients.length,
+      completedExams: labExamStats.totalCompleted,
+      completionRate: labExamStats.completionRate,
+      companyDistribution,
+      serviceDistribution,
+      alerts: proactiveAlerts
+    };
+    
+    console.log('Génération du rapport HAS:', reportData);
+    
+    // Dans un vrai système, cela génèrerait un PDF structuré selon les normes HAS
+    const blob = new Blob([JSON.stringify(reportData, null, 2)], {
+      type: 'application/json'
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rapport-has-${format(new Date(), 'yyyy-MM-dd')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">{t('systemStatistics')}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{t('systemStatistics')}</h1>
+        <Button onClick={generateHASReport} className="flex items-center gap-2">
+          <FileText className="h-4 w-4" />
+          {t('generateMonthlyReport')}
+        </Button>
+      </div>
+
+      {/* Alertes proactives */}
+      {proactiveAlerts.length > 0 && (
+        <div className="space-y-2">
+          {proactiveAlerts.map((alert, index) => (
+            <Alert key={index} variant={alert.type === 'critical' ? 'destructive' : 'default'}>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-medium">{alert.message}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{alert.recommendation}</p>
+                  </div>
+                  <Badge variant={alert.type === 'critical' ? 'destructive' : 'secondary'}>
+                    {alert.company}
+                  </Badge>
+                </div>
+              </AlertDescription>
+            </Alert>
+          ))}
+        </div>
+      )}
       
       {/* Résumé des statistiques */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -168,11 +308,62 @@ const StatsOverviewPage: React.FC = () => {
         </Card>
       </div>
       
-      <Tabs defaultValue="daily" className="w-full">
-        <TabsList>
+      <Tabs defaultValue="analytics" className="w-full">
+        <TabsList className="grid grid-cols-4 w-full">
+          <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            {t('predictiveAnalytics')}
+          </TabsTrigger>
+          <TabsTrigger value="heatmap" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            {t('heatmapAnalysis')}
+          </TabsTrigger>
           <TabsTrigger value="daily">{t('dailyActivity')}</TabsTrigger>
           <TabsTrigger value="distribution">{t('distribution')}</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="analytics" className="space-y-6">
+          <PredictiveWorkloadChart />
+          
+          {/* Carte des pathologies dominantes */}
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('dominantPathologiesMap')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {pathologyMap.map((company: any, index) => (
+                  <Card key={index} className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-medium">{company.company}</h3>
+                      <Badge variant={company.riskLevel === 'elevated' ? 'destructive' : 'secondary'}>
+                        {company.riskLevel === 'elevated' ? 'Risque Élevé' : 'Normal'}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {company.totalPatients} patients
+                    </p>
+                    <p className="text-sm font-medium">
+                      {company.dominantPathology}
+                    </p>
+                    <div className="mt-2 h-2 bg-gray-200 rounded-full">
+                      <div 
+                        className={`h-full rounded-full ${
+                          company.riskLevel === 'elevated' ? 'bg-red-500' : 'bg-green-500'
+                        }`}
+                        style={{ width: `${(company.pathologyCount / company.totalPatients) * 100}%` }}
+                      />
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="heatmap" className="space-y-6">
+          <ServiceHeatmap />
+        </TabsContent>
         
         <TabsContent value="daily" className="space-y-4">
           <Card>
@@ -242,7 +433,7 @@ const StatsOverviewPage: React.FC = () => {
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart
                     layout="vertical"
-                    data={companyDistribution.slice(0, 5)} // Afficher seulement les 5 premières entreprises
+                    data={companyDistribution.slice(0, 5)}
                     margin={{
                       top: 5,
                       right: 30,

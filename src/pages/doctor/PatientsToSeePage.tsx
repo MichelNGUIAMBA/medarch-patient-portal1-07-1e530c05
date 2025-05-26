@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePatientStore } from '@/stores/patient';
@@ -9,19 +8,27 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, Search, AlertTriangle, Clock, Star } from 'lucide-react';
+import { Eye, Search, AlertTriangle, Clock, Star, Brain, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format, differenceInMinutes } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Patient } from '@/types/patient';
+import StandardDecisionButtons, { StandardDecision } from '@/components/doctor/decisions/StandardDecisionButtons';
+import ElectronicSignature, { SignatureData } from '@/components/doctor/signature/ElectronicSignature';
+import { toast } from '@/components/ui/use-toast';
 
 const PatientsToSeePage: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { user } = useAuth();
   const patients = usePatientStore((state) => state.patients);
+  const updateServiceHistory = usePatientStore((state) => state.updateServiceHistory);
+  
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('priority'); // 'priority', 'wait', 'name'
+  const [sortBy, setSortBy] = useState('priority');
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [isQuickConsultation, setIsQuickConsultation] = useState(false);
+  const [quickDecision, setQuickDecision] = useState<StandardDecision | null>(null);
 
   // Fonction pour calculer la priorité d'un patient
   const calculatePatientPriority = (patient: Patient): number => {
@@ -40,23 +47,58 @@ const PatientsToSeePage: React.FC = () => {
       priority += patient.completedLabExams.length * 5;
     }
     
-    // Simuler une priorité basée sur la gravité (dans une vraie application, cela viendrait d'une IA)
-    // Pour l'instant, on utilise une valeur aléatoire "persistante" basée sur l'ID du patient
-    const patientIdSum = patient.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-    if (patientIdSum % 10 > 7) {
-      priority += 15; // Haute priorité
-    } else if (patientIdSum % 10 > 4) {
-      priority += 10; // Priorité moyenne
-    } else {
-      priority += 5;  // Priorité normale
+    // Score IA basé sur les résultats labo (simulation)
+    if (patient.completedLabExams && patient.completedLabExams.length > 0) {
+      const hasAnomalies = patient.completedLabExams.some(exam => 
+        exam.results?.toLowerCase().includes('élevé') || 
+        exam.results?.toLowerCase().includes('anormal') ||
+        exam.results?.toLowerCase().includes('critique')
+      );
+      if (hasAnomalies) priority += 20;
     }
+    
+    // Contraintes légales (visites obligatoires)
+    const daysSinceRegistration = Math.floor(waitTimeMinutes / (24 * 60));
+    if (daysSinceRegistration > 2) priority += 15; // Délai légal dépassé
     
     return priority;
   };
 
+  const generateAISummary = (patient: Patient): string[] => {
+    const points = [];
+    
+    // Analyse des résultats d'examens
+    if (patient.completedLabExams && patient.completedLabExams.length > 0) {
+      const criticalExams = patient.completedLabExams.filter(exam => 
+        exam.results?.toLowerCase().includes('critique') || 
+        exam.results?.toLowerCase().includes('urgent')
+      );
+      
+      if (criticalExams.length > 0) {
+        points.push(`⚠️ ${criticalExams.length} résultat(s) critique(s) détecté(s)`);
+      } else {
+        points.push(`✅ Résultats d'examens dans les normes`);
+      }
+    }
+    
+    // Analyse du temps d'attente
+    const waitTime = differenceInMinutes(new Date(), new Date(patient.registeredAt));
+    if (waitTime > 180) { // 3 heures
+      points.push(`⏰ Attente prolongée: ${Math.floor(waitTime / 60)}h${waitTime % 60}min`);
+    }
+    
+    // Analyse du type de service
+    if (patient.service === 'Ug') {
+      points.push(`🚨 Urgence - Évaluation immédiate requise`);
+    } else {
+      points.push(`📋 Consultation de routine programmée`);
+    }
+    
+    return points.slice(0, 3); // Limiter à 3 points clés
+  };
+
   // Filter patients who are waiting to see the doctor
   const patientsToSee = useMemo(() => {
-    // Get patients with completed exams and service status "Terminé"
     const patients = usePatientStore.getState().patients.filter(patient => {
       const hasCompletedExams = patient.completedLabExams && patient.completedLabExams.length > 0;
       const isPendingDoctorReview = !patient.serviceHistory?.some(record => 
@@ -65,11 +107,11 @@ const PatientsToSeePage: React.FC = () => {
       return hasCompletedExams && isPendingDoctorReview;
     });
     
-    // Calculate priority for each patient
     return patients.map(patient => ({
       ...patient,
       priority: calculatePatientPriority(patient),
-      waitTime: differenceInMinutes(new Date(), new Date(patient.registeredAt))
+      waitTime: differenceInMinutes(new Date(), new Date(patient.registeredAt)),
+      aiSummary: generateAISummary(patient)
     }));
   }, [patients]);
 
@@ -96,6 +138,13 @@ const PatientsToSeePage: React.FC = () => {
         return [...filteredPatients].sort((a, b) => b.waitTime - a.waitTime);
       case 'name':
         return [...filteredPatients].sort((a, b) => a.name.localeCompare(b.name));
+      case 'aiScore':
+        return [...filteredPatients].sort((a, b) => {
+          // Trier par score IA (nombre d'alertes critiques)
+          const aScore = a.aiSummary.filter(s => s.includes('⚠️') || s.includes('🚨')).length;
+          const bScore = b.aiSummary.filter(s => s.includes('⚠️') || s.includes('🚨')).length;
+          return bScore - aScore;
+        });
       default:
         return filteredPatients;
     }
@@ -103,6 +152,53 @@ const PatientsToSeePage: React.FC = () => {
 
   const handleViewPatient = (patientId: string) => {
     navigate(`/dashboard/doctor/patient/${patientId}`);
+  };
+
+  const handleQuickConsultation = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setIsQuickConsultation(true);
+  };
+
+  const handleStandardDecision = (decision: StandardDecision) => {
+    setQuickDecision(decision);
+  };
+
+  const handleSignature = (signatureData: SignatureData) => {
+    if (!selectedPatient || !quickDecision || !user) return;
+
+    // Sauvegarder la décision avec signature électronique
+    const latestService = selectedPatient.serviceHistory ? 
+      [...selectedPatient.serviceHistory].sort((a, b) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      )[0] : null;
+    
+    if (latestService) {
+      const updatedServiceData = {
+        ...latestService.serviceData,
+        doctorReview: {
+          doctor: user.name,
+          reviewDate: new Date().toISOString(),
+          interpretation: `Décision standard: ${quickDecision.title}`,
+          recommendations: quickDecision.description,
+          prescription: quickDecision.type === 'medication_adjustment' ? 'Ajustement thérapeutique selon protocole' : '',
+          completed: true,
+          quickDecision: quickDecision,
+          electronicSignature: signatureData
+        }
+      };
+      
+      updateServiceHistory(selectedPatient.id, latestService.date, updatedServiceData);
+      
+      toast({
+        title: t('quickConsultationCompleted'),
+        description: `${quickDecision.title} enregistré avec signature électronique`
+      });
+    }
+
+    // Reset
+    setIsQuickConsultation(false);
+    setSelectedPatient(null);
+    setQuickDecision(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -156,6 +252,75 @@ const PatientsToSeePage: React.FC = () => {
     return `${hours}h ${remainingMinutes}min`;
   };
 
+  if (isQuickConsultation && selectedPatient) {
+    return (
+      <div className="space-y-6 max-w-4xl mx-auto">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">{t('quickConsultation')} - {selectedPatient.lastName} {selectedPatient.firstName}</h1>
+          <Button variant="outline" onClick={() => setIsQuickConsultation(false)}>
+            {t('backToList')}
+          </Button>
+        </div>
+
+        {/* Résumé IA en 3 points */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="h-5 w-5" />
+              {t('aiSummary')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {selectedPatient.aiSummary.map((point, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center font-bold mt-0.5">
+                    {index + 1}
+                  </span>
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Décisions standards */}
+        {!quickDecision && (
+          <StandardDecisionButtons
+            onDecision={handleStandardDecision}
+          />
+        )}
+
+        {/* Signature électronique */}
+        {quickDecision && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('selectedDecision')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <h3 className="font-medium">{quickDecision.title}</h3>
+                  <p className="text-sm text-muted-foreground">{quickDecision.description}</p>
+                  {quickDecision.duration && (
+                    <Badge variant="outline">Durée: {quickDecision.duration}</Badge>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <ElectronicSignature
+              documentType={`Consultation rapide - ${quickDecision.title}`}
+              patientId={selectedPatient.id}
+              content={`Patient: ${selectedPatient.lastName} ${selectedPatient.firstName}\nDécision: ${quickDecision.title}\nDescription: ${quickDecision.description}`}
+              onSigned={handleSignature}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
@@ -171,15 +336,13 @@ const PatientsToSeePage: React.FC = () => {
             />
           </div>
           
-          <Select
-            value={sortBy}
-            onValueChange={setSortBy}
-          >
+          <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={t('sortBy')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="priority">{t('priority')}</SelectItem>
+              <SelectItem value="aiScore">{t('aiScore')}</SelectItem>
               <SelectItem value="wait">{t('waitTime')}</SelectItem>
               <SelectItem value="name">{t('name')}</SelectItem>
             </SelectContent>
@@ -201,8 +364,8 @@ const PatientsToSeePage: React.FC = () => {
                   <TableHead>{t('name')}</TableHead>
                   <TableHead>{t('service')}</TableHead>
                   <TableHead>{t('company')}</TableHead>
+                  <TableHead>{t('aiSummary')}</TableHead>
                   <TableHead>{t('waitTime')}</TableHead>
-                  <TableHead>{t('completedExams')}</TableHead>
                   <TableHead>{t('actions')}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -214,18 +377,34 @@ const PatientsToSeePage: React.FC = () => {
                     <TableCell>{patient.lastName} {patient.firstName}</TableCell>
                     <TableCell>{getServiceBadge(patient.service)}</TableCell>
                     <TableCell>{patient.company}</TableCell>
+                    <TableCell className="max-w-xs">
+                      <div className="space-y-1">
+                        {patient.aiSummary.slice(0, 2).map((point, index) => (
+                          <div key={index} className="text-xs">{point}</div>
+                        ))}
+                      </div>
+                    </TableCell>
                     <TableCell>{getWaitTimeDisplay(patient.waitTime)}</TableCell>
-                    <TableCell>{patient.completedLabExams?.length || 0}</TableCell>
                     <TableCell>
-                      <Button 
-                        variant={patient.priority >= 60 ? "default" : "outline"}
-                        size="sm" 
-                        onClick={() => handleViewPatient(patient.id)}
-                        className={patient.priority >= 60 ? "bg-red-600 hover:bg-red-700" : ""}
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        {t('view')}
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant={patient.priority >= 60 ? "default" : "outline"}
+                          size="sm" 
+                          onClick={() => handleViewPatient(patient.id)}
+                          className={patient.priority >= 60 ? "bg-red-600 hover:bg-red-700" : ""}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          {t('view')}
+                        </Button>
+                        <Button 
+                          variant="secondary"
+                          size="sm" 
+                          onClick={() => handleQuickConsultation(patient)}
+                        >
+                          <Zap className="w-4 h-4 mr-2" />
+                          {t('quick')}
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
