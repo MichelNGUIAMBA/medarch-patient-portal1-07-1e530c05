@@ -3,7 +3,7 @@ import React from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { RefreshCw, Zap, Copy } from 'lucide-react';
+import { Copy, Trash2, Send } from 'lucide-react';
 import { AIResponse } from './AITypes';
 
 interface AIDoctorInputFormProps {
@@ -27,56 +27,59 @@ const AIDoctorInputForm: React.FC<AIDoctorInputFormProps> = ({
 }) => {
   const { t } = useLanguage();
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
+      onSubmit();
+    }
+  };
+
   return (
-    <div className="flex flex-col sm:flex-row gap-2">
-      <Textarea
-        placeholder={t('askAIAssistant')}
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-        className="min-h-24 flex-grow"
-      />
-      
-      <div className="flex sm:flex-col justify-end gap-2">
-        <Button 
+    <div className="space-y-3">
+      <div className="relative">
+        <Textarea
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={t('askAIAssistant')}
+          className="min-h-[80px] pr-12 resize-none"
+          disabled={isProcessing}
+        />
+        <Button
+          size="sm"
           onClick={onSubmit}
-          disabled={isProcessing || !query.trim()}
-          className="w-full sm:w-auto"
+          disabled={!query.trim() || isProcessing}
+          className="absolute bottom-2 right-2 h-8 w-8 p-0"
         >
-          {isProcessing ? (
-            <>
-              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              <span className="hidden sm:inline">{t('processing')}</span>
-              <span className="inline sm:hidden">...</span>
-            </>
-          ) : (
-            <>
-              <Zap className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">{t('analyze')}</span>
-              <span className="inline sm:hidden">Go</span>
-            </>
-          )}
+          <Send className="h-4 w-4" />
         </Button>
-        
-        {aiResponse && (
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={onCopyToClipboard}
-              title={t('textCopiedToClipboard')}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={onClearResponse}
-              title={t('clearResponse')}
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
+      </div>
+      
+      {aiResponse && (
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onCopyToClipboard}
+            className="flex items-center gap-2"
+          >
+            <Copy className="h-4 w-4" />
+            {t('copyToReview')}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClearResponse}
+            className="flex items-center gap-2"
+          >
+            <Trash2 className="h-4 w-4" />
+            {t('clearResponse')}
+          </Button>
+        </div>
+      )}
+      
+      <div className="text-xs text-muted-foreground">
+        Ctrl+Entrée pour envoyer • Alimenté par GPT-4 Medical & Claude Medical
       </div>
     </div>
   );
