@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/use-auth-context';
 import { toast } from '@/components/ui/sonner';
 
 interface PatientEditDialogProps {
-  patient: Patient;
+  patient: Patient | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -22,11 +22,23 @@ const PatientEditDialog = ({ patient, isOpen, onClose }: PatientEditDialogProps)
   const updatePatient = usePatientStore(state => state.updatePatient);
   
   const [formData, setFormData] = useState({
-    firstName: patient.firstName,
-    lastName: patient.lastName,
-    notes: patient.notes || '',
-    status: patient.status
+    firstName: patient?.firstName || '',
+    lastName: patient?.lastName || '',
+    notes: patient?.notes || '',
+    status: patient?.status || 'En attente'
   });
+  
+  // Update form data when patient changes
+  React.useEffect(() => {
+    if (patient) {
+      setFormData({
+        firstName: patient.firstName,
+        lastName: patient.lastName,
+        notes: patient.notes || '',
+        status: patient.status
+      });
+    }
+  }, [patient]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -49,6 +61,11 @@ const PatientEditDialog = ({ patient, isOpen, onClose }: PatientEditDialogProps)
       return;
     }
     
+    if (!patient) {
+      toast.error("Aucun patient sélectionné");
+      return;
+    }
+    
     updatePatient(
       patient.id,
       {
@@ -63,6 +80,11 @@ const PatientEditDialog = ({ patient, isOpen, onClose }: PatientEditDialogProps)
     toast.success("Informations du patient mises à jour");
     onClose();
   };
+  
+  // Don't render if no patient is selected
+  if (!patient) {
+    return null;
+  }
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
