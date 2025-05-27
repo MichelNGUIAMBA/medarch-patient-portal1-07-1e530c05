@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,13 @@ const PatientDetailView = () => {
   const navigate = useNavigate();
   const patients = usePatientStore((state) => state.patients);
   const { t } = useLanguage();
+  
+  console.log('PatientDetailView - patientId:', patientId);
+  console.log('PatientDetailView - available patients:', patients.map(p => p.id));
+  
   const patient = patients.find(p => p.id === patientId);
+  
+  console.log('PatientDetailView - found patient:', patient);
   
   const [showHistory, setShowHistory] = useState(false);
   const [showServiceHistory, setShowServiceHistory] = useState(false);
@@ -34,6 +41,19 @@ const PatientDetailView = () => {
     handleCloseCompleteEdit
   } = usePatientDialog();
 
+  if (!patientId) {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="flex items-center gap-4 mb-6">
+          <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold">{t('invalidPatientId')}</h1>
+        </div>
+      </div>
+    );
+  }
+
   if (!patient) {
     return (
       <div className="container mx-auto py-6">
@@ -41,7 +61,10 @@ const PatientDetailView = () => {
           <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold">{t('patientNotFound')}</h1>
+          <div>
+            <h1 className="text-2xl font-bold">{t('patientNotFound')}</h1>
+            <p className="text-muted-foreground">ID: {patientId}</p>
+          </div>
         </div>
       </div>
     );
@@ -55,10 +78,10 @@ const PatientDetailView = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-primary">
+            <h1 className="text-4xl font-bold text-primary mb-2">
               {patient.firstName} {patient.lastName}
             </h1>
-            <p className="text-lg text-muted-foreground mt-1">
+            <p className="text-lg text-muted-foreground">
               {t('patientDetails')} - ID: {patient.id}
             </p>
           </div>

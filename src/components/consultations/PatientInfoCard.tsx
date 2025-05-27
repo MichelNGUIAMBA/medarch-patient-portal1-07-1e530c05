@@ -5,13 +5,25 @@ import { Patient } from '@/types/patient';
 import { useLanguage } from '@/hooks/useLanguage';
 
 interface PatientInfoCardProps {
-  patient: Patient;
+  patient: Patient | null;
 }
 
-const PatientInfoCard = ({
-  patient
-}: PatientInfoCardProps) => {
+const PatientInfoCard = ({ patient }: PatientInfoCardProps) => {
   const { t } = useLanguage();
+  
+  if (!patient) {
+    return (
+      <Card className="w-full mb-6">
+        <CardHeader>
+          <CardTitle className="text-lg">{t('patientInfo')}</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <p className="text-muted-foreground">{t('patientNotFound')}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   // Determine le type de service
   const getServiceDisplay = () => {
     switch(patient.service) {
