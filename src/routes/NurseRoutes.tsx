@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import MedicalVisitForm from "@/pages/nurse/MedicalVisitForm";
 import MedicalVisitTypeSelector from "@/pages/nurse/MedicalVisitTypeSelector";
 import WaitingPatients from "@/pages/nurse/WaitingPatients";
@@ -16,6 +16,8 @@ import ExamsRequestPage from "@/pages/nurse/ExamsRequestPage";
 const NurseRoutes = () => {
   return (
     <Routes>
+      {/* Default redirect to waiting-patients */}
+      <Route index element={<Navigate to="waiting-patients" replace />} />
       <Route path="waiting-patients" element={<WaitingPatients />} />
       <Route path="medical-visits/:patientId" element={<MedicalVisitForm />} />
       <Route path="medical-visits/:patientId/edit" element={<MedicalVisitForm />} />

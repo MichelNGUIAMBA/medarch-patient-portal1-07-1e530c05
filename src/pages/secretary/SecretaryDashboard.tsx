@@ -17,13 +17,17 @@ const SecretaryDashboard = () => {
   
   const filteredAndSortedPatients = useMemo(() => {
     let result = [...patients];
-    if (searchTerm) {
+    
+    // Apply search filter
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase().trim();
       result = result.filter(patient => {
-        const searchLower = searchTerm.toLowerCase();
         return activeFilters.some(filter => {
           switch (filter) {
             case 'name':
-              return patient.name.toLowerCase().includes(searchLower) || patient.firstName.toLowerCase().includes(searchLower) || patient.lastName.toLowerCase().includes(searchLower);
+              return patient.firstName.toLowerCase().includes(searchLower) || 
+                     patient.lastName.toLowerCase().includes(searchLower) ||
+                     patient.name.toLowerCase().includes(searchLower);
             case 'company':
               return patient.company.toLowerCase().includes(searchLower);
             case 'age':
@@ -37,6 +41,8 @@ const SecretaryDashboard = () => {
         });
       });
     }
+    
+    // Apply sorting
     switch (sortOrder) {
       case 'alpha-asc':
         return result.sort((a, b) => a.name.localeCompare(b.name));
@@ -55,12 +61,31 @@ const SecretaryDashboard = () => {
     urg: patients.filter(p => p.service === "Ug").length
   };
   
-  return <div className="space-y-6 bg-inherit rounded-sm-">
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+  };
+  
+  const handleSortChange = (value: string) => {
+    setSortOrder(value);
+  };
+  
+  const handleFilterChange = (filters: string[]) => {
+    setActiveFilters(filters);
+  };
+  
+  return (
+    <div className="space-y-6 bg-inherit rounded-sm">
       <StatsCards stats={waitingListData} />
       <QuickActions />
-      <SearchBar onSearch={setSearchTerm} onSortChange={setSortOrder} onFilterChange={setActiveFilters} activeFilters={activeFilters} />
+      <SearchBar 
+        onSearch={handleSearchChange} 
+        onSortChange={handleSortChange} 
+        onFilterChange={handleFilterChange} 
+        activeFilters={activeFilters} 
+      />
       <PatientsTable patients={filteredAndSortedPatients} />
-    </div>;
+    </div>
+  );
 };
 
 export default SecretaryDashboard;

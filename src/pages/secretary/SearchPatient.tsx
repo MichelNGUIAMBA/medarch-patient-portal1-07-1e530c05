@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
-import SearchBar from '@/components/secretary/SearchBar';
+import UniversalSearchBar from '@/components/shared/UniversalSearchBar';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { differenceInYears } from 'date-fns';
 import BackButton from '@/components/shared/BackButton';
@@ -19,18 +19,16 @@ const SearchPatient = () => {
   const filteredAndSortedPatients = useMemo(() => {
     let result = [...patients];
     
-    // Appliquer la recherche
-    if (searchTerm) {
+    // Apply search filter
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase().trim();
       result = result.filter(patient => {
-        const searchLower = searchTerm.toLowerCase();
-        
-        // Recherche dans tous les champs selon les filtres actifs
         return activeFilters.some(filter => {
           switch (filter) {
             case 'name':
-              return patient.name.toLowerCase().includes(searchLower) ||
-                     patient.firstName.toLowerCase().includes(searchLower) ||
-                     patient.lastName.toLowerCase().includes(searchLower);
+              return patient.firstName.toLowerCase().includes(searchLower) ||
+                     patient.lastName.toLowerCase().includes(searchLower) ||
+                     patient.name.toLowerCase().includes(searchLower);
             case 'company':
               return patient.company.toLowerCase().includes(searchLower);
             case 'age':
@@ -45,7 +43,7 @@ const SearchPatient = () => {
       });
     }
 
-    // Appliquer le tri
+    // Apply sorting
     switch (sortOrder) {
       case 'alpha-asc':
         return result.sort((a, b) => a.name.localeCompare(b.name));
@@ -60,6 +58,25 @@ const SearchPatient = () => {
     }
   }, [patients, searchTerm, sortOrder, activeFilters]);
 
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+  };
+
+  const handleSortChange = (value: string) => {
+    setSortOrder(value);
+  };
+
+  const handleFilterChange = (filters: string[]) => {
+    setActiveFilters(filters);
+  };
+
+  const availableFilters = [
+    { key: 'name', label: t('name') },
+    { key: 'company', label: t('company') },
+    { key: 'age', label: t('age') },
+    { key: 'service', label: t('service') }
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -67,15 +84,15 @@ const SearchPatient = () => {
         <h1 className="text-2xl font-bold">{t('searchPatients')}</h1>
       </div>
 
-      {/* Barre de recherche avec filtres */}
-      <SearchBar
-        onSearch={setSearchTerm}
-        onSortChange={setSortOrder}
-        onFilterChange={setActiveFilters}
+      <UniversalSearchBar
+        onSearch={handleSearchChange}
+        onSortChange={handleSortChange}
+        onFilterChange={handleFilterChange}
         activeFilters={activeFilters}
+        placeholder={t('searchPatient')}
+        availableFilters={availableFilters}
       />
 
-      {/* Liste des patients */}
       <Card>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -91,7 +108,7 @@ const SearchPatient = () => {
             </thead>
             <tbody>
               {filteredAndSortedPatients.map((patient) => (
-                <tr key={patient.id} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/dashboard/secretary/patient/${patient.id}`)}>
+                <tr key={patient.id} className="border-b hover:bg-gray-50 cursor-pointer">
                   <td className="px-6 py-4 whitespace-nowrap">{patient.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap font-medium">{patient.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{patient.company}</td>
@@ -110,6 +127,8 @@ const SearchPatient = () => {
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       patient.status === "En cours" 
                         ? "bg-green-100 text-green-800" 
+                        : patient.status === "Terminé"
+                        ? "bg-blue-100 text-blue-800"
                         : "bg-yellow-100 text-yellow-800"
                     }`}>
                       {patient.status}
@@ -128,6 +147,13 @@ const SearchPatient = () => {
                   </td>
                 </tr>
               ))}
+              {filteredAndSortedPatients.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-4 text-center text-muted-foreground">
+                    {searchTerm ? 'Aucun patient trouvé avec ces critères' : 'Aucun patient enregistré'}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

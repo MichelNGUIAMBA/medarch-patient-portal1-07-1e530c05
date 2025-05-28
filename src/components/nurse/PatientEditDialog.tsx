@@ -10,6 +10,9 @@ import { usePatientStore } from '@/stores/usePatientStore';
 import { Patient } from '@/types/patient';
 import { useAuth } from '@/hooks/use-auth-context';
 import { toast } from '@/components/ui/sonner';
+import { useNurseAccessControl } from '@/hooks/useNurseAccessControl';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Lock } from 'lucide-react';
 
 interface PatientEditDialogProps {
   patient: Patient | null;
@@ -20,6 +23,7 @@ interface PatientEditDialogProps {
 const PatientEditDialog = ({ patient, isOpen, onClose }: PatientEditDialogProps) => {
   const { user } = useAuth();
   const updatePatient = usePatientStore(state => state.updatePatient);
+  const { canModifyPatient, getAccessMessage } = useNurseAccessControl();
   
   const [formData, setFormData] = useState({
     firstName: patient?.firstName || '',
@@ -66,6 +70,11 @@ const PatientEditDialog = ({ patient, isOpen, onClose }: PatientEditDialogProps)
       return;
     }
     
+    if (!canModifyPatient(patient)) {
+      toast.error("Vous n'avez pas l'autorisation de modifier ce patient");
+      return;
+    }
+    
     updatePatient(
       patient.id,
       {
@@ -86,12 +95,24 @@ const PatientEditDialog = ({ patient, isOpen, onClose }: PatientEditDialogProps)
     return null;
   }
   
+  const canEdit = canModifyPatient(patient);
+  const accessMessage = getAccessMessage(patient);
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Modifier les informations du patient</DialogTitle>
+          <DialogTitle>
+            {canEdit ? 'Modifier les informations du patient' : 'Consulter les informations du patient'}
+          </DialogTitle>
         </DialogHeader>
+        
+        {!canEdit && accessMessage && (
+          <Alert>
+            <Lock className="h-4 w-4" />
+            <AlertDescription>{accessMessage}</AlertDescription>
+          </Alert>
+        )}
         
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-2 gap-4">
@@ -102,6 +123,7 @@ const PatientEditDialog = ({ patient, isOpen, onClose }: PatientEditDialogProps)
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleInputChange}
+                disabled={!canEdit}
               />
             </div>
             <div className="space-y-2">
@@ -111,6 +133,7 @@ const PatientEditDialog = ({ patient, isOpen, onClose }: PatientEditDialogProps)
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleInputChange}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -124,6 +147,7 @@ const PatientEditDialog = ({ patient, isOpen, onClose }: PatientEditDialogProps)
               onChange={handleInputChange}
               placeholder="Observations, traitements, recommandations..."
               className="min-h-[100px]"
+              disabled={!canEdit}
             />
           </div>
           
@@ -132,6 +156,7 @@ const PatientEditDialog = ({ patient, isOpen, onClose }: PatientEditDialogProps)
             <Select
               value={formData.status}
               onValueChange={(value) => handleSelectChange('status', value)}
+              disabled={!canEdit}
             >
               <SelectTrigger id="status">
                 <SelectValue placeholder="Sélectionnez" />
@@ -146,8 +171,12 @@ const PatientEditDialog = ({ patient, isOpen, onClose }: PatientEditDialogProps)
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Annuler</Button>
-          <Button onClick={handleSaveChanges}>Enregistrer</Button>
+          <Button variant="outline" onClick={onClose}>
+            {canEdit ? 'Annuler' : 'Fermer'}
+          </Button>
+          {canEdit && (
+            <Button onClick={handleSaveChanges}>Enregistrer</Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
