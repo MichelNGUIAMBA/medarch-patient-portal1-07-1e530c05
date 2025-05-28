@@ -1,26 +1,18 @@
 
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import NewPatient from "@/pages/secretary/NewPatient";
-import WaitingLists from "@/pages/secretary/WaitingLists";
-import PatientDetails from "@/pages/secretary/PatientDetails";
-import SearchPatient from "@/pages/secretary/SearchPatient";
-import NewConsultationSelector from "@/pages/secretary/NewConsultationSelector";
-import SelectPatientForConsultation from "@/pages/secretary/SelectPatientForConsultation";
+import SecretaryDashboard from '@/pages/secretary/SecretaryDashboard';
+import PatientRegistration from '@/pages/secretary/PatientRegistration';
+import PatientDetails from '@/pages/secretary/PatientDetails';
 
 const SecretaryRoutes = () => {
   return (
     <Routes>
-      {/* Default redirect to new-patient */}
-      <Route index element={<Navigate to="new-patient" replace />} />
-      <Route path="new-patient" element={<NewPatient />} />
-      <Route path="waiting-lists" element={<WaitingLists />} />
+      <Route index element={<Navigate to="dashboard" replace />} />
+      <Route path="dashboard" element={<SecretaryDashboard />} />
+      <Route path="register-patient" element={<PatientRegistration />} />
       <Route path="patient/:id" element={<PatientDetails />} />
-      <Route path="search-patient" element={<SearchPatient />} />
-      <Route path="new-consultation" element={<NewConsultationSelector />} />
-      <Route path="select-patient" element={<SelectPatientForConsultation />} />
-      {/* Catch all route for 404 within secretary section */}
-      <Route path="*" element={<Navigate to="new-patient" replace />} />
+      <Route path="*" element={<Navigate to="dashboard" replace />} />
     </Routes>
   );
 };

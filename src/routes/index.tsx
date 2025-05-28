@@ -1,19 +1,11 @@
 
-import React from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute';
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import Login from '@/pages/Login';
+import { createBrowserRouter } from 'react-router-dom';
 import Index from '@/pages/Index';
+import Login from '@/pages/Login';
 import Dashboard from '@/pages/Dashboard';
-import NotFound from '@/pages/NotFound';
-import SecretaryRoutes from './SecretaryRoutes';
 import NurseRoutes from './NurseRoutes';
+import SecretaryRoutes from './SecretaryRoutes';
 import LabRoutes from './LabRoutes';
-import DoctorRoutes from './DoctorRoutes';
-import AdminRoutes from './AdminRoutes';
-import PatientDetailView from '@/pages/nurse/PatientDetailView';
-import PatientDetails from '@/pages/secretary/PatientDetails';
 
 export const router = createBrowserRouter([
   {
@@ -26,49 +18,41 @@ export const router = createBrowserRouter([
   },
   {
     path: '/dashboard',
-    element: (
-      <ProtectedRoute>
-        <DashboardLayout />
-      </ProtectedRoute>
-    ),
+    element: <Dashboard />,
     children: [
       {
-        index: true,
-        element: <Dashboard />,
+        path: 'nurse/*',
+        element: <NurseRoutes />,
       },
       {
         path: 'secretary/*',
         element: <SecretaryRoutes />,
       },
       {
-        path: 'nurse/*',
-        element: <NurseRoutes />,
-      },
-      {
         path: 'lab/*',
         element: <LabRoutes />,
       },
-      {
-        path: 'doctor/*',
-        element: <DoctorRoutes />,
-      },
-      {
-        path: 'admin/*',
-        element: <AdminRoutes />,
-      },
-      // Routes globales pour les détails des patients accessibles depuis toutes les sections
-      {
-        path: 'patient/:id',
-        element: <PatientDetails />,
-      },
-      {
-        path: 'patient-details/:patientId',
-        element: <PatientDetailView />,
-      },
     ],
   },
+  // Routes directes pour la compatibilité
   {
-    path: '*',
-    element: <NotFound />,
+    path: '/waiting-patients',
+    element: <Dashboard />,
+  },
+  {
+    path: '/medical-visits/:patientId',
+    element: <Dashboard />,
+  },
+  {
+    path: '/consultations/:patientId',
+    element: <Dashboard />,
+  },
+  {
+    path: '/emergencies/:patientId',
+    element: <Dashboard />,
+  },
+  {
+    path: '/patient-details/:patientId',
+    element: <Dashboard />,
   },
 ]);
