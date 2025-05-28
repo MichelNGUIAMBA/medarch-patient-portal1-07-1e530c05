@@ -13,7 +13,7 @@ const Index = () => {
     if (isAuthenticated) {
       navigate('/dashboard');
     } else {
-      navigate('/login'); // Redirige vers /login au lieu de /
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
