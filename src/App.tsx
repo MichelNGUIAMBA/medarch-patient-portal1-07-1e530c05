@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
-import AppRoutes from "./routes";
+import AppRoutes from "./routes/AppRoutes";
 import { AuthProvider } from "./hooks/use-auth-context";
 import { ThemeProvider } from "./hooks/useTheme";
 import { LanguageProvider } from "./hooks/useLanguage";
@@ -20,10 +20,8 @@ const App = () => (
           <AuthProvider>
             <Toaster />
             <Sonner />
-            <BrowserRouter>
-              <AppRoutes />
-              <Chatbot />
-            </BrowserRouter>
+            <AppRoutes />
+            <Chatbot />
           </AuthProvider>
         </LanguageProvider>
       </ThemeProvider>
