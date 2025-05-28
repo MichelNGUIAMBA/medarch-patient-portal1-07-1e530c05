@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -25,7 +26,8 @@ const PatientDetails = () => {
   console.log('PatientDetails - patientId:', id);
   console.log('PatientDetails - available patients:', patients.map(p => p.id));
   
-  const patient = patients.find(p => p.id === id);
+  // Recherche du patient avec différentes méthodes pour éviter les erreurs
+  const patient = patients.find(p => p.id === id) || patients.find(p => p.id === `P-${id}`) || null;
   
   console.log('PatientDetails - found patient:', patient);
   
@@ -58,11 +60,16 @@ const PatientDetails = () => {
   if (!patient) {
     return (
       <div className="container mx-auto py-6">
-        <div>
+        <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">{t('patientNotFound')}</h1>
-          <p className="text-muted-foreground mb-6">ID: {id}</p>
+          <p className="text-muted-foreground mb-6">ID recherché: {id}</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Patients disponibles: {patients.length > 0 ? patients.map(p => p.id).join(', ') : 'Aucun patient trouvé'}
+          </p>
         </div>
-        <BackButton />
+        <div className="flex justify-center">
+          <BackButton />
+        </div>
       </div>
     );
   }

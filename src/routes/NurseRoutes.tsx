@@ -32,6 +32,8 @@ const NurseRoutes = () => {
       <Route path="emergency-forms" element={<EmergencyFormSelector />} />
       <Route path="patient-details/:patientId" element={<PatientDetailView />} />
       <Route path="exams" element={<ExamsRequestPage />} />
+      {/* Catch all route for 404 within nurse section */}
+      <Route path="*" element={<Navigate to="waiting-patients" replace />} />
     </Routes>
   );
 };

@@ -19,6 +19,8 @@ const SecretaryRoutes = () => {
       <Route path="search-patient" element={<SearchPatient />} />
       <Route path="new-consultation" element={<NewConsultationSelector />} />
       <Route path="select-patient" element={<SelectPatientForConsultation />} />
+      {/* Catch all route for 404 within secretary section */}
+      <Route path="*" element={<Navigate to="new-patient" replace />} />
     </Routes>
   );
 };

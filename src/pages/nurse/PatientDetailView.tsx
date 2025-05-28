@@ -24,7 +24,8 @@ const PatientDetailView = () => {
   console.log('PatientDetailView - patientId:', patientId);
   console.log('PatientDetailView - available patients:', patients.map(p => p.id));
   
-  const patient = patients.find(p => p.id === patientId);
+  // Recherche du patient avec différentes méthodes pour éviter les erreurs
+  const patient = patients.find(p => p.id === patientId) || patients.find(p => p.id === `P-${patientId}`) || null;
   
   console.log('PatientDetailView - found patient:', patient);
   
@@ -61,9 +62,12 @@ const PatientDetailView = () => {
           <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
+          <div className="text-center">
             <h1 className="text-2xl font-bold">{t('patientNotFound')}</h1>
-            <p className="text-muted-foreground">ID: {patientId}</p>
+            <p className="text-muted-foreground">ID recherché: {patientId}</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Patients disponibles: {patients.length > 0 ? patients.map(p => p.id).join(', ') : 'Aucun patient trouvé'}
+            </p>
           </div>
         </div>
       </div>
