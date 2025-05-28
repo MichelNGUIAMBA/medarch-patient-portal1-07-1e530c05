@@ -1,11 +1,19 @@
 
-import { createBrowserRouter } from 'react-router-dom';
-import Index from '@/pages/Index';
+import React from 'react';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import ProtectedRoute from './ProtectedRoute';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import Login from '@/pages/Login';
+import Index from '@/pages/Index';
 import Dashboard from '@/pages/Dashboard';
-import NurseRoutes from './NurseRoutes';
+import NotFound from '@/pages/NotFound';
 import SecretaryRoutes from './SecretaryRoutes';
+import NurseRoutes from './NurseRoutes';
 import LabRoutes from './LabRoutes';
+import DoctorRoutes from './DoctorRoutes';
+import AdminRoutes from './AdminRoutes';
+import PatientDetailView from '@/pages/nurse/PatientDetailView';
+import PatientDetails from '@/pages/secretary/PatientDetails';
 
 export const router = createBrowserRouter([
   {
@@ -18,41 +26,49 @@ export const router = createBrowserRouter([
   },
   {
     path: '/dashboard',
-    element: <Dashboard />,
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
-        path: 'nurse/*',
-        element: <NurseRoutes />,
+        index: true,
+        element: <Dashboard />,
       },
       {
         path: 'secretary/*',
         element: <SecretaryRoutes />,
       },
       {
+        path: 'nurse/*',
+        element: <NurseRoutes />,
+      },
+      {
         path: 'lab/*',
         element: <LabRoutes />,
       },
+      {
+        path: 'doctor/*',
+        element: <DoctorRoutes />,
+      },
+      {
+        path: 'admin/*',
+        element: <AdminRoutes />,
+      },
+      // Routes globales pour les détails des patients accessibles depuis toutes les sections
+      {
+        path: 'patient/:id',
+        element: <PatientDetails />,
+      },
+      {
+        path: 'patient-details/:patientId',
+        element: <PatientDetailView />,
+      },
     ],
   },
-  // Routes directes pour la compatibilité
   {
-    path: '/waiting-patients',
-    element: <Dashboard />,
-  },
-  {
-    path: '/medical-visits/:patientId',
-    element: <Dashboard />,
-  },
-  {
-    path: '/consultations/:patientId',
-    element: <Dashboard />,
-  },
-  {
-    path: '/emergencies/:patientId',
-    element: <Dashboard />,
-  },
-  {
-    path: '/patient-details/:patientId',
-    element: <Dashboard />,
+    path: '*',
+    element: <NotFound />,
   },
 ]);
