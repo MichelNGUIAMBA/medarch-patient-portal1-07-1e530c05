@@ -5,6 +5,7 @@ import SecretaryDashboard from './secretary/SecretaryDashboard';
 import NurseDashboard from '@/components/dashboards/NurseDashboard';
 import AdminDashboard from '@/components/dashboards/AdminDashboard';
 import DoctorDashboard from '@/components/dashboards/DoctorDashboard';
+import LabDashboard from '@/components/dashboards/LabDashboard';
 import DefaultDashboard from '@/components/dashboards/DefaultDashboard';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Navigate } from 'react-router-dom';
@@ -15,7 +16,7 @@ const Dashboard = () => {
 
   // Redirect lab users directly to their dashboard
   if (user?.role === 'lab') {
-    return <Navigate to="/dashboard/laboratory" replace />;
+    return <Navigate to="/dashboard/lab" replace />;
   }
 
   // Render dashboard based on user role
@@ -29,6 +30,8 @@ const Dashboard = () => {
         return <AdminDashboard />;
       case 'doctor':
         return <DoctorDashboard />;
+      case 'lab':
+        return <LabDashboard />;
       default:
         return <DefaultDashboard />;
     }
