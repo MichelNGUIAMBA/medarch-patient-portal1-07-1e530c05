@@ -44,7 +44,9 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
               .eq('id', session.user.id)
               .single();
             
-            setProfile(profileData);
+            if (profileData && ['admin', 'secretary', 'nurse', 'lab', 'doctor'].includes(profileData.role)) {
+              setProfile(profileData as Profile);
+            }
             setLoading(false);
           }, 0);
         } else {
@@ -66,7 +68,9 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
           .eq('id', session.user.id)
           .single()
           .then(({ data: profileData }) => {
-            setProfile(profileData);
+            if (profileData && ['admin', 'secretary', 'nurse', 'lab', 'doctor'].includes(profileData.role)) {
+              setProfile(profileData as Profile);
+            }
             setLoading(false);
           });
       } else {
