@@ -26,9 +26,9 @@ const Dashboard = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Redirect lab users directly to their dashboard
+  // Redirect lab users directly to their dashboard (they use this as main dashboard)
   if (profile.role === 'lab') {
-    return <Navigate to="/dashboard/lab" replace />;
+    return <LabDashboard />;
   }
 
   // Render dashboard based on user role

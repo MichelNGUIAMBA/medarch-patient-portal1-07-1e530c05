@@ -1,158 +1,184 @@
 
-import React, { useState } from 'react';
-import { ClipboardCheck, Search } from 'lucide-react';
-import { useLanguage } from '@/hooks/useLanguage';
-import { useNavigate } from 'react-router-dom';
-import { usePatientStore } from '@/stores/usePatientStore';
-import StatsCard from '@/components/shared/StatsCard';
+import React from 'react';
+import { useSupabaseLab } from '@/hooks/useSupabaseLab';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Patient } from '@/types/patient';
-import BackButton from '@/components/shared/BackButton';
-import { format } from 'date-fns';
+import { TestTube, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const LabDashboard = () => {
+  const { pendingExams, completedExams, loading } = useSupabaseLab();
   const { t } = useLanguage();
-  const navigate = useNavigate();
-  const patients = usePatientStore(state => state.patients);
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Get patients who have completed nurse visits and have exams pending
-  const patientsWithPendingExams = patients.filter(p => 
-    p.status === "Terminé" && 
-    p.takenCareBy && 
-    p.pendingLabExams && 
-    p.pendingLabExams.length > 0
-  );
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
+      </div>
+    );
+  }
 
-  const pendingExamsCount = patientsWithPendingExams.reduce(
-    (sum, patient) => sum + (patient.pendingLabExams?.length || 0), 
-    0
-  );
-
-  const examsCompletedToday = patients.reduce(
-    (sum, patient) => sum + (patient.completedLabExams?.filter(exam => 
-      new Date(exam.completedAt).toDateString() === new Date().toDateString()
-    ).length || 0), 
-    0
-  );
-
-  const handlePatientSelect = (patient: Patient) => {
-    setSelectedPatient(patient);
-    setIsDialogOpen(true);
-  };
-
-  const handlePerformExams = (patientId: string) => {
-    setIsDialogOpen(false);
-    navigate(`/dashboard/perform-exams/${patientId}`);
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'urgent': return 'bg-red-500';
+      case 'high': return 'bg-orange-500';
+      case 'normal': return 'bg-blue-500';
+      case 'low': return 'bg-gray-500';
+      default: return 'bg-blue-500';
+    }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{t('labDashboard')}</h1>
-        <BackButton />
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard 
-          title={t('pendingExams')} 
-          value={pendingExamsCount} 
-          icon={ClipboardCheck} 
-          iconColor="text-orange-600" 
-        />
-        <StatsCard 
-          title={t('examsCompletedToday')} 
-          value={examsCompletedToday} 
-          icon={ClipboardCheck} 
-          iconColor="text-green-600" 
-        />
-      </div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Examens en attente</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{pendingExams.length}</div>
+            <p className="text-xs text-muted-foreground">À traiter</p>
+          </CardContent>
+        </Card>
 
-      <div className="rounded-lg shadow bg-inherit">
-        <div className="p-4 border-b bg-inherit">
-          <h2 className="text-lg font-semibold">{t('pendingExams')}</h2>
-        </div>
-        <div className="p-0">
-          <table className="w-full">
-            <thead>
-              <tr className="text-xs font-medium text-gray-500 bg-gray-50 border-b">
-                <th className="px-6 py-3 text-left">{t('id')}</th>
-                <th className="px-6 py-3 text-left">{t('name')}</th>
-                <th className="px-6 py-3 text-left">{t('service')}</th>
-                <th className="px-6 py-3 text-left">{t('requestedBy')}</th>
-                <th className="px-6 py-3 text-left">{t('date')}</th>
-                <th className="px-6 py-3 text-left">{t('actions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {patientsWithPendingExams.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center">{t('noExamsPending')}</td>
-                </tr>
-              ) : (
-                patientsWithPendingExams.map(patient => (
-                  <tr key={patient.id} className="border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">{patient.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{patient.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{t(patient.service)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{patient.takenCareBy?.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {patient.registeredAt ? format(new Date(patient.registeredAt), 'dd/MM/yyyy') : ''}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Button 
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                        size="sm"
-                        onClick={() => handlePatientSelect(patient)}
-                      >
-                        {t('viewExams')}
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Examens urgents</CardTitle>
+            <AlertCircle className="h-4 w-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">
+              {pendingExams.filter(exam => exam.priority === 'urgent').length}
+            </div>
+            <p className="text-xs text-muted-foreground">Priorité urgente</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Examens complétés</CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{completedExams.length}</div>
+            <p className="text-xs text-muted-foreground">Aujourd'hui</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Efficacité</CardTitle>
+            <TestTube className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {pendingExams.length + completedExams.length > 0 
+                ? Math.round((completedExams.length / (pendingExams.length + completedExams.length)) * 100)
+                : 0}%
+            </div>
+            <p className="text-xs text-muted-foreground">Taux de completion</p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Dialog to view pending exams for selected patient */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{t('pendingExamsFor')} {selectedPatient?.name}</DialogTitle>
-            <DialogDescription>
-              {selectedPatient?.id} - {t(selectedPatient?.service || '')}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="py-4">
-            <h3 className="font-semibold mb-2">{t('requestedExams')}:</h3>
-            <ul className="list-disc pl-5 space-y-1">
-              {selectedPatient?.pendingLabExams?.map((exam, index) => (
-                <li key={index}>{t(exam.type)}</li>
+      {/* Pending Exams */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Examens en attente
+          </CardTitle>
+          <CardDescription>
+            Liste des examens à effectuer par ordre de priorité
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {pendingExams.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">
+              Aucun examen en attente
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {pendingExams.map((exam) => (
+                <div key={exam.id} className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className={`${getPriorityColor(exam.priority)} text-white`}>
+                          {exam.priority}
+                        </Badge>
+                        <span className="font-medium">{exam.exam_name}</span>
+                        <span className="text-sm text-muted-foreground">({exam.exam_type})</span>
+                      </div>
+                      <p className="text-sm">
+                        <strong>Patient:</strong> {exam.patients?.name} 
+                        {exam.patients?.companies?.name && (
+                          <span className="text-muted-foreground"> - {exam.patients?.companies?.name}</span>
+                        )}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Demandé par: {exam.requester?.name} - {new Date(exam.requested_at).toLocaleString()}
+                      </p>
+                    </div>
+                    <Button size="sm">
+                      Traiter
+                    </Button>
+                  </div>
+                </div>
               ))}
-            </ul>
-          </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-          <div className="flex justify-end gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setIsDialogOpen(false)}
-            >
-              {t('cancel')}
-            </Button>
-            <Button 
-              className="bg-blue-600 hover:bg-blue-700" 
-              onClick={() => selectedPatient && handlePerformExams(selectedPatient.id)}
-            >
-              {t('performExams')}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Recent Completed Exams */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-500" />
+            Examens récemment complétés
+          </CardTitle>
+          <CardDescription>
+            Derniers examens terminés
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {completedExams.slice(0, 5).length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">
+              Aucun examen complété récemment
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {completedExams.slice(0, 5).map((exam) => (
+                <div key={exam.id} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="text-green-600 border-green-600">
+                          Complété
+                        </Badge>
+                        <span className="font-medium">{exam.exam_name}</span>
+                      </div>
+                      <p className="text-sm">
+                        <strong>Patient:</strong> {exam.patients?.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Complété le: {exam.completed_at ? new Date(exam.completed_at).toLocaleString() : 'N/A'}
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      Voir résultats
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
