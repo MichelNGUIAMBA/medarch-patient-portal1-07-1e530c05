@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import Login from '@/pages/Login';
+import Auth from '@/pages/Auth';
 import Index from '@/pages/Index';
 import Dashboard from '@/pages/Dashboard';
 import NotFound from '@/pages/NotFound';
@@ -21,8 +21,8 @@ export const router = createBrowserRouter([
     element: <Index />,
   },
   {
-    path: '/login',
-    element: <Login />,
+    path: '/auth',
+    element: <Auth />,
   },
   {
     path: '/dashboard',
@@ -56,7 +56,6 @@ export const router = createBrowserRouter([
         path: 'admin/*',
         element: <AdminRoutes />,
       },
-      // Routes globales pour les détails des patients accessibles depuis toutes les sections
       {
         path: 'patient/:id',
         element: <PatientDetails />,

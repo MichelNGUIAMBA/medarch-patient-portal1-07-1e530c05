@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAuth } from '@/hooks/use-auth-context';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import SecretaryDashboard from './secretary/SecretaryDashboard';
 import NurseDashboard from '@/components/dashboards/NurseDashboard';
 import AdminDashboard from '@/components/dashboards/AdminDashboard';
@@ -11,17 +11,29 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { Navigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { profile, loading } = useSupabaseAuth();
   const { t } = useLanguage();
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return <Navigate to="/auth" replace />;
+  }
+
   // Redirect lab users directly to their dashboard
-  if (user?.role === 'lab') {
+  if (profile.role === 'lab') {
     return <Navigate to="/dashboard/lab" replace />;
   }
 
   // Render dashboard based on user role
   const renderRoleDashboard = () => {
-    switch (user?.role) {
+    switch (profile.role) {
       case 'secretary':
         return <SecretaryDashboard />;
       case 'nurse':
@@ -39,7 +51,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">{t('welcome')}, {user?.name}</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('welcome')}, {profile.name}</h1>
       {renderRoleDashboard()}
     </div>
   );
