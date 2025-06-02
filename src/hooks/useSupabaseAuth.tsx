@@ -19,12 +19,17 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
     const initializeAuth = async () => {
       try {
+        console.log('Starting auth initialization...');
+        
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Error getting session:', error);
           if (mounted) {
             setError(error.message);
+            setUser(null);
+            setProfile(null);
+            setSession(null);
             setLoading(false);
           }
           return;
@@ -32,24 +37,41 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
         if (!mounted) return;
 
-        console.log('Initial session:', session?.user?.id);
+        console.log('Initial session user ID:', session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          const profileData = await fetchProfile(session.user.id);
+          try {
+            const profileData = await fetchProfile(session.user.id);
+            if (mounted) {
+              console.log('Profile fetched:', profileData);
+              setProfile(profileData);
+            }
+          } catch (profileError) {
+            console.error('Error fetching profile:', profileError);
+            if (mounted) {
+              setProfile(null);
+            }
+          }
+        } else {
           if (mounted) {
-            setProfile(profileData);
+            setProfile(null);
           }
         }
         
+        // Always set loading to false at the end
         if (mounted) {
+          console.log('Auth initialization complete, setting loading to false');
           setLoading(false);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
         if (mounted) {
           setError('Erreur d\'initialisation de l\'authentification');
+          setUser(null);
+          setProfile(null);
+          setSession(null);
           setLoading(false);
         }
       }
@@ -57,7 +79,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth event:', event, session?.user?.id);
+        console.log('Auth event:', event, 'User ID:', session?.user?.id);
         
         if (!mounted) return;
 
@@ -65,13 +87,23 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         setUser(session?.user ?? null);
         setError(null);
         
-        if (session?.user && event === 'SIGNED_IN') {
-          const profileData = await fetchProfile(session.user.id);
-          if (mounted) {
-            setProfile(profileData);
-            setLoading(false);
+        if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          try {
+            const profileData = await fetchProfile(session.user.id);
+            if (mounted) {
+              console.log('Profile updated from auth change:', profileData);
+              setProfile(profileData);
+              setLoading(false);
+            }
+          } catch (profileError) {
+            console.error('Error fetching profile on auth change:', profileError);
+            if (mounted) {
+              setProfile(null);
+              setLoading(false);
+            }
           }
-        } else if (!session?.user) {
+        } else {
+          // No session or signed out
           if (mounted) {
             setProfile(null);
             setLoading(false);
@@ -80,6 +112,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       }
     );
 
+    // Start initialization
     initializeAuth();
 
     return () => {
@@ -94,6 +127,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     
     try {
       await loginUser(email, password);
+      // Loading will be set to false by onAuthStateChange
     } catch (error: any) {
       setError(error.message);
       setLoading(false);
@@ -107,6 +141,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     
     try {
       await signupUser(email, password, name, role);
+      // Loading will be set to false by onAuthStateChange
     } catch (error: any) {
       setError(error.message);
       setLoading(false);
@@ -121,6 +156,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       await logoutUser();
     } catch (error) {
       console.error('Logout error:', error);
+      // Force redirect even if logout fails
       window.location.href = '/auth';
     }
   };

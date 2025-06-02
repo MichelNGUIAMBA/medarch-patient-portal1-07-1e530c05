@@ -10,15 +10,29 @@ const Index = () => {
   const [hasRedirected, setHasRedirected] = useState(false);
 
   useEffect(() => {
+    console.log('Index page - loading:', loading, 'isAuthenticated:', isAuthenticated, 'hasRedirected:', hasRedirected);
+    
+    // Add a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      if (loading && !hasRedirected) {
+        console.log('Forcing redirect due to timeout');
+        setHasRedirected(true);
+        navigate('/auth', { replace: true });
+      }
+    }, 10000); // 10 second timeout
+
     if (!loading && !hasRedirected) {
       setHasRedirected(true);
       
+      console.log('Redirecting based on auth state:', isAuthenticated);
       if (isAuthenticated) {
         navigate('/dashboard', { replace: true });
       } else {
         navigate('/auth', { replace: true });
       }
     }
+
+    return () => clearTimeout(timeoutId);
   }, [isAuthenticated, loading, navigate, hasRedirected]);
 
   return (
@@ -35,6 +49,11 @@ const Index = () => {
             {loading ? 'Vérification des accès médicaux...' : 'Redirection sécurisée en cours...'}
           </span>
         </div>
+        {loading && (
+          <div className="mt-4 text-sm text-blue-600 dark:text-blue-300">
+            Chargement en cours... Si cela prend trop de temps, vous serez redirigé automatiquement.
+          </div>
+        )}
       </div>
     </div>
   );
