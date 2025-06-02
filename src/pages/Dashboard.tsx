@@ -8,27 +8,35 @@ import DoctorDashboard from '@/components/dashboards/DoctorDashboard';
 import LabDashboard from '@/components/dashboards/LabDashboard';
 import DefaultDashboard from '@/components/dashboards/DefaultDashboard';
 import { useLanguage } from '@/hooks/useLanguage';
-import { Heart } from 'lucide-react';
+import { Stethoscope } from 'lucide-react';
 
 const Dashboard = () => {
-  const { profile, loading } = useSupabaseAuth();
+  const { profile, loading, isAuthenticated } = useSupabaseAuth();
   const { t } = useLanguage();
 
+  // Si pas encore chargé, afficher le loader
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <Heart className="h-12 w-12 text-primary animate-pulse mb-4" />
-        <p className="text-lg text-primary font-medium">Chargement du tableau de bord médical...</p>
+        <Stethoscope className="h-12 w-12 text-blue-800 dark:text-blue-400 animate-pulse mb-4" />
+        <p className="text-lg text-blue-800 dark:text-blue-400 font-medium">
+          Chargement du dossier médical...
+        </p>
       </div>
     );
   }
 
-  if (!profile) {
+  // Si pas authentifié, afficher un message (normalement on ne devrait pas arriver ici)
+  if (!isAuthenticated || !profile) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Profil non trouvé</h2>
-          <p className="text-muted-foreground">Veuillez vous reconnecter.</p>
+          <h2 className="text-xl font-semibold mb-2 text-blue-800 dark:text-blue-400">
+            Accès médical requis
+          </h2>
+          <p className="text-blue-600 dark:text-blue-300">
+            Veuillez vous reconnecter pour accéder au système.
+          </p>
         </div>
       </div>
     );
@@ -55,10 +63,10 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-primary">
+        <h1 className="text-3xl font-bold text-blue-800 dark:text-blue-400">
           Bienvenue, {profile.name}
         </h1>
-        <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium capitalize">
+        <div className="px-3 py-1 bg-blue-800/10 text-blue-800 dark:text-blue-400 rounded-full text-sm font-medium capitalize">
           {profile.role === "secretary" ? "Secrétaire" : 
            profile.role === "nurse" ? "Infirmier(e)" : 
            profile.role === "lab" ? "Laboratoire" : 

@@ -17,9 +17,15 @@ const DashboardLayout = () => {
   const { t } = useLanguage();
   
   const handleLogout = async () => {
-    await logout();
-    toast.success(t('logout'));
-    navigate("/");
+    try {
+      await logout();
+      toast.success('Déconnexion réussie');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Erreur lors de la déconnexion');
+      // Force redirect even if logout fails
+      window.location.href = '/auth';
+    }
   };
   
   const navigationItems = useMemo(() => {
@@ -104,8 +110,8 @@ const DashboardLayout = () => {
       <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
         <Sidebar className="border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 dark:text-white">
           <div className="flex h-16 items-center border-b px-6 border-gray-200 dark:border-gray-700">
-            <Hospital className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            <span className="ml-2 text-lg font-semibold text-blue-800 dark:text-blue-300">MedArch</span>
+            <Hospital className="h-6 w-6 text-blue-800 dark:text-blue-400" />
+            <span className="ml-2 text-lg font-semibold text-blue-800 dark:text-blue-400">MedArch</span>
           </div>
           <SidebarContent>
             <SidebarGroup>
@@ -130,7 +136,11 @@ const DashboardLayout = () => {
                     {profile?.role === "secretary" ? t('secretary') : profile?.role === "nurse" ? t('nurse') : profile?.role === "lab" ? t('lab') : profile?.role === "doctor" ? t('doctor') : t('admin')}
                   </div>
                 </div>
-                <Button variant="ghost" className="w-full justify-start text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 dark:hover:text-red-300" onClick={handleLogout}>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 dark:hover:text-red-300" 
+                  onClick={handleLogout}
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   {t('logout')}
                 </Button>

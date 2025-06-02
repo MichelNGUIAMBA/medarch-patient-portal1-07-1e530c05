@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from '@supabase/supabase-js';
+import { cleanupAuthState } from '@/utils/authCleanup';
 
 interface Profile {
   id: string;
@@ -57,6 +58,42 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     let mounted = true;
 
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth event:', event, session?.user?.id);
+        
+        if (!mounted) return;
+
+        setSession(session);
+        setUser(session?.user ?? null);
+        setError(null);
+        
+        if (session?.user && event === 'SIGNED_IN') {
+          // Defer profile fetching to prevent deadlocks
+          setTimeout(async () => {
+            if (mounted) {
+              const profileData = await fetchProfile(session.user.id);
+              if (mounted) {
+                setProfile(profileData);
+                setLoading(false);
+              }
+            }
+          }, 0);
+        } else if (!session?.user) {
+          if (mounted) {
+            setProfile(null);
+            setLoading(false);
+          }
+        } else {
+          if (mounted) {
+            setLoading(false);
+          }
+        }
+      }
+    );
+
+    // THEN check for existing session
     const initializeAuth = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -94,30 +131,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       }
     };
 
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth event:', event, session?.user?.id);
-        
-        if (!mounted) return;
-
-        setSession(session);
-        setUser(session?.user ?? null);
-        setError(null);
-        
-        if (session?.user && event !== 'INITIAL_SESSION') {
-          const profileData = await fetchProfile(session.user.id);
-          if (mounted) {
-            setProfile(profileData);
-          }
-        } else if (!session?.user) {
-          if (mounted) {
-            setProfile(null);
-          }
-        }
-      }
-    );
-
     initializeAuth();
 
     return () => {
@@ -128,42 +141,85 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
   const login = async (email: string, password: string) => {
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    setLoading(true);
     
-    if (error) {
-      setError(error.message);
+    try {
+      // Clean up existing state first
+      cleanupAuthState();
+      
+      // Attempt global sign out
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.log('Global signout error (ignoring):', err);
+      }
+      
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        throw error;
+      }
+    } catch (error) {
+      setLoading(false);
       throw error;
     }
   };
 
   const signup = async (email: string, password: string, name: string, role: string) => {
     setError(null);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
-          role,
-        },
-      },
-    });
+    setLoading(true);
     
-    if (error) {
-      setError(error.message);
+    try {
+      // Clean up existing state first
+      cleanupAuthState();
+      
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            role,
+          },
+        },
+      });
+      
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        throw error;
+      }
+    } catch (error) {
+      setLoading(false);
       throw error;
     }
   };
 
   const logout = async () => {
     setError(null);
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      setError(error.message);
-      throw error;
+    
+    try {
+      // Clean up auth state first
+      cleanupAuthState();
+      
+      // Attempt global sign out
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.log('Logout error (ignoring):', err);
+      }
+      
+      // Force page reload for clean state
+      window.location.href = '/auth';
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force reload even if there's an error
+      window.location.href = '/auth';
     }
   };
 
