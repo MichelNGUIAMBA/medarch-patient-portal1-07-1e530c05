@@ -25,10 +25,10 @@ interface LabExam {
     companies?: {
       name: string;
     };
-  };
+  } | null;
   requester?: {
     name: string;
-  };
+  } | null;
 }
 
 export const useSupabaseLab = () => {
@@ -63,8 +63,15 @@ export const useSupabaseLab = () => {
 
     if (error) {
       console.error('Error fetching pending exams:', error);
+      setPendingExams([]);
     } else {
-      setPendingExams(data as LabExam[] || []);
+      // Transform data to ensure proper typing
+      const transformedData = (data || []).map(item => ({
+        ...item,
+        patients: item.patients || null,
+        requester: Array.isArray(item.requester) ? item.requester[0] || null : item.requester || null
+      })) as LabExam[];
+      setPendingExams(transformedData);
     }
     setLoading(false);
   };
@@ -94,8 +101,15 @@ export const useSupabaseLab = () => {
 
     if (error) {
       console.error('Error fetching completed exams:', error);
+      setCompletedExams([]);
     } else {
-      setCompletedExams(data as LabExam[] || []);
+      // Transform data to ensure proper typing
+      const transformedData = (data || []).map(item => ({
+        ...item,
+        patients: item.patients || null,
+        requester: Array.isArray(item.requester) ? item.requester[0] || null : item.requester || null
+      })) as LabExam[];
+      setCompletedExams(transformedData);
     }
   };
 
