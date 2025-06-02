@@ -1,4 +1,3 @@
-
 import React, { useMemo } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
@@ -160,9 +159,6 @@ const DashboardLayout = () => {
             <div className="ml-auto flex items-center gap-2">
               <ThemeSwitcher />
               <LanguageSwitcher />
-              <span className="ml-2 text-sm text-muted-foreground">
-                {t('takenCareBy')} {profile?.name}
-              </span>
             </div>
           </header>
           

@@ -9,11 +9,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Search, UserPlus, Edit, User, Trash2, AlertTriangle } from 'lucide-react';
+import { Search, UserPlus, Edit, User, Trash2 } from 'lucide-react';
 import { useSupabaseAdmin } from '@/hooks/useSupabaseAdmin';
 
 const UserManagement = () => {
-  const { users, loading, createUser, updateUserRole, deleteUser } = useSupabaseAdmin();
+  const { users, loading, createUser, updateUserRole, updateUserName, deleteUser } = useSupabaseAdmin();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
@@ -29,10 +29,10 @@ const UserManagement = () => {
   });
 
   const [editUser, setEditUser] = useState({
+    name: '',
     role: '',
   });
 
-  // Filter users based on search term
   const filteredUsers = users.filter(user => 
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -42,6 +42,14 @@ const UserManagement = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewUser(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditUser(prev => ({
       ...prev,
       [name]: value
     }));
@@ -62,13 +70,11 @@ const UserManagement = () => {
   };
 
   const handleAddUser = async () => {
-    // Validate form
     if (!newUser.firstName || !newUser.lastName || !newUser.email || !newUser.role || !newUser.password) {
       toast.error("Veuillez remplir tous les champs");
       return;
     }
     
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newUser.email)) {
       toast.error("Adresse email invalide");
@@ -90,7 +96,6 @@ const UserManagement = () => {
       );
       toast.success(`${newUser.firstName} ${newUser.lastName} a été ajouté avec succès`);
       
-      // Reset form and close dialog
       setNewUser({
         firstName: '',
         lastName: '',
@@ -107,18 +112,27 @@ const UserManagement = () => {
   };
 
   const handleEditUser = async () => {
-    if (!editUser.role) {
-      toast.error("Veuillez sélectionner un rôle");
+    if (!editUser.role || !editUser.name) {
+      toast.error("Veuillez remplir tous les champs");
       return;
     }
 
     setActionLoading(true);
     try {
-      await updateUserRole(selectedUser?.id, editUser.role);
+      // Update name if changed
+      if (editUser.name !== selectedUser?.name) {
+        await updateUserName(selectedUser?.id, editUser.name);
+      }
+      
+      // Update role if changed
+      if (editUser.role !== selectedUser?.role) {
+        await updateUserRole(selectedUser?.id, editUser.role);
+      }
+      
       toast.success("Utilisateur modifié avec succès");
       
       setIsEditUserOpen(false);
-      setEditUser({ role: '' });
+      setEditUser({ name: '', role: '' });
     } catch (error: any) {
       toast.error(error.message || "Erreur lors de la modification de l'utilisateur");
     } finally {
@@ -142,7 +156,6 @@ const UserManagement = () => {
     }
   };
 
-  // Helper function to get role name in French
   function getRoleName(role: string): string {
     switch (role) {
       case 'admin':
@@ -277,20 +290,6 @@ const UserManagement = () => {
           </Dialog>
         </div>
       </div>
-
-      {/* Avertissement pour les fonctionnalités limitées */}
-      <Card className="border-yellow-200 bg-yellow-50">
-        <CardContent className="pt-6">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
-            <div>
-              <p className="text-sm text-yellow-800">
-                <strong>Fonctionnalités limitées :</strong> Le changement de mot de passe et la gestion du statut utilisateur nécessitent des privilèges administrateur spéciaux qui ne sont pas disponibles avec les permissions standard.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
       
       <Card>
         <CardHeader>
@@ -342,7 +341,7 @@ const UserManagement = () => {
                           className="h-8 w-8 p-0"
                           onClick={() => {
                             setSelectedUser(user);
-                            setEditUser({ role: user.role });
+                            setEditUser({ name: user.name, role: user.role });
                             setIsEditUserOpen(true);
                           }}
                         >
@@ -383,6 +382,17 @@ const UserManagement = () => {
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="editName">Nom complet</Label>
+              <Input
+                id="editName"
+                name="name"
+                value={editUser.name}
+                onChange={handleEditInputChange}
+                placeholder="Nom complet"
+              />
+            </div>
+            
             <div className="space-y-2">
               <Label htmlFor="editRole">Rôle</Label>
               <Select onValueChange={handleEditRoleChange} value={editUser.role}>

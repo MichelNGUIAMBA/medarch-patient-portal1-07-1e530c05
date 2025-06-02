@@ -13,9 +13,6 @@ interface UserProfile {
 
 interface SystemStats {
   totalPatients: number;
-  todayPatients: number;
-  pendingExams: number;
-  completedServices: number;
   usersByRole: Record<string, number>;
 }
 
@@ -51,24 +48,6 @@ export const useSupabaseAdmin = () => {
         .from('patients')
         .select('id', { count: 'exact' });
 
-      // Get today's patients
-      const today = new Date().toISOString().split('T')[0];
-      const { count: todayPatients } = await supabase
-        .from('patients')
-        .select('id', { count: 'exact' })
-        .gte('created_at', `${today}T00:00:00`);
-
-      // Get pending lab exams
-      const { count: pendingExams } = await supabase
-        .from('lab_exams')
-        .select('id', { count: 'exact' })
-        .eq('status', 'pending');
-
-      // Get completed services
-      const { count: completedServices } = await supabase
-        .from('service_records')
-        .select('id', { count: 'exact' });
-
       // Get users by role
       const { data: userRoles } = await supabase
         .from('profiles')
@@ -81,9 +60,6 @@ export const useSupabaseAdmin = () => {
 
       setStats({
         totalPatients: totalPatients || 0,
-        todayPatients: todayPatients || 0,
-        pendingExams: pendingExams || 0,
-        completedServices: completedServices || 0,
         usersByRole
       });
     } catch (error) {
@@ -96,7 +72,6 @@ export const useSupabaseAdmin = () => {
       throw new Error('Non autorisé');
     }
 
-    // Utiliser l'inscription normale au lieu de l'API admin
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -113,7 +88,6 @@ export const useSupabaseAdmin = () => {
       throw error;
     }
 
-    // Si l'utilisateur est créé avec succès, mettre à jour le profil
     if (data.user) {
       const { error: profileError } = await supabase
         .from('profiles')
@@ -151,26 +125,29 @@ export const useSupabaseAdmin = () => {
     }
 
     await fetchUsers();
+    await fetchSystemStats();
     return data;
   };
 
-  const updateUserPassword = async (userId: string, newPassword: string) => {
-    if (!user || profile?.role !== 'admin') {
-      throw new Error('Non autorisé - changement de mot de passe non disponible');
-    }
-
-    // Note: Le changement de mot de passe via l'API admin nécessite des privilèges spéciaux
-    // Pour le moment, cette fonctionnalité n'est pas disponible avec les permissions standard
-    throw new Error('Le changement de mot de passe nécessite des privilèges administrateur spéciaux');
-  };
-
-  const toggleUserStatus = async (userId: string, banned: boolean) => {
+  const updateUserName = async (userId: string, newName: string) => {
     if (!user || profile?.role !== 'admin') {
       throw new Error('Non autorisé');
     }
 
-    // Cette fonctionnalité nécessite également l'API admin
-    throw new Error('La gestion du statut utilisateur nécessite des privilèges administrateur spéciaux');
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ name: newName })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating user name:', error);
+      throw error;
+    }
+
+    await fetchUsers();
+    return data;
   };
 
   const deleteUser = async (userId: string) => {
@@ -178,7 +155,6 @@ export const useSupabaseAdmin = () => {
       throw new Error('Non autorisé');
     }
 
-    // Supprimer le profil (l'utilisateur auth sera nettoyé automatiquement)
     const { error } = await supabase
       .from('profiles')
       .delete()
@@ -190,6 +166,7 @@ export const useSupabaseAdmin = () => {
     }
 
     await fetchUsers();
+    await fetchSystemStats();
   };
 
   useEffect(() => {
@@ -205,8 +182,7 @@ export const useSupabaseAdmin = () => {
     loading,
     createUser,
     updateUserRole,
-    updateUserPassword,
-    toggleUserStatus,
+    updateUserName,
     deleteUser,
     fetchUsers,
     fetchSystemStats

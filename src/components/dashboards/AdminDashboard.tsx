@@ -1,15 +1,18 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSupabaseAdmin } from '@/hooks/useSupabaseAdmin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Activity, Database, Shield, TrendingUp } from 'lucide-react';
+import { Users, Database, Shield, Settings } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import StatsCard from '@/components/shared/StatsCard';
 
 const AdminDashboard = () => {
   const { users, stats, loading } = useSupabaseAdmin();
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -44,52 +47,19 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-6">
       {/* System Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalPatients || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              +{stats?.todayPatients || 0} aujourd'hui
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Examens en attente</CardTitle>
-            <Activity className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{stats?.pendingExams || 0}</div>
-            <p className="text-xs text-muted-foreground">À traiter</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Services complétés</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats?.completedServices || 0}</div>
-            <p className="text-xs text-muted-foreground">Total</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Utilisateurs actifs</CardTitle>
-            <Shield className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{users.length}</div>
-            <p className="text-xs text-muted-foreground">Total des comptes</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <StatsCard
+          title="Total Patients"
+          value={stats?.totalPatients || 0}
+          icon={Users}
+          iconColor="text-blue-600"
+        />
+        <StatsCard
+          title="Utilisateurs actifs"
+          value={users.length}
+          icon={Shield}
+          iconColor="text-purple-600"
+        />
       </div>
 
       {/* Users by Role */}
@@ -150,16 +120,6 @@ const AdminDashboard = () => {
                         Créé le: {new Date(user.created_at).toLocaleString()}
                       </p>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        Modifier
-                      </Button>
-                      {user.role !== 'admin' && (
-                        <Button variant="destructive" size="sm">
-                          Supprimer
-                        </Button>
-                      )}
-                    </div>
                   </div>
                 </div>
               ))}
@@ -178,19 +138,34 @@ const AdminDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button className="h-20 flex flex-col items-center justify-center">
+            <Button 
+              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => navigate('/dashboard/admin/users')}
+            >
               <Users className="h-6 w-6 mb-2" />
               Gérer utilisateurs
             </Button>
-            <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => window.open('https://supabase.com/dashboard/project/vngnehmsavxtfeoumuvy', '_blank')}
+            >
               <Database className="h-6 w-6 mb-2" />
-              Backup BD
+              Console Supabase
             </Button>
-            <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-              <Activity className="h-6 w-6 mb-2" />
-              Statistiques
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => navigate('/dashboard/admin/settings')}
+            >
+              <Settings className="h-6 w-6 mb-2" />
+              Paramètres
             </Button>
-            <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => navigate('/dashboard/admin/users')}
+            >
               <Shield className="h-6 w-6 mb-2" />
               Sécurité
             </Button>
