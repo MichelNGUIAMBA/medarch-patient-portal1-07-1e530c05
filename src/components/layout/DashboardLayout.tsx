@@ -1,3 +1,4 @@
+
 import React, { useMemo } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
@@ -25,6 +26,10 @@ const DashboardLayout = () => {
       // Force redirect even if logout fails
       window.location.href = '/auth';
     }
+  };
+
+  const handleLogoClick = () => {
+    navigate('/dashboard');
   };
   
   const navigationItems = useMemo(() => {
@@ -108,7 +113,7 @@ const DashboardLayout = () => {
   return <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
         <Sidebar className="border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 dark:text-white">
-          <div className="flex h-16 items-center border-b px-6 border-gray-200 dark:border-gray-700">
+          <div className="flex h-16 items-center border-b px-6 border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" onClick={handleLogoClick}>
             <Hospital className="h-6 w-6 text-blue-800 dark:text-blue-400" />
             <span className="ml-2 text-lg font-semibold text-blue-800 dark:text-blue-400">MedArch</span>
           </div>
