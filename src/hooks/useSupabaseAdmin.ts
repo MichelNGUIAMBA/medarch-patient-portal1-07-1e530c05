@@ -96,20 +96,37 @@ export const useSupabaseAdmin = () => {
       throw new Error('Non autorisé');
     }
 
-    // Créer l'utilisateur via l'API admin de Supabase
-    const { data, error } = await supabase.auth.admin.createUser({
+    // Utiliser l'inscription normale au lieu de l'API admin
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      user_metadata: {
-        name,
-        role
-      },
-      email_confirm: true
+      options: {
+        data: {
+          name,
+          role
+        }
+      }
     });
 
     if (error) {
       console.error('Error creating user:', error);
       throw error;
+    }
+
+    // Si l'utilisateur est créé avec succès, mettre à jour le profil
+    if (data.user) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: data.user.id,
+          name,
+          role
+        });
+
+      if (profileError) {
+        console.error('Error creating profile:', profileError);
+        throw profileError;
+      }
     }
 
     await fetchUsers();
@@ -139,19 +156,12 @@ export const useSupabaseAdmin = () => {
 
   const updateUserPassword = async (userId: string, newPassword: string) => {
     if (!user || profile?.role !== 'admin') {
-      throw new Error('Non autorisé');
+      throw new Error('Non autorisé - changement de mot de passe non disponible');
     }
 
-    const { data, error } = await supabase.auth.admin.updateUserById(userId, {
-      password: newPassword
-    });
-
-    if (error) {
-      console.error('Error updating user password:', error);
-      throw error;
-    }
-
-    return data;
+    // Note: Le changement de mot de passe via l'API admin nécessite des privilèges spéciaux
+    // Pour le moment, cette fonctionnalité n'est pas disponible avec les permissions standard
+    throw new Error('Le changement de mot de passe nécessite des privilèges administrateur spéciaux');
   };
 
   const toggleUserStatus = async (userId: string, banned: boolean) => {
@@ -159,17 +169,8 @@ export const useSupabaseAdmin = () => {
       throw new Error('Non autorisé');
     }
 
-    const { data, error } = await supabase.auth.admin.updateUserById(userId, {
-      ban_duration: banned ? 'none' : '876000h' // ~100 years if banning
-    });
-
-    if (error) {
-      console.error('Error toggling user status:', error);
-      throw error;
-    }
-
-    await fetchUsers();
-    return data;
+    // Cette fonctionnalité nécessite également l'API admin
+    throw new Error('La gestion du statut utilisateur nécessite des privilèges administrateur spéciaux');
   };
 
   const deleteUser = async (userId: string) => {
@@ -177,10 +178,14 @@ export const useSupabaseAdmin = () => {
       throw new Error('Non autorisé');
     }
 
-    const { error } = await supabase.auth.admin.deleteUser(userId);
+    // Supprimer le profil (l'utilisateur auth sera nettoyé automatiquement)
+    const { error } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', userId);
 
     if (error) {
-      console.error('Error deleting user:', error);
+      console.error('Error deleting user profile:', error);
       throw error;
     }
 

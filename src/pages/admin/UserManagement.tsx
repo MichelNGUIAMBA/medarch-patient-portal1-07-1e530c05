@@ -9,14 +9,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Search, UserPlus, Lock, UserCheck, UserX, Edit, User, Trash2 } from 'lucide-react';
+import { Search, UserPlus, Edit, User, Trash2, AlertTriangle } from 'lucide-react';
 import { useSupabaseAdmin } from '@/hooks/useSupabaseAdmin';
 
 const UserManagement = () => {
-  const { users, loading, createUser, updateUserRole, updateUserPassword, deleteUser } = useSupabaseAdmin();
+  const { users, loading, createUser, updateUserRole, deleteUser } = useSupabaseAdmin();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -27,11 +26,6 @@ const UserManagement = () => {
     email: '',
     password: '',
     role: '',
-  });
-  
-  const [passwords, setPasswords] = useState({
-    password: '',
-    confirmPassword: '',
   });
 
   const [editUser, setEditUser] = useState({
@@ -48,14 +42,6 @@ const UserManagement = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewUser(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPasswords(prev => ({
       ...prev,
       [name]: value
     }));
@@ -115,41 +101,6 @@ const UserManagement = () => {
       setIsAddUserOpen(false);
     } catch (error: any) {
       toast.error(error.message || "Erreur lors de la création de l'utilisateur");
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleChangePassword = async () => {
-    // Validate passwords
-    if (!passwords.password || !passwords.confirmPassword) {
-      toast.error("Veuillez remplir tous les champs");
-      return;
-    }
-    
-    if (passwords.password !== passwords.confirmPassword) {
-      toast.error("Les mots de passe ne correspondent pas");
-      return;
-    }
-    
-    if (passwords.password.length < 6) {
-      toast.error("Le mot de passe doit contenir au moins 6 caractères");
-      return;
-    }
-    
-    setActionLoading(true);
-    try {
-      await updateUserPassword(selectedUser?.id, passwords.password);
-      toast.success("Mot de passe modifié avec succès");
-      
-      // Reset form and close dialog
-      setPasswords({
-        password: '',
-        confirmPassword: '',
-      });
-      setIsChangePasswordOpen(false);
-    } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la modification du mot de passe");
     } finally {
       setActionLoading(false);
     }
@@ -326,6 +277,20 @@ const UserManagement = () => {
           </Dialog>
         </div>
       </div>
+
+      {/* Avertissement pour les fonctionnalités limitées */}
+      <Card className="border-yellow-200 bg-yellow-50">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+            <div>
+              <p className="text-sm text-yellow-800">
+                <strong>Fonctionnalités limitées :</strong> Le changement de mot de passe et la gestion du statut utilisateur nécessitent des privilèges administrateur spéciaux qui ne sont pas disponibles avec les permissions standard.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       
       <Card>
         <CardHeader>
@@ -384,19 +349,6 @@ const UserManagement = () => {
                           <span className="sr-only">Modifier</span>
                           <Edit className="h-4 w-4" />
                         </Button>
-
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 w-8 p-0"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setIsChangePasswordOpen(true);
-                          }}
-                        >
-                          <span className="sr-only">Changer le mot de passe</span>
-                          <Lock className="h-4 w-4" />
-                        </Button>
                         
                         {user.role !== 'admin' && (
                           <Button
@@ -453,53 +405,6 @@ const UserManagement = () => {
               Annuler
             </Button>
             <Button onClick={handleEditUser} disabled={actionLoading}>
-              {actionLoading ? "Modification..." : "Mettre à jour"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Change Password Dialog */}
-      <Dialog open={isChangePasswordOpen} onOpenChange={setIsChangePasswordOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Changer le mot de passe</DialogTitle>
-            <DialogDescription>
-              {selectedUser && `Modifier le mot de passe pour ${selectedUser.name}`}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">Nouveau mot de passe</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={passwords.password}
-                onChange={handlePasswordChange}
-                placeholder="Entrez le nouveau mot de passe"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmez le mot de passe</Label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                value={passwords.confirmPassword}
-                onChange={handlePasswordChange}
-                placeholder="Confirmez le nouveau mot de passe"
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsChangePasswordOpen(false)}>
-              Annuler
-            </Button>
-            <Button onClick={handleChangePassword} disabled={actionLoading}>
               {actionLoading ? "Modification..." : "Mettre à jour"}
             </Button>
           </DialogFooter>
