@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from '@supabase/supabase-js';
-import { AuthContext } from "./auth/AuthContext";
+import { AuthContext, useAuthContext } from "./auth/AuthContext";
 import { Profile, AuthContextType } from "./auth/types";
 import { fetchProfile } from "./auth/profileService";
 import { loginUser, signupUser, logoutUser } from "./auth/authActions";
