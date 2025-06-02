@@ -2,6 +2,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { Heart } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -12,8 +13,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-slate-900">
+        <Heart className="h-12 w-12 text-primary animate-pulse mb-4" />
+        <p className="text-lg text-primary font-medium">Vérification de l'accès médical...</p>
       </div>
     );
   }

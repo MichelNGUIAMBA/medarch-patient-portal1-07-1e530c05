@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
-import { Hospital } from 'lucide-react';
+import { Hospital, Heart } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -26,15 +26,15 @@ const Index = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-slate-900">
       <div className="text-center">
-        <Hospital className="mx-auto h-16 w-16 text-blue-800 dark:text-blue-400" />
-        <h1 className="mt-4 text-4xl font-bold text-blue-800 dark:text-blue-400">MedArch</h1>
-        <p className="mt-2 text-xl text-blue-700 dark:text-blue-300">
+        <Hospital className="mx-auto h-16 w-16 text-primary" />
+        <h1 className="mt-4 text-4xl font-bold text-primary">MedArch</h1>
+        <p className="mt-2 text-xl text-primary/80">
           Système d'archivage des dossiers médicaux
         </p>
         <div className="mt-8 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-800 dark:border-blue-400"></div>
-          <span className="ml-4 text-blue-700 dark:text-blue-300">
-            {loading ? 'Chargement...' : 'Redirection en cours...'}
+          <Heart className="h-8 w-8 text-primary animate-pulse mr-4" />
+          <span className="text-primary font-medium">
+            {loading ? 'Initialisation du système médical...' : 'Redirection en cours...'}
           </span>
         </div>
       </div>

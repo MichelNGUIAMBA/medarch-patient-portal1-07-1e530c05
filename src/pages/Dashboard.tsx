@@ -8,6 +8,7 @@ import DoctorDashboard from '@/components/dashboards/DoctorDashboard';
 import LabDashboard from '@/components/dashboards/LabDashboard';
 import DefaultDashboard from '@/components/dashboards/DefaultDashboard';
 import { useLanguage } from '@/hooks/useLanguage';
+import { Heart } from 'lucide-react';
 
 const Dashboard = () => {
   const { profile, loading } = useSupabaseAuth();
@@ -15,8 +16,9 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <Heart className="h-12 w-12 text-primary animate-pulse mb-4" />
+        <p className="text-lg text-primary font-medium">Chargement du tableau de bord médical...</p>
       </div>
     );
   }
