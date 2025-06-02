@@ -1,7 +1,7 @@
 
 import React, { useMemo } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
-import { useAuth } from "@/hooks/use-auth-context";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { Button } from "@/components/ui/button";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -12,12 +12,12 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/hooks/useLanguage";
 
 const DashboardLayout = () => {
-  const { user, logout } = useAuth();
+  const { profile, logout } = useSupabaseAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
   
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     toast.success(t('logout'));
     navigate("/");
   };
@@ -97,8 +97,8 @@ const DashboardLayout = () => {
       }]
     };
     
-    return user?.role && roleBasedItems[user.role] ? [...commonItems, ...roleBasedItems[user.role]] : commonItems;
-  }, [t, user?.role]); // Dépendances correctement déclarées
+    return profile?.role && roleBasedItems[profile.role] ? [...commonItems, ...roleBasedItems[profile.role]] : commonItems;
+  }, [t, profile?.role]);
   
   return <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gray-900">
@@ -125,9 +125,9 @@ const DashboardLayout = () => {
               <SidebarGroupLabel>{t('yourAccount')}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <div className="px-4 py-2">
-                  <div className="mb-2 font-medium">{user?.name}</div>
+                  <div className="mb-2 font-medium">{profile?.name}</div>
                   <div className="text-sm text-muted-foreground capitalize">
-                    {user?.role === "secretary" ? t('secretary') : user?.role === "nurse" ? t('nurse') : user?.role === "lab" ? t('lab') : user?.role === "doctor" ? t('doctor') : t('admin')}
+                    {profile?.role === "secretary" ? t('secretary') : profile?.role === "nurse" ? t('nurse') : profile?.role === "lab" ? t('lab') : profile?.role === "doctor" ? t('doctor') : t('admin')}
                   </div>
                 </div>
                 <Button variant="ghost" className="w-full justify-start text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 dark:hover:text-red-300" onClick={handleLogout}>
@@ -144,14 +144,14 @@ const DashboardLayout = () => {
             <SidebarTrigger />
             <div className="ml-4">
               <h1 className="text-lg font-semibold">
-                {user?.role === "secretary" ? t('secretaryPortal') : user?.role === "nurse" ? t('nursePortal') : user?.role === "lab" ? t('labPortal') : user?.role === "doctor" ? t('doctorPortal') : t('adminPortal')}
+                {profile?.role === "secretary" ? t('secretaryPortal') : profile?.role === "nurse" ? t('nursePortal') : profile?.role === "lab" ? t('labPortal') : profile?.role === "doctor" ? t('doctorPortal') : t('adminPortal')}
               </h1>
             </div>
             <div className="ml-auto flex items-center gap-2">
               <ThemeSwitcher />
               <LanguageSwitcher />
               <span className="ml-2 text-sm text-muted-foreground">
-                {t('takenCareBy')} {user?.name}
+                {t('takenCareBy')} {profile?.name}
               </span>
             </div>
           </header>
