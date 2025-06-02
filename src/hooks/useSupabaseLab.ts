@@ -8,8 +8,8 @@ interface LabExam {
   patient_id: string;
   exam_type: string;
   exam_name: string;
-  status: 'pending' | 'in_progress' | 'completed';
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  status: string;
+  priority: string;
   requested_by: string;
   completed_by?: string;
   results?: any;
@@ -64,7 +64,7 @@ export const useSupabaseLab = () => {
     if (error) {
       console.error('Error fetching pending exams:', error);
     } else {
-      setPendingExams(data || []);
+      setPendingExams(data as LabExam[] || []);
     }
     setLoading(false);
   };
@@ -95,7 +95,7 @@ export const useSupabaseLab = () => {
     if (error) {
       console.error('Error fetching completed exams:', error);
     } else {
-      setCompletedExams(data || []);
+      setCompletedExams(data as LabExam[] || []);
     }
   };
 
