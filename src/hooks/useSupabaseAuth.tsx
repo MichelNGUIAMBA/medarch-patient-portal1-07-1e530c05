@@ -1,28 +1,11 @@
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from '@supabase/supabase-js';
-import { cleanupAuthState } from '@/utils/authCleanup';
-
-interface Profile {
-  id: string;
-  name: string;
-  role: 'admin' | 'secretary' | 'nurse' | 'lab' | 'doctor';
-}
-
-interface AuthContextType {
-  user: User | null;
-  profile: Profile | null;
-  session: Session | null;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string, role: string) => Promise<void>;
-  logout: () => Promise<void>;
-  isAuthenticated: boolean;
-  loading: boolean;
-  error: string | null;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext } from "./auth/AuthContext";
+import { Profile, AuthContextType } from "./auth/types";
+import { fetchProfile } from "./auth/profileService";
+import { loginUser, signupUser, logoutUser } from "./auth/authActions";
 
 export function SupabaseAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -31,36 +14,11 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProfile = async (userId: string) => {
-    try {
-      const { data: profileData, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-      
-      if (profileData && ['admin', 'secretary', 'nurse', 'lab', 'doctor'].includes(profileData.role)) {
-        return profileData as Profile;
-      }
-      
-      return null;
-    } catch (error) {
-      console.error('Error in fetchProfile:', error);
-      return null;
-    }
-  };
-
   useEffect(() => {
     let mounted = true;
 
     const initializeAuth = async () => {
       try {
-        // Get current session
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -97,7 +55,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       }
     };
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth event:', event, session?.user?.id);
@@ -123,7 +80,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       }
     );
 
-    // Initialize auth
     initializeAuth();
 
     return () => {
@@ -137,25 +93,9 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     setLoading(true);
     
     try {
-      cleanupAuthState();
-      
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        console.log('Global signout error (ignoring):', err);
-      }
-      
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) {
-        setError(error.message);
-        setLoading(false);
-        throw error;
-      }
-    } catch (error) {
+      await loginUser(email, password);
+    } catch (error: any) {
+      setError(error.message);
       setLoading(false);
       throw error;
     }
@@ -166,25 +106,9 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     setLoading(true);
     
     try {
-      cleanupAuthState();
-      
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-            role,
-          },
-        },
-      });
-      
-      if (error) {
-        setError(error.message);
-        setLoading(false);
-        throw error;
-      }
-    } catch (error) {
+      await signupUser(email, password, name, role);
+    } catch (error: any) {
+      setError(error.message);
       setLoading(false);
       throw error;
     }
@@ -194,42 +118,30 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     setError(null);
     
     try {
-      cleanupAuthState();
-      
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        console.log('Logout error (ignoring):', err);
-      }
-      
-      window.location.href = '/auth';
+      await logoutUser();
     } catch (error) {
       console.error('Logout error:', error);
       window.location.href = '/auth';
     }
   };
 
+  const value: AuthContextType = {
+    user,
+    profile,
+    session,
+    login,
+    signup,
+    logout,
+    isAuthenticated: !!user && !!profile,
+    loading,
+    error
+  };
+
   return (
-    <AuthContext.Provider value={{
-      user,
-      profile,
-      session,
-      login,
-      signup,
-      logout,
-      isAuthenticated: !!user && !!profile,
-      loading,
-      error
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useSupabaseAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useSupabaseAuth must be used within SupabaseAuthProvider");
-  }
-  return context;
-};
+export { useAuthContext as useSupabaseAuth };
