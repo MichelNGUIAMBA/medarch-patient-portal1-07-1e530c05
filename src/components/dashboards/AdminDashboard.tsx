@@ -5,14 +5,18 @@ import { useSupabaseAdmin } from '@/hooks/useSupabaseAdmin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Database, Shield, Settings } from 'lucide-react';
+import { Users, Database, Shield, Settings, User, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import StatsCard from '@/components/shared/StatsCard';
 
 const AdminDashboard = () => {
-  const { users, stats, loading } = useSupabaseAdmin();
+  const { users, patients, stats, loading, loadAllData } = useSupabaseAdmin();
   const { t } = useLanguage();
   const navigate = useNavigate();
+
+  const handleRefresh = () => {
+    loadAllData();
+  };
 
   if (loading) {
     return (
@@ -44,19 +48,37 @@ const AdminDashboard = () => {
     }
   };
 
+  const getServiceLabel = (service: string) => {
+    switch (service) {
+      case 'VM': return 'Visite Médicale';
+      case 'Cons': return 'Consultation';
+      case 'Ug': return 'Urgence';
+      default: return service;
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Header with refresh button */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Tableau de bord administrateur</h1>
+        <Button onClick={handleRefresh} variant="outline" size="sm">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Actualiser
+        </Button>
+      </div>
+
       {/* System Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <StatsCard
           title="Total Patients"
           value={stats?.totalPatients || 0}
-          icon={Users}
+          icon={User}
           iconColor="text-blue-600"
         />
         <StatsCard
           title="Utilisateurs actifs"
-          value={users.length}
+          value={stats?.totalUsers || 0}
           icon={Shield}
           iconColor="text-purple-600"
         />
@@ -88,6 +110,54 @@ const AdminDashboard = () => {
         </CardContent>
       </Card>
 
+      {/* Recent Patients */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Patients récemment enregistrés
+          </CardTitle>
+          <CardDescription>
+            Derniers patients ajoutés au système
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {patients.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">
+              Aucun patient trouvé
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {patients.map((patient) => (
+                <div key={patient.id} className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-medium uppercase">{patient.name}</span>
+                        <Badge className="bg-blue-500 text-white">
+                          {getServiceLabel(patient.service)}
+                        </Badge>
+                        <Badge variant="outline">
+                          {patient.status}
+                        </Badge>
+                      </div>
+                      {patient.companies?.name && (
+                        <p className="text-sm text-muted-foreground mb-1">
+                          Entreprise: {patient.companies.name}
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Enregistré le: {new Date(patient.created_at).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Recent Users */}
       <Card>
         <CardHeader>
@@ -106,7 +176,7 @@ const AdminDashboard = () => {
             </p>
           ) : (
             <div className="space-y-4">
-              {users.slice(0, 10).map((user) => (
+              {users.slice(0, 5).map((user) => (
                 <div key={user.id} className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">

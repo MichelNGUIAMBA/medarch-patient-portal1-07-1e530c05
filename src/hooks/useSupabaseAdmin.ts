@@ -11,13 +11,28 @@ interface UserProfile {
   updated_at: string;
 }
 
+interface Patient {
+  id: string;
+  name: string;
+  first_name: string;
+  last_name: string;
+  created_at: string;
+  companies?: {
+    name: string;
+  };
+  service: string;
+  status: string;
+}
+
 interface SystemStats {
   totalPatients: number;
+  totalUsers: number;
   usersByRole: Record<string, number>;
 }
 
 export const useSupabaseAdmin = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
   const [stats, setStats] = useState<SystemStats | null>(null);
   const [loading, setLoading] = useState(true);
   const { user, profile } = useSupabaseAuth();
@@ -25,18 +40,51 @@ export const useSupabaseAdmin = () => {
   const fetchUsers = async () => {
     if (!user || profile?.role !== 'admin') return;
     
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching users:', error);
-    } else {
-      setUsers(data || []);
+      if (error) {
+        console.error('Error fetching users:', error);
+      } else {
+        setUsers(data || []);
+      }
+    } catch (error) {
+      console.error('Error in fetchUsers:', error);
     }
-    setLoading(false);
+  };
+
+  const fetchPatients = async () => {
+    if (!user || profile?.role !== 'admin') return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('patients')
+        .select(`
+          id,
+          name,
+          first_name,
+          last_name,
+          created_at,
+          service,
+          status,
+          companies (
+            name
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error('Error fetching patients:', error);
+      } else {
+        setPatients(data || []);
+      }
+    } catch (error) {
+      console.error('Error in fetchPatients:', error);
+    }
   };
 
   const fetchSystemStats = async () => {
@@ -60,6 +108,7 @@ export const useSupabaseAdmin = () => {
 
       setStats({
         totalPatients: totalPatients || 0,
+        totalUsers: userRoles?.length || 0,
         usersByRole
       });
     } catch (error) {
@@ -104,6 +153,7 @@ export const useSupabaseAdmin = () => {
     }
 
     await fetchUsers();
+    await fetchSystemStats();
     return data;
   };
 
@@ -169,15 +219,34 @@ export const useSupabaseAdmin = () => {
     await fetchSystemStats();
   };
 
+  const loadAllData = async () => {
+    if (!user || profile?.role !== 'admin') return;
+    
+    setLoading(true);
+    try {
+      await Promise.all([
+        fetchUsers(),
+        fetchPatients(),
+        fetchSystemStats()
+      ]);
+    } catch (error) {
+      console.error('Error loading admin data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (user && profile?.role === 'admin') {
-      fetchUsers();
-      fetchSystemStats();
+      loadAllData();
+    } else {
+      setLoading(false);
     }
-  }, [user, profile]);
+  }, [user, profile?.role]);
 
   return {
     users,
+    patients,
     stats,
     loading,
     createUser,
@@ -185,6 +254,8 @@ export const useSupabaseAdmin = () => {
     updateUserName,
     deleteUser,
     fetchUsers,
-    fetchSystemStats
+    fetchPatients,
+    fetchSystemStats,
+    loadAllData
   };
 };
