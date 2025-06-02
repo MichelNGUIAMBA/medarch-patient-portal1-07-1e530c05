@@ -12,84 +12,68 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setThemeState] = useState<Theme>(
-    () => (localStorage.getItem('theme') as Theme) || 
-    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-  );
+  const [theme, setThemeState] = useState<Theme>(() => {
+    // Check localStorage first, then system preference
+    const stored = localStorage.getItem('medarch-theme') as Theme;
+    if (stored && ['light', 'dark'].includes(stored)) {
+      return stored;
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
   
-  // Update the theme in localStorage and apply it to the document
+  // Apply theme to DOM with smooth transition
+  const applyThemeToDOM = (newTheme: Theme) => {
+    const root = document.documentElement;
+    
+    // Add transition class for smooth animation
+    root.classList.add('theme-transition');
+    
+    // Apply theme
+    if (newTheme === 'dark') {
+      root.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      root.setAttribute('data-theme', 'light');
+    }
+    
+    // Remove transition class after animation
+    setTimeout(() => {
+      root.classList.remove('theme-transition');
+    }, 150);
+  };
+  
+  // Update theme with persistence
   const setTheme = (newTheme: Theme) => {
-    localStorage.setItem('theme', newTheme);
+    localStorage.setItem('medarch-theme', newTheme);
     applyThemeToDOM(newTheme);
     setThemeState(newTheme);
   };
   
-  // Toggle between light and dark mode
+  // Toggle between themes
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
   
-  // Function to apply theme to DOM with smooth transition
-  const applyThemeToDOM = (theme: Theme) => {
-    // Add transition class to document for smooth color transitions
-    document.documentElement.classList.add('theme-transition');
-    
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-    
-    // Add event listener to remove transition class after transition completes
-    const transitionEndHandler = () => {
-      document.documentElement.classList.remove('theme-transition');
-      document.documentElement.removeEventListener('transitionend', transitionEndHandler);
-    };
-    
-    document.documentElement.addEventListener('transitionend', transitionEndHandler);
-    
-    // Fallback: remove transition class after a delay in case transitionend doesn't fire
-    setTimeout(() => {
-      document.documentElement.classList.remove('theme-transition');
-    }, 1000);
-  };
-  
-  // Apply the theme when the component mounts
+  // Apply theme on mount and listen for system changes
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-    }
+    applyThemeToDOM(theme);
     
     // Listen for system theme changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('theme')) {
+    const handleSystemChange = (e: MediaQueryListEvent) => {
+      // Only apply system change if no theme is stored
+      if (!localStorage.getItem('medarch-theme')) {
         setTheme(e.matches ? 'dark' : 'light');
       }
     };
     
-    try {
-      mediaQuery.addEventListener('change', handleChange);
-    } catch (error) {
-      // Fallback for browsers that don't support addEventListener
-      mediaQuery.addListener(handleChange);
-    }
+    mediaQuery.addEventListener('change', handleSystemChange);
     
     return () => {
-      try {
-        mediaQuery.removeEventListener('change', handleChange);
-      } catch (error) {
-        // Fallback for browsers that don't support removeEventListener
-        mediaQuery.removeListener(handleChange);
-      }
+      mediaQuery.removeEventListener('change', handleSystemChange);
     };
-  }, []);
+  }, [theme]);
   
   const value = { theme, setTheme, toggleTheme };
   

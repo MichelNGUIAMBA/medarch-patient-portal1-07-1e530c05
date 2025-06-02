@@ -5,11 +5,10 @@ import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: string[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
-  const { isAuthenticated, profile, loading } = useSupabaseAuth();
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+  const { isAuthenticated, loading } = useSupabaseAuth();
 
   if (loading) {
     return (
@@ -21,10 +20,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
 
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
-  }
-
-  if (requiredRole && profile && !requiredRole.includes(profile.role)) {
-    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;

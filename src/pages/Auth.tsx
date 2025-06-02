@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Hospital } from "lucide-react";
+import { Hospital, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import ThemeSwitcher from "@/components/layout/ThemeSwitcher";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -18,7 +19,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null);
-  const { login } = useSupabaseAuth();
+  const { login, error } = useSupabaseAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
 
@@ -27,10 +28,10 @@ const Auth = () => {
     setIsLoading(true);
     try {
       await login(email, password);
-      toast.success("Connexion réussie !");
+      toast.success(t('loginSuccess') || "Connexion réussie !");
       navigate("/dashboard");
     } catch (error: any) {
-      toast.error(error.message || "Erreur de connexion");
+      toast.error(error.message || t('loginError') || "Erreur de connexion");
     } finally {
       setIsLoading(false);
     }
@@ -59,8 +60,8 @@ const Auth = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-slate-900">
-      <div className="fixed top-4 right-4 flex space-x-2">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-slate-900 p-4">
+      <div className="fixed top-4 right-4 flex space-x-2 z-10">
         <ThemeSwitcher />
         <LanguageSwitcher />
       </div>
@@ -68,21 +69,30 @@ const Auth = () => {
       <Card className="w-full max-w-md shadow-lg dark:bg-gray-800 dark:text-white">
         <CardHeader className="space-y-2 text-center">
           <div className="flex justify-center">
-            <Hospital className="h-14 w-14 text-blue-600 bg-inherit rounded-none" />
+            <Hospital className="h-14 w-14 text-blue-600 dark:text-blue-400" />
           </div>
           <CardTitle className="text-2xl font-bold text-blue-800 dark:text-blue-400">MedArch</CardTitle>
           <CardDescription className="text-inherit text-sm font-light dark:text-gray-300">
-            Système d'archivage des dossiers médicaux
+            {t('appDescription') || 'Système d\'archivage des dossiers médicaux'}
           </CardDescription>
         </CardHeader>
+        
         <CardContent className="space-y-4">
+          {/* Error Alert */}
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
           {/* Social Login Buttons */}
           <div className="space-y-3">
             <Button 
               variant="outline" 
               className="w-full flex items-center justify-center gap-2"
               onClick={() => handleSocialLogin('google')}
-              disabled={isSocialLoading !== null}
+              disabled={isSocialLoading !== null || isLoading}
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -97,7 +107,7 @@ const Auth = () => {
               variant="outline" 
               className="w-full flex items-center justify-center gap-2"
               onClick={() => handleSocialLogin('linkedin_oidc')}
-              disabled={isSocialLoading !== null}
+              disabled={isSocialLoading !== null || isLoading}
             >
               <svg className="h-5 w-5" fill="#0A66C2" viewBox="0 0 24 24">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
@@ -119,21 +129,22 @@ const Auth = () => {
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
-                Email
+                {t('email') || 'Email'}
               </label>
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="votre@email.com" 
+                placeholder={t('emailPlaceholder') || 'votre@email.com'}
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
                 className="w-full dark:bg-gray-700 dark:border-gray-600" 
                 required 
+                disabled={isLoading || isSocialLoading !== null}
               />
             </div>
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium">
-                Mot de passe
+                {t('password') || 'Mot de passe'}
               </label>
               <Input 
                 id="password" 
@@ -143,6 +154,7 @@ const Auth = () => {
                 onChange={e => setPassword(e.target.value)} 
                 className="w-full dark:bg-gray-700 dark:border-gray-600" 
                 required 
+                disabled={isLoading || isSocialLoading !== null}
               />
             </div>
             <Button 
@@ -150,26 +162,27 @@ const Auth = () => {
               disabled={isLoading || isSocialLoading !== null} 
               className="w-full bg-blue-600 hover:bg-blue-700 text-white text-base font-medium"
             >
-              {isLoading ? "Connexion..." : "Se connecter"}
+              {isLoading ? (t('loggingIn') || "Connexion...") : (t('login') || "Se connecter")}
             </Button>
           </form>
         </CardContent>
+        
         <CardFooter className="text-center text-sm text-muted-foreground">
-          © {currentYear} MedArch - Tous droits réservés
+          © {currentYear} MedArch - {t('allRightsReserved') || 'Tous droits réservés'}
         </CardFooter>
       </Card>
       
       {/* Message d'aide avec comptes de test */}
-      <div className="fixed bottom-4 right-4">
+      <div className="fixed bottom-4 right-4 max-w-sm">
         <Card className="p-4 shadow-md bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 dark:text-white">
-          <h3 className="font-medium mb-2">Comptes de démonstration :</h3>
+          <h3 className="font-medium mb-2">{t('demoAccounts') || 'Comptes de démonstration'} :</h3>
           <ul className="text-sm space-y-1">
             <li>admin@medarch.com</li>
             <li>secretary@medarch.com</li>
             <li>nurse@medarch.com</li>
             <li>lab@medarch.com</li>
             <li>doctor@medarch.com</li>
-            <li className="font-medium mt-1">Mot de passe : password</li>
+            <li className="font-medium mt-1">{t('password') || 'Mot de passe'} : password</li>
           </ul>
         </Card>
       </div>

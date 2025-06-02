@@ -25,6 +25,10 @@ export const router = createBrowserRouter([
     element: <Auth />,
   },
   {
+    path: '/login',
+    element: <Navigate to="/auth" replace />,
+  },
+  {
     path: '/dashboard',
     element: (
       <ProtectedRoute>
