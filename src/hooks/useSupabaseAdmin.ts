@@ -28,6 +28,7 @@ export const useSupabaseAdmin = () => {
   const fetchUsers = async () => {
     if (!user || profile?.role !== 'admin') return;
     
+    setLoading(true);
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -38,6 +39,7 @@ export const useSupabaseAdmin = () => {
     } else {
       setUsers(data || []);
     }
+    setLoading(false);
   };
 
   const fetchSystemStats = async () => {
@@ -89,9 +91,34 @@ export const useSupabaseAdmin = () => {
     }
   };
 
+  const createUser = async (email: string, password: string, name: string, role: string) => {
+    if (!user || profile?.role !== 'admin') {
+      throw new Error('Non autorisé');
+    }
+
+    // Créer l'utilisateur via l'API admin de Supabase
+    const { data, error } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      user_metadata: {
+        name,
+        role
+      },
+      email_confirm: true
+    });
+
+    if (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
+
+    await fetchUsers();
+    return data;
+  };
+
   const updateUserRole = async (userId: string, newRole: string) => {
     if (!user || profile?.role !== 'admin') {
-      throw new Error('Unauthorized');
+      throw new Error('Non autorisé');
     }
 
     const { data, error } = await supabase
@@ -110,17 +137,47 @@ export const useSupabaseAdmin = () => {
     return data;
   };
 
-  const deleteUser = async (userId: string) => {
+  const updateUserPassword = async (userId: string, newPassword: string) => {
     if (!user || profile?.role !== 'admin') {
-      throw new Error('Unauthorized');
+      throw new Error('Non autorisé');
     }
 
-    // Note: In a real application, you might want to handle this differently
-    // as deleting from auth.users requires admin privileges
-    const { error } = await supabase
-      .from('profiles')
-      .delete()
-      .eq('id', userId);
+    const { data, error } = await supabase.auth.admin.updateUserById(userId, {
+      password: newPassword
+    });
+
+    if (error) {
+      console.error('Error updating user password:', error);
+      throw error;
+    }
+
+    return data;
+  };
+
+  const toggleUserStatus = async (userId: string, banned: boolean) => {
+    if (!user || profile?.role !== 'admin') {
+      throw new Error('Non autorisé');
+    }
+
+    const { data, error } = await supabase.auth.admin.updateUserById(userId, {
+      ban_duration: banned ? 'none' : '876000h' // ~100 years if banning
+    });
+
+    if (error) {
+      console.error('Error toggling user status:', error);
+      throw error;
+    }
+
+    await fetchUsers();
+    return data;
+  };
+
+  const deleteUser = async (userId: string) => {
+    if (!user || profile?.role !== 'admin') {
+      throw new Error('Non autorisé');
+    }
+
+    const { error } = await supabase.auth.admin.deleteUser(userId);
 
     if (error) {
       console.error('Error deleting user:', error);
@@ -137,17 +194,14 @@ export const useSupabaseAdmin = () => {
     }
   }, [user, profile]);
 
-  useEffect(() => {
-    if (!loading) {
-      setLoading(false);
-    }
-  }, [users, stats]);
-
   return {
     users,
     stats,
-    loading: loading && (!users.length || !stats),
+    loading,
+    createUser,
     updateUserRole,
+    updateUserPassword,
+    toggleUserStatus,
     deleteUser,
     fetchUsers,
     fetchSystemStats

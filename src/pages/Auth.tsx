@@ -6,8 +6,6 @@ import { toast } from "@/components/ui/sonner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Hospital } from "lucide-react";
 import ThemeSwitcher from "@/components/layout/ThemeSwitcher";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
@@ -16,10 +14,8 @@ import { useLanguage } from "@/hooks/useLanguage";
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [role, setRole] = useState("secretary");
   const [isLoading, setIsLoading] = useState(false);
-  const { login, signup } = useSupabaseAuth();
+  const { login } = useSupabaseAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
 
@@ -32,19 +28,6 @@ const Auth = () => {
       navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Erreur de connexion");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      await signup(email, password, name, role);
-      toast.success("Compte créé avec succès ! Vérifiez votre email.");
-    } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la création du compte");
     } finally {
       setIsLoading(false);
     }
@@ -70,128 +53,63 @@ const Auth = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Connexion</TabsTrigger>
-              <TabsTrigger value="signup">Inscription</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium">
-                    Email
-                  </label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="votre@email.com" 
-                    value={email} 
-                    onChange={e => setEmail(e.target.value)} 
-                    className="w-full dark:bg-gray-700 dark:border-gray-600" 
-                    required 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="password" className="text-sm font-medium">
-                    Mot de passe
-                  </label>
-                  <Input 
-                    id="password" 
-                    type="password" 
-                    placeholder="••••••••" 
-                    value={password} 
-                    onChange={e => setPassword(e.target.value)} 
-                    className="w-full dark:bg-gray-700 dark:border-gray-600" 
-                    required 
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  disabled={isLoading} 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-base font-medium"
-                >
-                  {isLoading ? "Connexion..." : "Se connecter"}
-                </Button>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <form onSubmit={handleSignup} className="space-y-4">
-                <div className="space-y-2">
-                  <label htmlFor="signup-name" className="text-sm font-medium">
-                    Nom complet
-                  </label>
-                  <Input 
-                    id="signup-name" 
-                    type="text" 
-                    placeholder="Votre nom complet" 
-                    value={name} 
-                    onChange={e => setName(e.target.value)} 
-                    className="w-full dark:bg-gray-700 dark:border-gray-600" 
-                    required 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="signup-role" className="text-sm font-medium">
-                    Rôle
-                  </label>
-                  <Select value={role} onValueChange={setRole}>
-                    <SelectTrigger className="w-full dark:bg-gray-700 dark:border-gray-600">
-                      <SelectValue placeholder="Sélectionnez votre rôle" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="admin">Administrateur</SelectItem>
-                      <SelectItem value="secretary">Secrétaire</SelectItem>
-                      <SelectItem value="nurse">Infirmier(ère)</SelectItem>
-                      <SelectItem value="lab">Laboratoire</SelectItem>
-                      <SelectItem value="doctor">Médecin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="signup-email" className="text-sm font-medium">
-                    Email
-                  </label>
-                  <Input 
-                    id="signup-email" 
-                    type="email" 
-                    placeholder="votre@email.com" 
-                    value={email} 
-                    onChange={e => setEmail(e.target.value)} 
-                    className="w-full dark:bg-gray-700 dark:border-gray-600" 
-                    required 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="signup-password" className="text-sm font-medium">
-                    Mot de passe
-                  </label>
-                  <Input 
-                    id="signup-password" 
-                    type="password" 
-                    placeholder="••••••••" 
-                    value={password} 
-                    onChange={e => setPassword(e.target.value)} 
-                    className="w-full dark:bg-gray-700 dark:border-gray-600" 
-                    required 
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  disabled={isLoading} 
-                  className="w-full bg-green-600 hover:bg-green-700 text-white text-base font-medium"
-                >
-                  {isLoading ? "Création..." : "Créer un compte"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">
+                Email
+              </label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="votre@email.com" 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                className="w-full dark:bg-gray-700 dark:border-gray-600" 
+                required 
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium">
+                Mot de passe
+              </label>
+              <Input 
+                id="password" 
+                type="password" 
+                placeholder="••••••••" 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                className="w-full dark:bg-gray-700 dark:border-gray-600" 
+                required 
+              />
+            </div>
+            <Button 
+              type="submit" 
+              disabled={isLoading} 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-base font-medium"
+            >
+              {isLoading ? "Connexion..." : "Se connecter"}
+            </Button>
+          </form>
         </CardContent>
         <CardFooter className="text-center text-sm text-muted-foreground">
           © {currentYear} MedArch - Tous droits réservés
         </CardFooter>
       </Card>
+      
+      {/* Message d'aide avec comptes de test */}
+      <div className="fixed bottom-4 right-4">
+        <Card className="p-4 shadow-md bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 dark:text-white">
+          <h3 className="font-medium mb-2">Comptes de démonstration :</h3>
+          <ul className="text-sm space-y-1">
+            <li>admin@medarch.com</li>
+            <li>secretary@medarch.com</li>
+            <li>nurse@medarch.com</li>
+            <li>lab@medarch.com</li>
+            <li>doctor@medarch.com</li>
+            <li className="font-medium mt-1">Mot de passe : password</li>
+          </ul>
+        </Card>
+      </div>
     </div>
   );
 };

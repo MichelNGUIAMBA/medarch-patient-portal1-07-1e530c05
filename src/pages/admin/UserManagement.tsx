@@ -9,18 +9,23 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Search, UserPlus, Lock, UserCheck, UserX, Edit, User } from 'lucide-react';
+import { Search, UserPlus, Lock, UserCheck, UserX, Edit, User, Trash2 } from 'lucide-react';
+import { useSupabaseAdmin } from '@/hooks/useSupabaseAdmin';
 
 const UserManagement = () => {
+  const { users, loading, createUser, updateUserRole, updateUserPassword, deleteUser } = useSupabaseAdmin();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isEditUserOpen, setIsEditUserOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [actionLoading, setActionLoading] = useState(false);
   
   const [newUser, setNewUser] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    password: '',
     role: '',
   });
   
@@ -29,20 +34,14 @@ const UserManagement = () => {
     confirmPassword: '',
   });
 
-  // Mock users data
-  const users = [
-    { id: 1, firstName: 'Marie', lastName: 'Secrétaire', email: 'secretary@medarch.com', role: 'secretary', status: 'active', lastLogin: '2025-04-23 14:32:00' },
-    { id: 2, firstName: 'Jean', lastName: 'Infirmier', email: 'nurse@medarch.com', role: 'nurse', status: 'active', lastLogin: '2025-04-23 08:15:00' },
-    { id: 3, firstName: 'Lucie', lastName: 'Laboratoire', email: 'lab@medarch.com', role: 'lab', status: 'active', lastLogin: '2025-04-22 15:45:00' },
-    { id: 4, firstName: 'Robert', lastName: 'Docteur', email: 'doctor@medarch.com', role: 'doctor', status: 'active', lastLogin: '2025-04-23 11:20:00' },
-    { id: 5, firstName: 'Thomas', lastName: 'Dupont', email: 'thomas@medarch.com', role: 'secretary', status: 'inactive', lastLogin: '2025-04-10 09:30:00' },
-  ];
+  const [editUser, setEditUser] = useState({
+    role: '',
+  });
 
   // Filter users based on search term
   const filteredUsers = users.filter(user => 
-    user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
     getRoleName(user.role).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -69,9 +68,16 @@ const UserManagement = () => {
     }));
   };
 
-  const handleAddUser = () => {
+  const handleEditRoleChange = (value: string) => {
+    setEditUser(prev => ({
+      ...prev,
+      role: value
+    }));
+  };
+
+  const handleAddUser = async () => {
     // Validate form
-    if (!newUser.firstName || !newUser.lastName || !newUser.email || !newUser.role) {
+    if (!newUser.firstName || !newUser.lastName || !newUser.email || !newUser.role || !newUser.password) {
       toast.error("Veuillez remplir tous les champs");
       return;
     }
@@ -82,22 +88,39 @@ const UserManagement = () => {
       toast.error("Adresse email invalide");
       return;
     }
+
+    if (newUser.password.length < 6) {
+      toast.error("Le mot de passe doit contenir au moins 6 caractères");
+      return;
+    }
     
-    // In a real app, this would add the user to the database
-    console.log("New user:", newUser);
-    toast.success(`${newUser.firstName} ${newUser.lastName} a été ajouté avec succès`);
-    
-    // Reset form and close dialog
-    setNewUser({
-      firstName: '',
-      lastName: '',
-      email: '',
-      role: '',
-    });
-    setIsAddUserOpen(false);
+    setActionLoading(true);
+    try {
+      await createUser(
+        newUser.email, 
+        newUser.password, 
+        `${newUser.firstName} ${newUser.lastName}`, 
+        newUser.role
+      );
+      toast.success(`${newUser.firstName} ${newUser.lastName} a été ajouté avec succès`);
+      
+      // Reset form and close dialog
+      setNewUser({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        role: '',
+      });
+      setIsAddUserOpen(false);
+    } catch (error: any) {
+      toast.error(error.message || "Erreur lors de la création de l'utilisateur");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     // Validate passwords
     if (!passwords.password || !passwords.confirmPassword) {
       toast.error("Veuillez remplir tous les champs");
@@ -109,29 +132,63 @@ const UserManagement = () => {
       return;
     }
     
-    if (passwords.password.length < 8) {
-      toast.error("Le mot de passe doit contenir au moins 8 caractères");
+    if (passwords.password.length < 6) {
+      toast.error("Le mot de passe doit contenir au moins 6 caractères");
       return;
     }
     
-    // In a real app, this would update the user's password in the database
-    console.log(`Changing password for user ${selectedUser?.id}`);
-    toast.success("Mot de passe modifié avec succès");
-    
-    // Reset form and close dialog
-    setPasswords({
-      password: '',
-      confirmPassword: '',
-    });
-    setIsChangePasswordOpen(false);
+    setActionLoading(true);
+    try {
+      await updateUserPassword(selectedUser?.id, passwords.password);
+      toast.success("Mot de passe modifié avec succès");
+      
+      // Reset form and close dialog
+      setPasswords({
+        password: '',
+        confirmPassword: '',
+      });
+      setIsChangePasswordOpen(false);
+    } catch (error: any) {
+      toast.error(error.message || "Erreur lors de la modification du mot de passe");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const handleStatusToggle = (userId: number, currentStatus: string) => {
-    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-    // In a real app, this would update the user's status in the database
-    console.log(`Toggling user ${userId} status to ${newStatus}`);
-    
-    toast.success(`Statut modifié avec succès: ${newStatus === 'active' ? 'Actif' : 'Inactif'}`);
+  const handleEditUser = async () => {
+    if (!editUser.role) {
+      toast.error("Veuillez sélectionner un rôle");
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      await updateUserRole(selectedUser?.id, editUser.role);
+      toast.success("Utilisateur modifié avec succès");
+      
+      setIsEditUserOpen(false);
+      setEditUser({ role: '' });
+    } catch (error: any) {
+      toast.error(error.message || "Erreur lors de la modification de l'utilisateur");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer ${userName} ?`)) {
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      await deleteUser(userId);
+      toast.success("Utilisateur supprimé avec succès");
+    } catch (error: any) {
+      toast.error(error.message || "Erreur lors de la suppression de l'utilisateur");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   // Helper function to get role name in French
@@ -150,6 +207,14 @@ const UserManagement = () => {
       default:
         return role;
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
+      </div>
+    );
   }
 
   return (
@@ -219,6 +284,18 @@ const UserManagement = () => {
                     placeholder="nom@exemple.com"
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={newUser.password}
+                    onChange={handleInputChange}
+                    placeholder="••••••••"
+                  />
+                </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="role">Rôle</Label>
@@ -241,8 +318,8 @@ const UserManagement = () => {
                 <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>
                   Annuler
                 </Button>
-                <Button onClick={handleAddUser}>
-                  Ajouter
+                <Button onClick={handleAddUser} disabled={actionLoading}>
+                  {actionLoading ? "Création..." : "Ajouter"}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -259,17 +336,15 @@ const UserManagement = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nom</TableHead>
-                <TableHead>Email</TableHead>
                 <TableHead>Rôle</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead>Dernière connexion</TableHead>
+                <TableHead>Date de création</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                     Aucun utilisateur trouvé
                   </TableCell>
                 </TableRow>
@@ -282,28 +357,34 @@ const UserManagement = () => {
                           <User className="h-4 w-4 text-blue-700" />
                         </div>
                         <div>
-                          <p className="font-medium">{user.firstName} {user.lastName}</p>
+                          <p className="font-medium">{user.name}</p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{getRoleName(user.role)}</TableCell>
                     <TableCell>
-                      <Badge variant={user.status === 'active' ? 'default' : 'outline'} className={user.status === 'active' ? 'bg-green-100 text-green-800 hover:bg-green-100' : 'text-gray-500'}>
-                        {user.status === 'active' ? 'Actif' : 'Inactif'}
+                      <Badge variant="outline">
+                        {getRoleName(user.role)}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {new Date(user.lastLogin).toLocaleString('fr-FR', { 
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
+                      {new Date(user.created_at).toLocaleDateString('fr-FR')}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 w-8 p-0"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setEditUser({ role: user.role });
+                            setIsEditUserOpen(true);
+                          }}
+                        >
+                          <span className="sr-only">Modifier</span>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+
                         <Button
                           size="sm"
                           variant="outline"
@@ -317,29 +398,18 @@ const UserManagement = () => {
                           <Lock className="h-4 w-4" />
                         </Button>
                         
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 w-8 p-0"
-                        >
-                          <span className="sr-only">Modifier</span>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        
-                        <Button
-                          size="sm"
-                          variant={user.status === 'active' ? 'destructive' : 'outline'}
-                          className={`h-8 w-8 p-0 ${user.status !== 'active' && 'text-green-600 border-green-600 hover:bg-green-50'}`}
-                          onClick={() => handleStatusToggle(user.id, user.status)}
-                        >
-                          <span className="sr-only">
-                            {user.status === 'active' ? 'Désactiver' : 'Activer'}
-                          </span>
-                          {user.status === 'active' ? 
-                            <UserX className="h-4 w-4" /> : 
-                            <UserCheck className="h-4 w-4" />
-                          }
-                        </Button>
+                        {user.role !== 'admin' && (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleDeleteUser(user.id, user.name)}
+                            disabled={actionLoading}
+                          >
+                            <span className="sr-only">Supprimer</span>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -350,13 +420,52 @@ const UserManagement = () => {
         </CardContent>
       </Card>
       
+      {/* Edit User Dialog */}
+      <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Modifier l'utilisateur</DialogTitle>
+            <DialogDescription>
+              {selectedUser && `Modifier les informations de ${selectedUser.name}`}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="editRole">Rôle</Label>
+              <Select onValueChange={handleEditRoleChange} value={editUser.role}>
+                <SelectTrigger id="editRole">
+                  <SelectValue placeholder="Sélectionner un rôle" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Administrateur</SelectItem>
+                  <SelectItem value="secretary">Secrétaire</SelectItem>
+                  <SelectItem value="nurse">Infirmier(e)</SelectItem>
+                  <SelectItem value="lab">Laboratoire</SelectItem>
+                  <SelectItem value="doctor">Médecin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditUserOpen(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleEditUser} disabled={actionLoading}>
+              {actionLoading ? "Modification..." : "Mettre à jour"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
       {/* Change Password Dialog */}
       <Dialog open={isChangePasswordOpen} onOpenChange={setIsChangePasswordOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Changer le mot de passe</DialogTitle>
             <DialogDescription>
-              {selectedUser && `Modifier le mot de passe pour ${selectedUser.firstName} ${selectedUser.lastName}`}
+              {selectedUser && `Modifier le mot de passe pour ${selectedUser.name}`}
             </DialogDescription>
           </DialogHeader>
           
@@ -390,8 +499,8 @@ const UserManagement = () => {
             <Button variant="outline" onClick={() => setIsChangePasswordOpen(false)}>
               Annuler
             </Button>
-            <Button onClick={handleChangePassword}>
-              Mettre à jour
+            <Button onClick={handleChangePassword} disabled={actionLoading}>
+              {actionLoading ? "Modification..." : "Mettre à jour"}
             </Button>
           </DialogFooter>
         </DialogContent>
