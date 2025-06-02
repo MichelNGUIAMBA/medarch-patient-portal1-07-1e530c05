@@ -8,17 +8,16 @@ import DoctorDashboard from '@/components/dashboards/DoctorDashboard';
 import LabDashboard from '@/components/dashboards/LabDashboard';
 import DefaultDashboard from '@/components/dashboards/DefaultDashboard';
 import { useLanguage } from '@/hooks/useLanguage';
-import { Stethoscope } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 const Dashboard = () => {
   const { profile, loading, isAuthenticated } = useSupabaseAuth();
   const { t } = useLanguage();
 
-  // Si pas encore chargé, afficher le loader
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <Stethoscope className="h-12 w-12 text-blue-800 dark:text-blue-400 animate-pulse mb-4" />
+        <Heart className="h-12 w-12 text-blue-800 dark:text-blue-400 animate-pulse mb-4" />
         <p className="text-lg text-blue-800 dark:text-blue-400 font-medium">
           Chargement du dossier médical...
         </p>
@@ -26,7 +25,6 @@ const Dashboard = () => {
     );
   }
 
-  // Si pas authentifié, afficher un message (normalement on ne devrait pas arriver ici)
   if (!isAuthenticated || !profile) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -42,7 +40,6 @@ const Dashboard = () => {
     );
   }
 
-  // Render dashboard based on user role
   const renderRoleDashboard = () => {
     switch (profile.role) {
       case 'secretary':
