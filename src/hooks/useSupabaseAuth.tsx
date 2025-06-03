@@ -16,36 +16,18 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     let mounted = true;
-    let profileCache: { [key: string]: Profile | null } = {};
-
-    const fetchProfileWithCache = async (userId: string) => {
-      if (profileCache[userId]) {
-        return profileCache[userId];
-      }
-      
-      try {
-        const profileData = await fetchProfile(userId);
-        profileCache[userId] = profileData;
-        return profileData;
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-    };
 
     const initializeAuth = async () => {
       try {
-        console.log('Starting auth initialization...');
+        console.log('Initializing auth...');
         
+        // Récupérer la session existante
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Error getting session:', error);
           if (mounted) {
             setError(error.message);
-            setUser(null);
-            setProfile(null);
-            setSession(null);
             setLoading(false);
           }
           return;
@@ -53,15 +35,22 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
         if (!mounted) return;
 
-        console.log('Initial session user ID:', session?.user?.id);
+        console.log('Session retrieved:', session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
+        // Récupérer le profil si l'utilisateur est connecté
         if (session?.user) {
-          const profileData = await fetchProfileWithCache(session.user.id);
-          if (mounted) {
-            console.log('Profile fetched:', profileData);
-            setProfile(profileData);
+          try {
+            const profileData = await fetchProfile(session.user.id);
+            if (mounted) {
+              setProfile(profileData);
+            }
+          } catch (profileError) {
+            console.error('Error fetching profile:', profileError);
+            if (mounted) {
+              setProfile(null);
+            }
           }
         } else {
           if (mounted) {
@@ -70,24 +59,21 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         }
         
         if (mounted) {
-          console.log('Auth initialization complete');
           setLoading(false);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
         if (mounted) {
-          setError('Erreur d\'initialisation de l\'authentification');
-          setUser(null);
-          setProfile(null);
-          setSession(null);
+          setError('Erreur d\'initialisation');
           setLoading(false);
         }
       }
     };
 
+    // Écouter les changements d'état d'auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth event:', event, 'User ID:', session?.user?.id);
+        console.log('Auth state changed:', event, session?.user?.id);
         
         if (!mounted) return;
 
@@ -95,14 +81,25 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         setUser(session?.user ?? null);
         setError(null);
         
-        if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
-          // Use cached profile for faster loading
-          const profileData = await fetchProfileWithCache(session.user.id);
-          if (mounted) {
-            console.log('Profile updated from auth change:', profileData);
-            setProfile(profileData);
-            setLoading(false);
-          }
+        if (session?.user && event === 'SIGNED_IN') {
+          // Différer la récupération du profil pour éviter les conflits
+          setTimeout(async () => {
+            if (mounted) {
+              try {
+                const profileData = await fetchProfile(session.user.id);
+                if (mounted) {
+                  setProfile(profileData);
+                  setLoading(false);
+                }
+              } catch (error) {
+                console.error('Error fetching profile on sign in:', error);
+                if (mounted) {
+                  setProfile(null);
+                  setLoading(false);
+                }
+              }
+            }
+          }, 100);
         } else {
           if (mounted) {
             setProfile(null);
@@ -112,6 +109,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       }
     );
 
+    // Initialiser l'auth
     initializeAuth();
 
     return () => {
@@ -126,7 +124,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     
     try {
       await loginUser(email, password);
-      // Don't set loading to false here, let onAuthStateChange handle it
+      // L'état sera mis à jour par onAuthStateChange
     } catch (error: any) {
       setError(error.message);
       setLoading(false);
@@ -154,6 +152,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       await logoutUser();
     } catch (error) {
       console.error('Logout error:', error);
+      // Forcer la redirection même en cas d'erreur
       window.location.href = '/auth';
     }
   };

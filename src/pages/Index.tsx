@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { Hospital, Heart } from 'lucide-react';
@@ -7,34 +7,19 @@ import { Hospital, Heart } from 'lucide-react';
 const Index = () => {
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useSupabaseAuth();
-  const [hasRedirected, setHasRedirected] = useState(false);
 
   useEffect(() => {
-    console.log('Index page - loading:', loading, 'isAuthenticated:', isAuthenticated, 'hasRedirected:', hasRedirected);
-    
-    // Reduced timeout to 3 seconds for faster fallback
-    const timeoutId = setTimeout(() => {
-      if (loading && !hasRedirected) {
-        console.log('Forcing redirect due to timeout');
-        setHasRedirected(true);
-        navigate('/auth', { replace: true });
-      }
-    }, 3000);
-
-    if (!loading && !hasRedirected) {
-      setHasRedirected(true);
-      
-      console.log('Redirecting based on auth state:', isAuthenticated);
+    // Attendre que l'auth soit résolue avant de rediriger
+    if (!loading) {
       if (isAuthenticated) {
         navigate('/dashboard', { replace: true });
       } else {
         navigate('/auth', { replace: true });
       }
     }
+  }, [loading, isAuthenticated, navigate]);
 
-    return () => clearTimeout(timeoutId);
-  }, [isAuthenticated, loading, navigate, hasRedirected]);
-
+  // Afficher l'écran de chargement pendant la vérification
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-slate-900">
       <div className="text-center">
@@ -46,14 +31,9 @@ const Index = () => {
         <div className="mt-8 flex items-center justify-center">
           <Heart className="h-8 w-8 text-blue-800 dark:text-blue-400 animate-pulse mr-4" />
           <span className="text-blue-800 dark:text-blue-400 font-medium">
-            {loading ? 'Connexion rapide en cours...' : 'Redirection sécurisée...'}
+            Initialisation en cours...
           </span>
         </div>
-        {loading && (
-          <div className="mt-4 text-sm text-blue-600 dark:text-blue-300">
-            Authentification optimisée...
-          </div>
-        )}
       </div>
     </div>
   );

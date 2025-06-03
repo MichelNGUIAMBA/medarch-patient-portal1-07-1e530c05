@@ -23,10 +23,10 @@ const Auth = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
-  // Redirection automatique si déjà connecté
+  // Redirection si déjà connecté (une seule fois)
   useEffect(() => {
     if (isAuthenticated) {
-      console.log('User is authenticated, redirecting to dashboard...');
+      console.log('User already authenticated, redirecting...');
       navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, navigate]);
@@ -34,13 +34,10 @@ const Auth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
     try {
       await login(email, password);
       toast.success(t('loginSuccess') || "Connexion réussie !");
-      // Force redirect after successful login
-      setTimeout(() => {
-        navigate('/dashboard', { replace: true });
-      }, 100);
     } catch (error: any) {
       toast.error(error.message || t('loginError') || "Erreur de connexion");
     } finally {
@@ -60,9 +57,6 @@ const Auth = () => {
       
       if (error) {
         toast.error(`Erreur de connexion ${provider === 'google' ? 'Google' : 'LinkedIn'}: ${error.message}`);
-      } else {
-        // OAuth will handle redirect automatically
-        toast.success("Redirection en cours...");
       }
     } catch (error: any) {
       toast.error(`Erreur de connexion ${provider === 'google' ? 'Google' : 'LinkedIn'}: ${error.message}`);
