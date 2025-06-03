@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { PatientSelect } from '@/components/exams/PatientSelect';
-import { useAuth } from '@/hooks/use-auth-context';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { toast } from '@/components/ui/sonner';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -96,7 +96,7 @@ type FormValues = {
 
 const LabExamForm = () => {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, profile } = useSupabaseAuth();
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<FormValues>();
   const { requestLabExams } = usePatientStore();
   const [selectedPatientId, setSelectedPatientId] = useState("");
@@ -161,7 +161,10 @@ const LabExamForm = () => {
       requestLabExams(
         data.patientId, 
         requestedExams, 
-        { name: user.name, role: user.role }
+        { 
+          name: profile?.name || user?.email || 'Utilisateur', 
+          role: profile?.role || 'nurse' 
+        }
       );
       
       toast.success(t('labExamsRequested'));
