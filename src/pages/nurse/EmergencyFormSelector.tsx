@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/sonner';
-import { useAuth } from '@/hooks/use-auth-context';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import BackButton from '@/components/shared/BackButton';
 import { PatientSelect } from '@/components/exams/PatientSelect';
@@ -17,7 +17,7 @@ import ObservationForm from '@/components/emergencies/ObservationForm';
 const EmergencyFormSelector = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   
   const [formType, setFormType] = useState('standard');
   const [selectedPatientId, setSelectedPatientId] = useState('');
@@ -79,11 +79,11 @@ const EmergencyFormSelector = () => {
         serviceData: updatedFormData,
         date: now
       },
-      { name: user.name, role: user.role }
+      { name: user.profile?.name || user.user?.email || 'Utilisateur', role: user.profile?.role || 'nurse' }
     );
     
     // Marquer le patient comme traité
-    setPatientCompleted(selectedPatientId, { name: user.name, role: user.role });
+    setPatientCompleted(selectedPatientId, { name: user.profile?.name || user.user?.email || 'Utilisateur', role: user.profile?.role || 'nurse' });
     
     toast.success(`${notesTitle} enregistrée avec succès`);
     

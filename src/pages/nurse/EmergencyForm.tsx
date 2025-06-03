@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { toast } from '@/components/ui/sonner';
-import { useAuth } from '@/hooks/use-auth-context';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import BackButton from '@/components/shared/BackButton';
 
@@ -15,7 +15,7 @@ const EmergencyForm = () => {
   const { patientId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const { t } = useLanguage();
   const isEditMode = location.pathname.includes('/edit');
   const [initialData, setInitialData] = useState({});
@@ -111,6 +111,9 @@ const EmergencyForm = () => {
         break;
     }
 
+    const userName = user.profile?.name || user.user?.email || 'Utilisateur';
+    const userRole = user.profile?.role || 'nurse';
+
     if (isEditMode) {
       // Mettre à jour le patient avec les nouvelles données
       updatePatient(
@@ -118,7 +121,7 @@ const EmergencyForm = () => {
         {
           notes: `${notesTitle}: ${notesDetails} - ${formData.immediateActions || t('noImmediateActions')}`
         },
-        { name: user.name, role: user.role }
+        { name: userName, role: userRole }
       );
       
       toast.success(t('emergencyTreatmentUpdated'));
@@ -132,7 +135,7 @@ const EmergencyForm = () => {
         {
           notes: `${notesTitle}: ${notesDetails} - ${formData.immediateActions || t('noImmediateActions')}`
         },
-        { name: user.name, role: user.role }
+        { name: userName, role: userRole }
       );
       
       // Ajouter l'enregistrement de service à l'historique du patient
@@ -143,11 +146,11 @@ const EmergencyForm = () => {
           serviceData: updatedFormData,
           date: now
         },
-        { name: user.name, role: user.role }
+        { name: userName, role: userRole }
       );
       
       // Marquer le patient comme terminé
-      setPatientCompleted(patient.id, { name: user.name, role: user.role });
+      setPatientCompleted(patient.id, { name: userName, role: userRole });
       
       toast.success(t('emergencyTreatmentSaved'));
     }
