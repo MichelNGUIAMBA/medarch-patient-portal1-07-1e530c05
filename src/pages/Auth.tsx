@@ -13,23 +13,30 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import ThemeSwitcher from "@/components/layout/ThemeSwitcher";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 import { useLanguage } from "@/hooks/useLanguage";
+import { cleanupAuthState } from "@/utils/authCleanup";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null);
-  const { login, error, isAuthenticated } = useSupabaseAuth();
+  const { login, error, isAuthenticated, loading } = useSupabaseAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
 
-  // Redirection si déjà connecté (une seule fois)
+  // Nettoyer l'état d'auth quand on arrive sur la page
   useEffect(() => {
-    if (isAuthenticated) {
-      console.log('User already authenticated, redirecting...');
+    console.log('Auth page mounted, cleaning up previous sessions...');
+    cleanupAuthState();
+  }, []);
+
+  // Redirection si connecté (mais seulement après que loading soit false)
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      console.log('User authenticated, redirecting to dashboard...');
       navigate('/dashboard', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, loading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +45,7 @@ const Auth = () => {
     try {
       await login(email, password);
       toast.success(t('loginSuccess') || "Connexion réussie !");
+      // La redirection sera gérée par useEffect
     } catch (error: any) {
       toast.error(error.message || t('loginError') || "Erreur de connexion");
     } finally {
@@ -48,6 +56,9 @@ const Auth = () => {
   const handleSocialLogin = async (provider: 'google' | 'linkedin_oidc') => {
     setIsSocialLoading(provider);
     try {
+      // Nettoyer avant la connexion sociale
+      cleanupAuthState();
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
@@ -66,6 +77,18 @@ const Auth = () => {
   };
 
   const currentYear = new Date().getFullYear();
+
+  // Afficher un loading pendant l'initialisation
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-slate-900">
+        <div className="text-center">
+          <Hospital className="mx-auto h-16 w-16 text-blue-800 dark:text-blue-400 animate-pulse" />
+          <p className="mt-4 text-blue-800 dark:text-blue-400">Vérification de l'authentification...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-slate-900 p-4">

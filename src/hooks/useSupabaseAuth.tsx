@@ -6,6 +6,7 @@ import { AuthContext, useAuthContext } from "./auth/AuthContext";
 import { Profile, AuthContextType } from "./auth/types";
 import { fetchProfile } from "./auth/profileService";
 import { loginUser, signupUser, logoutUser } from "./auth/authActions";
+import { cleanupAuthState } from "@/utils/authCleanup";
 
 export function SupabaseAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -21,7 +22,20 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       try {
         console.log('Initializing auth...');
         
-        // Récupérer la session existante
+        // Nettoyer l'état d'auth au démarrage
+        cleanupAuthState();
+        
+        // Forcer la déconnexion pour s'assurer qu'il n'y a pas de session résiduelle
+        try {
+          await supabase.auth.signOut({ scope: 'global' });
+        } catch (err) {
+          console.log('Initial signout attempt (ignoring errors):', err);
+        }
+        
+        // Attendre un peu avant de vérifier la session
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Récupérer la session existante (devrait être null après cleanup)
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -35,28 +49,12 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
         if (!mounted) return;
 
-        console.log('Session retrieved:', session?.user?.id);
-        setSession(session);
-        setUser(session?.user ?? null);
+        console.log('Session after cleanup:', session?.user?.id || 'No session');
         
-        // Récupérer le profil si l'utilisateur est connecté
-        if (session?.user) {
-          try {
-            const profileData = await fetchProfile(session.user.id);
-            if (mounted) {
-              setProfile(profileData);
-            }
-          } catch (profileError) {
-            console.error('Error fetching profile:', profileError);
-            if (mounted) {
-              setProfile(null);
-            }
-          }
-        } else {
-          if (mounted) {
-            setProfile(null);
-          }
-        }
+        // La session devrait être null après le nettoyage
+        setSession(null);
+        setUser(null);
+        setProfile(null);
         
         if (mounted) {
           setLoading(false);
@@ -73,7 +71,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     // Écouter les changements d'état d'auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
+        console.log('Auth state changed:', event, session?.user?.id || 'No session');
         
         if (!mounted) return;
 
@@ -82,7 +80,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         setError(null);
         
         if (session?.user && event === 'SIGNED_IN') {
-          // Différer la récupération du profil pour éviter les conflits
+          // Récupérer le profil après connexion réussie
           setTimeout(async () => {
             if (mounted) {
               try {
@@ -123,6 +121,9 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     setLoading(true);
     
     try {
+      // Nettoyer avant de se connecter
+      cleanupAuthState();
+      
       await loginUser(email, password);
       // L'état sera mis à jour par onAuthStateChange
     } catch (error: any) {
@@ -149,7 +150,19 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     setError(null);
     
     try {
-      await logoutUser();
+      // Nettoyer l'état d'auth
+      cleanupAuthState();
+      
+      // Déconnexion globale
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      // Réinitialiser les états
+      setUser(null);
+      setProfile(null);
+      setSession(null);
+      
+      // Rediriger vers auth
+      window.location.href = '/auth';
     } catch (error) {
       console.error('Logout error:', error);
       // Forcer la redirection même en cas d'erreur
