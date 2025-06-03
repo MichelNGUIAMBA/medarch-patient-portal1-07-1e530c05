@@ -126,7 +126,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     
     try {
       await loginUser(email, password);
-      // Don't set loading to false here, let onAuthStateChange handle it
     } catch (error: any) {
       setError(error.message);
       setLoading(false);
