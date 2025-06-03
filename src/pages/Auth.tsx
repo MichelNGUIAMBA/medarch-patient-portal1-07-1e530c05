@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,9 +19,17 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null);
-  const { login, error } = useSupabaseAuth();
+  const { login, error, isAuthenticated } = useSupabaseAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
+
+  // Redirection automatique si déjà connecté
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('User is authenticated, redirecting to dashboard...');
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +37,10 @@ const Auth = () => {
     try {
       await login(email, password);
       toast.success(t('loginSuccess') || "Connexion réussie !");
-      // Navigation will be handled by auth state change
+      // Force redirect after successful login
+      setTimeout(() => {
+        navigate('/dashboard', { replace: true });
+      }, 100);
     } catch (error: any) {
       toast.error(error.message || t('loginError') || "Erreur de connexion");
     } finally {
@@ -49,6 +60,9 @@ const Auth = () => {
       
       if (error) {
         toast.error(`Erreur de connexion ${provider === 'google' ? 'Google' : 'LinkedIn'}: ${error.message}`);
+      } else {
+        // OAuth will handle redirect automatically
+        toast.success("Redirection en cours...");
       }
     } catch (error: any) {
       toast.error(`Erreur de connexion ${provider === 'google' ? 'Google' : 'LinkedIn'}: ${error.message}`);
