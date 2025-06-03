@@ -17,7 +17,7 @@ import ObservationForm from '@/components/emergencies/ObservationForm';
 const EmergencyFormSelector = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { user } = useSupabaseAuth();
+  const { user, profile } = useSupabaseAuth();
   
   const [formType, setFormType] = useState('standard');
   const [selectedPatientId, setSelectedPatientId] = useState('');
@@ -79,11 +79,11 @@ const EmergencyFormSelector = () => {
         serviceData: updatedFormData,
         date: now
       },
-      { name: user.profile?.name || user.user?.email || 'Utilisateur', role: user.profile?.role || 'nurse' }
+      { name: profile?.name || user?.email || 'Utilisateur', role: profile?.role || 'nurse' }
     );
     
     // Marquer le patient comme traité
-    setPatientCompleted(selectedPatientId, { name: user.profile?.name || user.user?.email || 'Utilisateur', role: user.profile?.role || 'nurse' });
+    setPatientCompleted(selectedPatientId, { name: profile?.name || user?.email || 'Utilisateur', role: profile?.role || 'nurse' });
     
     toast.success(`${notesTitle} enregistrée avec succès`);
     

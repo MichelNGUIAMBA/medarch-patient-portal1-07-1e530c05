@@ -15,7 +15,7 @@ const EmergencyForm = () => {
   const { patientId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useSupabaseAuth();
+  const { user, profile } = useSupabaseAuth();
   const { t } = useLanguage();
   const isEditMode = location.pathname.includes('/edit');
   const [initialData, setInitialData] = useState({});
@@ -111,8 +111,8 @@ const EmergencyForm = () => {
         break;
     }
 
-    const userName = user.profile?.name || user.user?.email || 'Utilisateur';
-    const userRole = user.profile?.role || 'nurse';
+    const userName = profile?.name || user?.email || 'Utilisateur';
+    const userRole = profile?.role || 'nurse';
 
     if (isEditMode) {
       // Mettre à jour le patient avec les nouvelles données
