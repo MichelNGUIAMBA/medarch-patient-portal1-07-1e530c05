@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PatientSelect } from '@/components/exams/PatientSelect';
-import { useAuth } from '@/hooks/use-auth-context';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { toast } from '@/components/ui/sonner';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -25,7 +25,7 @@ type FormValues = {
 
 const GlycemiaForm = () => {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, profile } = useSupabaseAuth();
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<FormValues>({
     defaultValues: {
       examData: {
@@ -69,9 +69,15 @@ const GlycemiaForm = () => {
           type: 'GlycemiaControl',
           status: 'pending',
           data: filledRows,
-          requestedBy: { name: user.name, role: user.role }
+          requestedBy: { 
+            name: profile?.name || user?.email || 'Utilisateur', 
+            role: profile?.role || 'nurse' 
+          }
         }], 
-        { name: user.name, role: user.role }
+        { 
+          name: profile?.name || user?.email || 'Utilisateur', 
+          role: profile?.role || 'nurse' 
+        }
       );
       
       toast.success(t('glycemiaExamRequested'));
