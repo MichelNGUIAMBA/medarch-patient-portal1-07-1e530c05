@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { usePatientStore } from '@/stores/usePatientStore';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/sonner';
-import { useAuth } from '@/hooks/use-auth-context';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -16,7 +16,7 @@ import BackButton from '@/components/shared/BackButton';
 
 const WaitingPatients = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useSupabaseAuth();
   const { t } = useLanguage();
   const patients = usePatientStore(state => state.patients);
   const takeCharge = usePatientStore(state => state.takeCharge);
@@ -55,8 +55,8 @@ const WaitingPatients = () => {
   const handleTakeCharge = (patientId: string, service: "VM" | "Cons" | "Ug") => {
     if (!user) return;
     takeCharge(patientId, {
-      name: user.name,
-      role: user.role
+      name: profile?.name || user?.email || 'Utilisateur',
+      role: profile?.role || 'nurse'
     });
     toast.success(t('patientTakenInCharge'));
 
