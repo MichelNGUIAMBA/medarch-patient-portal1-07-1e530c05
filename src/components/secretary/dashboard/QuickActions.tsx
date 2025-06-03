@@ -54,7 +54,7 @@ const QuickActions = () => {
         
         <Button 
           variant="outline" 
-          onClick={() => navigate('/dashboard/nurse/emergency-forms')} 
+          onClick={() => navigate('/dashboard/secretary/emergency-forms')} 
           className="h-auto py-4 flex flex-col items-center justify-center border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <Hospital className="h-6 w-6 text-red-600 dark:text-red-400 mb-1" />

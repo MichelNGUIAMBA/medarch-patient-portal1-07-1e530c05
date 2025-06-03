@@ -182,20 +182,6 @@ const Auth = () => {
           © {currentYear} MedArch - {t('allRightsReserved') || 'Tous droits réservés'}
         </CardFooter>
       </Card>
-      
-      <div className="fixed bottom-4 right-4 max-w-sm">
-        <Card className="p-4 shadow-md bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 dark:text-white">
-          <h3 className="font-medium mb-2">{t('demoAccounts') || 'Comptes de démonstration'} :</h3>
-          <ul className="text-sm space-y-1">
-            <li>admin@medarch.com</li>
-            <li>secretary@medarch.com</li>
-            <li>nurse@medarch.com</li>
-            <li>lab@medarch.com</li>
-            <li>doctor@medarch.com</li>
-            <li className="font-medium mt-1">{t('password') || 'Mot de passe'} : password</li>
-          </ul>
-        </Card>
-      </div>
     </div>
   );
 };
