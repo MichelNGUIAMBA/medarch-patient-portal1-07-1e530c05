@@ -1,16 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { cleanupAuthState } from '@/utils/authCleanup';
 
 export const loginUser = async (email: string, password: string) => {
-  cleanupAuthState();
-  
-  try {
-    await supabase.auth.signOut({ scope: 'global' });
-  } catch (err) {
-    console.log('Global signout error (ignoring):', err);
-  }
-  
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -22,8 +13,6 @@ export const loginUser = async (email: string, password: string) => {
 };
 
 export const signupUser = async (email: string, password: string, name: string, role: string) => {
-  cleanupAuthState();
-  
   const { error } = await supabase.auth.signUp({
     email,
     password,
@@ -41,8 +30,6 @@ export const signupUser = async (email: string, password: string, name: string, 
 };
 
 export const logoutUser = async () => {
-  cleanupAuthState();
-  
   try {
     await supabase.auth.signOut({ scope: 'global' });
   } catch (err) {

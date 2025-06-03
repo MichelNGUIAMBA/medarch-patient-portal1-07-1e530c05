@@ -29,7 +29,7 @@ const Auth = () => {
     try {
       await login(email, password);
       toast.success(t('loginSuccess') || "Connexion réussie !");
-      navigate("/dashboard");
+      // Navigation will be handled by auth state change
     } catch (error: any) {
       toast.error(error.message || t('loginError') || "Erreur de connexion");
     } finally {
@@ -78,7 +78,6 @@ const Auth = () => {
         </CardHeader>
         
         <CardContent className="space-y-4">
-          {/* Error Alert */}
           {error && (
             <Alert variant="destructive" className="mb-4">
               <AlertCircle className="h-4 w-4" />
@@ -86,7 +85,6 @@ const Auth = () => {
             </Alert>
           )}
 
-          {/* Social Login Buttons */}
           <div className="space-y-3">
             <Button 
               variant="outline" 
@@ -125,7 +123,6 @@ const Auth = () => {
             </div>
           </div>
 
-          {/* Email/Password Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
@@ -172,7 +169,6 @@ const Auth = () => {
         </CardFooter>
       </Card>
       
-      {/* Message d'aide avec comptes de test */}
       <div className="fixed bottom-4 right-4 max-w-sm">
         <Card className="p-4 shadow-md bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 dark:text-white">
           <h3 className="font-medium mb-2">{t('demoAccounts') || 'Comptes de démonstration'} :</h3>

@@ -12,14 +12,14 @@ const Index = () => {
   useEffect(() => {
     console.log('Index page - loading:', loading, 'isAuthenticated:', isAuthenticated, 'hasRedirected:', hasRedirected);
     
-    // Add a timeout to prevent infinite loading
+    // Reduced timeout to 3 seconds for faster fallback
     const timeoutId = setTimeout(() => {
       if (loading && !hasRedirected) {
         console.log('Forcing redirect due to timeout');
         setHasRedirected(true);
         navigate('/auth', { replace: true });
       }
-    }, 10000); // 10 second timeout
+    }, 3000);
 
     if (!loading && !hasRedirected) {
       setHasRedirected(true);
@@ -46,12 +46,12 @@ const Index = () => {
         <div className="mt-8 flex items-center justify-center">
           <Heart className="h-8 w-8 text-blue-800 dark:text-blue-400 animate-pulse mr-4" />
           <span className="text-blue-800 dark:text-blue-400 font-medium">
-            {loading ? 'Vérification des accès médicaux...' : 'Redirection sécurisée en cours...'}
+            {loading ? 'Connexion rapide en cours...' : 'Redirection sécurisée...'}
           </span>
         </div>
         {loading && (
           <div className="mt-4 text-sm text-blue-600 dark:text-blue-300">
-            Chargement en cours... Si cela prend trop de temps, vous serez redirigé automatiquement.
+            Authentification optimisée...
           </div>
         )}
       </div>

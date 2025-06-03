@@ -16,6 +16,22 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     let mounted = true;
+    let profileCache: { [key: string]: Profile | null } = {};
+
+    const fetchProfileWithCache = async (userId: string) => {
+      if (profileCache[userId]) {
+        return profileCache[userId];
+      }
+      
+      try {
+        const profileData = await fetchProfile(userId);
+        profileCache[userId] = profileData;
+        return profileData;
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+      }
+    };
 
     const initializeAuth = async () => {
       try {
@@ -42,17 +58,10 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          try {
-            const profileData = await fetchProfile(session.user.id);
-            if (mounted) {
-              console.log('Profile fetched:', profileData);
-              setProfile(profileData);
-            }
-          } catch (profileError) {
-            console.error('Error fetching profile:', profileError);
-            if (mounted) {
-              setProfile(null);
-            }
+          const profileData = await fetchProfileWithCache(session.user.id);
+          if (mounted) {
+            console.log('Profile fetched:', profileData);
+            setProfile(profileData);
           }
         } else {
           if (mounted) {
@@ -60,9 +69,8 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
           }
         }
         
-        // Always set loading to false at the end
         if (mounted) {
-          console.log('Auth initialization complete, setting loading to false');
+          console.log('Auth initialization complete');
           setLoading(false);
         }
       } catch (error) {
@@ -88,22 +96,14 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         setError(null);
         
         if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
-          try {
-            const profileData = await fetchProfile(session.user.id);
-            if (mounted) {
-              console.log('Profile updated from auth change:', profileData);
-              setProfile(profileData);
-              setLoading(false);
-            }
-          } catch (profileError) {
-            console.error('Error fetching profile on auth change:', profileError);
-            if (mounted) {
-              setProfile(null);
-              setLoading(false);
-            }
+          // Use cached profile for faster loading
+          const profileData = await fetchProfileWithCache(session.user.id);
+          if (mounted) {
+            console.log('Profile updated from auth change:', profileData);
+            setProfile(profileData);
+            setLoading(false);
           }
         } else {
-          // No session or signed out
           if (mounted) {
             setProfile(null);
             setLoading(false);
@@ -112,7 +112,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       }
     );
 
-    // Start initialization
     initializeAuth();
 
     return () => {
@@ -127,7 +126,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     
     try {
       await loginUser(email, password);
-      // Loading will be set to false by onAuthStateChange
     } catch (error: any) {
       setError(error.message);
       setLoading(false);
@@ -141,7 +139,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     
     try {
       await signupUser(email, password, name, role);
-      // Loading will be set to false by onAuthStateChange
     } catch (error: any) {
       setError(error.message);
       setLoading(false);
@@ -156,7 +153,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       await logoutUser();
     } catch (error) {
       console.error('Logout error:', error);
-      // Force redirect even if logout fails
       window.location.href = '/auth';
     }
   };
