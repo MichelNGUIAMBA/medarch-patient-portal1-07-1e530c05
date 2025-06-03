@@ -8,7 +8,6 @@ import PatientEditDialog from '@/components/nurse/PatientEditDialog';
 import ModificationHistory from '@/components/nurse/ModificationHistory';
 import { CompletePatientEditDialog } from '@/components/nurse/patientEdit';
 import { useNavigate } from 'react-router-dom';
-
 const ConsultationsStats = () => {
   const navigate = useNavigate();
   // Fix: Separate state selectors to prevent infinite re-renders
@@ -54,7 +53,7 @@ const ConsultationsStats = () => {
     }
   };
   return <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-6">Statistiques des consultations</h1>
+      <h1 className="text-2xl font-bold mb-6 text-green-700">Statistiques des consultations</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <Card>
