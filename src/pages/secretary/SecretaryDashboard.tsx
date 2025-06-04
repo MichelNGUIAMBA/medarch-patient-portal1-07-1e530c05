@@ -91,19 +91,7 @@ const SecretaryDashboard = () => {
         onFilterChange={handleFilterChange} 
         activeFilters={activeFilters} 
       />
-      <PatientsTable patients={filteredAndSortedPatients.map(patient => ({
-        id: patient.id,
-        name: patient.name,
-        firstName: patient.first_name,
-        lastName: patient.last_name,
-        birthDate: patient.birth_date,
-        company: patient.companies?.name || '',
-        service: patient.service as "VM" | "Cons" | "Ug",
-        status: patient.status as "En attente" | "En cours" | "Terminé",
-        registeredAt: patient.created_at,
-        gender: patient.gender,
-        originalPatientId: patient.original_patient_id
-      }))} />
+      <PatientsTable />
     </div>
   );
 };
