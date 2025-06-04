@@ -12,7 +12,7 @@ interface StatsCardProps {
 
 const StatsCard = ({ title, value, icon: Icon, iconColor }: StatsCardProps) => {
   return (
-    <Card className="hover:scale-105 transition-transform duration-200 hover:shadow-lg hover:border-primary/50">
+    <Card className="hover:scale-105 transition-all duration-300 hover:shadow-lg hover:border-primary/50 cursor-pointer">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}

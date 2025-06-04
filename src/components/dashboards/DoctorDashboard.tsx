@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Users, Calendar, Hospital, Search, Brain, FileText, PieChart, AlertOctagon, BookOpen } from 'lucide-react';
 import StatsCard from '@/components/shared/StatsCard';
@@ -18,13 +17,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useAuth } from '@/hooks/use-auth-context';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { toast } from '@/components/ui/sonner';
 
 const DoctorDashboard = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const patients = usePatientStore(state => state.patients);
   const takeCharge = usePatientStore(state => state.takeCharge);
   
