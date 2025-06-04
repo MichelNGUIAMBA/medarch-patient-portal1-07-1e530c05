@@ -121,6 +121,7 @@ export const useSupabaseAdmin = () => {
       throw new Error('Non autorisé');
     }
 
+    // Utiliser l'API auth admin pour créer l'utilisateur
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -137,21 +138,8 @@ export const useSupabaseAdmin = () => {
       throw error;
     }
 
-    if (data.user) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: data.user.id,
-          name,
-          role
-        });
-
-      if (profileError) {
-        console.error('Error creating profile:', profileError);
-        throw profileError;
-      }
-    }
-
+    // Le trigger handle_new_user va automatiquement créer le profil
+    
     await fetchUsers();
     await fetchSystemStats();
     return data;
@@ -164,7 +152,7 @@ export const useSupabaseAdmin = () => {
 
     const { data, error } = await supabase
       .from('profiles')
-      .update({ role: newRole })
+      .update({ role: newRole, updated_at: new Date().toISOString() })
       .eq('id', userId)
       .select()
       .single();
@@ -186,7 +174,7 @@ export const useSupabaseAdmin = () => {
 
     const { data, error } = await supabase
       .from('profiles')
-      .update({ name: newName })
+      .update({ name: newName, updated_at: new Date().toISOString() })
       .eq('id', userId)
       .select()
       .single();
@@ -205,6 +193,7 @@ export const useSupabaseAdmin = () => {
       throw new Error('Non autorisé');
     }
 
+    // Supprimer le profil (cela ne supprime pas l'utilisateur auth, juste le profil)
     const { error } = await supabase
       .from('profiles')
       .delete()

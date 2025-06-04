@@ -22,20 +22,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       try {
         console.log('Initializing auth...');
         
-        // Nettoyer l'état d'auth au démarrage
-        cleanupAuthState();
-        
-        // Forcer la déconnexion pour s'assurer qu'il n'y a pas de session résiduelle
-        try {
-          await supabase.auth.signOut({ scope: 'global' });
-        } catch (err) {
-          console.log('Initial signout attempt (ignoring errors):', err);
-        }
-        
-        // Attendre un peu avant de vérifier la session
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Récupérer la session existante (devrait être null après cleanup)
+        // Récupérer la session existante
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -49,12 +36,25 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
         if (!mounted) return;
 
-        console.log('Session after cleanup:', session?.user?.id || 'No session');
+        console.log('Initial session:', session?.user?.id || 'No session');
         
-        // La session devrait être null après le nettoyage
-        setSession(null);
-        setUser(null);
-        setProfile(null);
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        // Si on a une session, récupérer le profil
+        if (session?.user) {
+          try {
+            const profileData = await fetchProfile(session.user.id);
+            if (mounted) {
+              setProfile(profileData);
+            }
+          } catch (error) {
+            console.error('Error fetching profile on init:', error);
+            if (mounted) {
+              setProfile(null);
+            }
+          }
+        }
         
         if (mounted) {
           setLoading(false);
@@ -79,8 +79,8 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         setUser(session?.user ?? null);
         setError(null);
         
-        if (session?.user && event === 'SIGNED_IN') {
-          // Récupérer le profil après connexion réussie
+        if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          // Récupérer le profil après connexion réussie ou refresh token
           setTimeout(async () => {
             if (mounted) {
               try {
@@ -121,9 +121,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     setLoading(true);
     
     try {
-      // Nettoyer avant de se connecter
-      cleanupAuthState();
-      
       await loginUser(email, password);
       // L'état sera mis à jour par onAuthStateChange
     } catch (error: any) {

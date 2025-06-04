@@ -14,9 +14,34 @@ export const fetchProfile = async (userId: string): Promise<Profile | null> => {
     
     if (error) {
       console.error('Error fetching profile:', error);
-      // If no profile found, return null instead of throwing
+      
+      // Si aucun profil trouvé, essayons de le créer à partir des données auth
       if (error.code === 'PGRST116') {
-        console.log('No profile found for user:', userId);
+        console.log('No profile found, attempting to create one...');
+        
+        // Récupérer les données de l'utilisateur depuis auth
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          // Créer le profil manquant
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              id: user.id,
+              name: user.user_metadata?.name || user.email || 'Utilisateur',
+              role: user.user_metadata?.role || 'secretary'
+            })
+            .select()
+            .single();
+          
+          if (createError) {
+            console.error('Error creating profile:', createError);
+            return null;
+          }
+          
+          console.log('Profile created successfully:', newProfile);
+          return newProfile as Profile;
+        }
         return null;
       }
       throw error;
