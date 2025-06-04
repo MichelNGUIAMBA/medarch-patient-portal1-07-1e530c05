@@ -53,6 +53,10 @@ export const router = createBrowserRouter([
         element: <LabRoutes />,
       },
       {
+        path: 'laboratory/*',
+        element: <LabRoutes />,
+      },
+      {
         path: 'doctor/*',
         element: <DoctorRoutes />,
       },

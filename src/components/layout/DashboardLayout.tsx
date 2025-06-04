@@ -85,11 +85,11 @@ const DashboardLayout = () => {
       }],
       lab: [{
         title: t('exams'),
-        url: "/dashboard/laboratory/exams",
+        url: "/dashboard/lab/exams",
         icon: ClipboardCheck
       }, {
         title: t('examHistory'),
-        url: "/dashboard/laboratory/exam-history",
+        url: "/dashboard/lab/exam-history",
         icon: FileText
       }],
       doctor: [{

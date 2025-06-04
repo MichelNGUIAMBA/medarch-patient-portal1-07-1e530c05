@@ -12,9 +12,9 @@ const LabRoutes = () => {
       {/* Default redirect to dashboard */}
       <Route index element={<Navigate to="dashboard" replace />} />
       <Route path="dashboard" element={<LabDashboard />} />
+      <Route path="exams" element={<LabExams />} />
       <Route path="exam-history" element={<ExamHistory />} />
       <Route path="perform-exams/:patientId" element={<PerformExams />} />
-      <Route path="exams" element={<LabExams />} />
       {/* Catch all route for 404 within lab section */}
       <Route path="*" element={<Navigate to="dashboard" replace />} />
     </Routes>
