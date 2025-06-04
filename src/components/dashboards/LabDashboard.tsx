@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TestTube, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import StatsCard from '@/components/shared/StatsCard';
 
 const LabDashboard = () => {
   const { pendingExams, completedExams, loading } = useSupabaseLab();
@@ -29,59 +30,42 @@ const LabDashboard = () => {
     }
   };
 
+  const urgentExamsCount = pendingExams.filter(exam => exam.priority === 'urgent').length;
+  const completionRate = pendingExams.length + completedExams.length > 0 
+    ? Math.round((completedExams.length / (pendingExams.length + completedExams.length)) * 100)
+    : 0;
+
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Examens en attente</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{pendingExams.length}</div>
-            <p className="text-xs text-muted-foreground">À traiter</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Examens urgents</CardTitle>
-            <AlertCircle className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {pendingExams.filter(exam => exam.priority === 'urgent').length}
-            </div>
-            <p className="text-xs text-muted-foreground">Priorité urgente</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Examens complétés</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{completedExams.length}</div>
-            <p className="text-xs text-muted-foreground">Aujourd'hui</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Efficacité</CardTitle>
-            <TestTube className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {pendingExams.length + completedExams.length > 0 
-                ? Math.round((completedExams.length / (pendingExams.length + completedExams.length)) * 100)
-                : 0}%
-            </div>
-            <p className="text-xs text-muted-foreground">Taux de completion</p>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Examens en attente"
+          value={pendingExams.length}
+          icon={Clock}
+          iconColor="text-orange-600"
+        />
+        
+        <StatsCard
+          title="Examens urgents"
+          value={urgentExamsCount}
+          icon={AlertCircle}
+          iconColor="text-red-600"
+        />
+        
+        <StatsCard
+          title="Examens complétés"
+          value={completedExams.length}
+          icon={CheckCircle}
+          iconColor="text-green-600"
+        />
+        
+        <StatsCard
+          title="Efficacité"
+          value={`${completionRate}%`}
+          icon={TestTube}
+          iconColor="text-blue-600"
+        />
       </div>
 
       {/* Pending Exams */}

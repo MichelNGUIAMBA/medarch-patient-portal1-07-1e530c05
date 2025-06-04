@@ -11,7 +11,7 @@ const DoctorRoutes = () => {
   return (
     <Routes>
       {/* Default redirect to patients-to-see */}
-      <Route index element={<Navigate to="patients-to-see" replace />} />
+      <Route index element={<PatientsToSeePage />} />
       <Route path="patients-to-see" element={<PatientsToSeePage />} />
       <Route path="medical-records" element={<MedicalRecordsPage />} />
       <Route path="medical-records-complete" element={<MedicalRecordsCompletePage />} />

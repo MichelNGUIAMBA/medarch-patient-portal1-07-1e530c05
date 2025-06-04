@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePatientStore } from '@/stores/patient';
 import { useLanguage } from '@/hooks/useLanguage';
-import { useAuth } from '@/hooks/use-auth-context';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,7 @@ interface PatientWithAI extends Patient {
 const PatientsToSeePage: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useSupabaseAuth();
   const patients = usePatientStore((state) => state.patients);
   const updateServiceRecord = usePatientStore((state) => state.updateServiceRecord);
   
@@ -172,7 +172,7 @@ const PatientsToSeePage: React.FC = () => {
   };
 
   const handleSignature = (signatureData: SignatureData) => {
-    if (!selectedPatient || !quickDecision || !user) return;
+    if (!selectedPatient || !quickDecision || !user || !profile) return;
 
     // Sauvegarder la décision avec signature électronique
     const latestService = selectedPatient.serviceHistory ? 
@@ -184,7 +184,7 @@ const PatientsToSeePage: React.FC = () => {
       const updatedServiceData = {
         ...latestService.serviceData,
         doctorReview: {
-          doctor: user.name,
+          doctor: profile.name,
           reviewDate: new Date().toISOString(),
           interpretation: `Décision standard: ${quickDecision.title}`,
           recommendations: quickDecision.description,
