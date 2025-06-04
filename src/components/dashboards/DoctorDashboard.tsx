@@ -23,7 +23,7 @@ import { toast } from '@/components/ui/sonner';
 const DoctorDashboard = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { user } = useSupabaseAuth();
+  const { user, profile } = useSupabaseAuth();
   const patients = usePatientStore(state => state.patients);
   const takeCharge = usePatientStore(state => state.takeCharge);
   
@@ -47,11 +47,11 @@ const DoctorDashboard = () => {
   };
 
   const handleTakeCharge = (patientId: string, service: "VM" | "Cons" | "Ug") => {
-    if (!user) return;
+    if (!user || !profile) return;
     
     takeCharge(patientId, {
-      name: user.name,
-      role: user.role
+      name: profile.name,
+      role: profile.role
     });
     
     toast.success(t('patientTakenInCharge'));
