@@ -1,7 +1,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePatientStore } from '@/stores/patient';
+import { useUnifiedPatients } from '@/hooks/useUnifiedPatients';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,8 +14,6 @@ import { Badge } from '@/components/ui/badge';
 import { format, differenceInMinutes } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Patient } from '@/types/patient';
-import StandardDecisionButtons, { StandardDecision } from '@/components/doctor/decisions/StandardDecisionButtons';
-import ElectronicSignature, { SignatureData } from '@/components/doctor/signature/ElectronicSignature';
 import { toast } from '@/components/ui/use-toast';
 
 // Extended Patient type for local use with computed properties
@@ -29,14 +27,10 @@ const PatientsToSeePage: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { user, profile } = useSupabaseAuth();
-  const patients = usePatientStore((state) => state.patients);
-  const updateServiceRecord = usePatientStore((state) => state.updateServiceRecord);
+  const { patients } = useUnifiedPatients();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('priority');
-  const [selectedPatient, setSelectedPatient] = useState<PatientWithAI | null>(null);
-  const [isQuickConsultation, setIsQuickConsultation] = useState(false);
-  const [quickDecision, setQuickDecision] = useState<StandardDecision | null>(null);
 
   // Fonction pour calculer la priorité d'un patient
   const calculatePatientPriority = (patient: Patient): number => {
@@ -87,6 +81,8 @@ const PatientsToSeePage: React.FC = () => {
       } else {
         points.push(`✅ Résultats d'examens dans les normes`);
       }
+    } else {
+      points.push(`📋 En attente de résultats d'examens`);
     }
     
     // Analyse du temps d'attente
@@ -107,7 +103,7 @@ const PatientsToSeePage: React.FC = () => {
 
   // Filter patients who are waiting to see the doctor
   const patientsToSee = useMemo(() => {
-    const patients = usePatientStore.getState().patients.filter(patient => {
+    const filteredPatients = patients.filter(patient => {
       const hasCompletedExams = patient.completedLabExams && patient.completedLabExams.length > 0;
       const isPendingDoctorReview = !patient.serviceHistory?.some(record => 
         record.serviceData?.doctorReview?.completed
@@ -115,7 +111,7 @@ const PatientsToSeePage: React.FC = () => {
       return hasCompletedExams && isPendingDoctorReview;
     });
     
-    return patients.map(patient => ({
+    return filteredPatients.map(patient => ({
       ...patient,
       priority: calculatePatientPriority(patient),
       waitTime: differenceInMinutes(new Date(), new Date(patient.registeredAt)),
@@ -160,53 +156,6 @@ const PatientsToSeePage: React.FC = () => {
 
   const handleViewPatient = (patientId: string) => {
     navigate(`/dashboard/doctor/patient/${patientId}`);
-  };
-
-  const handleQuickConsultation = (patient: PatientWithAI) => {
-    setSelectedPatient(patient);
-    setIsQuickConsultation(true);
-  };
-
-  const handleStandardDecision = (decision: StandardDecision) => {
-    setQuickDecision(decision);
-  };
-
-  const handleSignature = (signatureData: SignatureData) => {
-    if (!selectedPatient || !quickDecision || !user || !profile) return;
-
-    // Sauvegarder la décision avec signature électronique
-    const latestService = selectedPatient.serviceHistory ? 
-      [...selectedPatient.serviceHistory].sort((a, b) => 
-        new Date(b.date || '').getTime() - new Date(a.date || '').getTime()
-      )[0] : null;
-    
-    if (latestService && latestService.date) {
-      const updatedServiceData = {
-        ...latestService.serviceData,
-        doctorReview: {
-          doctor: profile.name,
-          reviewDate: new Date().toISOString(),
-          interpretation: `Décision standard: ${quickDecision.title}`,
-          recommendations: quickDecision.description,
-          prescription: quickDecision.type === 'medication_adjustment' ? 'Ajustement thérapeutique selon protocole' : '',
-          completed: true,
-          quickDecision: quickDecision,
-          electronicSignature: signatureData
-        }
-      };
-      
-      updateServiceRecord(selectedPatient.id, latestService.date, updatedServiceData);
-      
-      toast({
-        title: t('quickConsultationCompleted'),
-        description: `${quickDecision.title} enregistré avec signature électronique`
-      });
-    }
-
-    // Reset
-    setIsQuickConsultation(false);
-    setSelectedPatient(null);
-    setQuickDecision(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -259,75 +208,6 @@ const PatientsToSeePage: React.FC = () => {
     const remainingMinutes = minutes % 60;
     return `${hours}h ${remainingMinutes}min`;
   };
-
-  if (isQuickConsultation && selectedPatient) {
-    return (
-      <div className="space-y-6 max-w-4xl mx-auto">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">{t('quickConsultation')} - {selectedPatient.lastName} {selectedPatient.firstName}</h1>
-          <Button variant="outline" onClick={() => setIsQuickConsultation(false)}>
-            {t('backToList')}
-          </Button>
-        </div>
-
-        {/* Résumé IA en 3 points */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="h-5 w-5" />
-              {t('aiSummary')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {selectedPatient.aiSummary.map((point, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center font-bold mt-0.5">
-                    {index + 1}
-                  </span>
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        {/* Décisions standards */}
-        {!quickDecision && (
-          <StandardDecisionButtons
-            onDecision={handleStandardDecision}
-          />
-        )}
-
-        {/* Signature électronique */}
-        {quickDecision && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('selectedDecision')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <h3 className="font-medium">{quickDecision.title}</h3>
-                  <p className="text-sm text-muted-foreground">{quickDecision.description}</p>
-                  {quickDecision.duration && (
-                    <Badge variant="outline">Durée: {quickDecision.duration}</Badge>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <ElectronicSignature
-              documentType={`Consultation rapide - ${quickDecision.title}`}
-              patientId={selectedPatient.id}
-              content={`Patient: ${selectedPatient.lastName} ${selectedPatient.firstName}\nDécision: ${quickDecision.title}\nDescription: ${quickDecision.description}`}
-              onSigned={handleSignature}
-            />
-          </div>
-        )}
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -407,7 +287,10 @@ const PatientsToSeePage: React.FC = () => {
                         <Button 
                           variant="secondary"
                           size="sm" 
-                          onClick={() => handleQuickConsultation(patient)}
+                          onClick={() => toast({
+                            title: "Consultation rapide",
+                            description: "Fonctionnalité en cours de développement"
+                          })}
                         >
                           <Zap className="w-4 h-4 mr-2" />
                           {t('quick')}

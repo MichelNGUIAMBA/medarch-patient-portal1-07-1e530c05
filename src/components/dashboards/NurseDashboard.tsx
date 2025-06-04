@@ -1,15 +1,16 @@
 
 import React from 'react';
-import { useSupabaseNurse } from '@/hooks/useSupabaseNurse';
+import { useUnifiedPatients } from '@/hooks/useUnifiedPatients';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Users, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { differenceInYears } from 'date-fns';
+import StatsCard from '@/components/shared/StatsCard';
 
 const NurseDashboard = () => {
-  const { waitingPatients, inProgressPatients, completedPatients, loading, takeChargeOfPatient } = useSupabaseNurse();
+  const { patients, loading } = useUnifiedPatients();
   const { t } = useLanguage();
 
   if (loading) {
@@ -19,6 +20,12 @@ const NurseDashboard = () => {
       </div>
     );
   }
+
+  // Filtrer les patients par statut
+  const waitingPatients = patients.filter(p => p.status === 'En attente');
+  const inProgressPatients = patients.filter(p => p.status === 'En cours');
+  const completedPatients = patients.filter(p => p.status === 'Terminé');
+  const urgentPatients = waitingPatients.filter(p => p.service === 'Ug');
 
   const getServiceBadgeColor = (service: string) => {
     switch (service) {
@@ -38,63 +45,37 @@ const NurseDashboard = () => {
     }
   };
 
-  const handleTakeCharge = async (patientId: string) => {
-    try {
-      await takeChargeOfPatient(patientId);
-    } catch (error) {
-      console.error('Error taking charge:', error);
-    }
-  };
-
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Patients en attente</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{waitingPatients.length}</div>
-            <p className="text-xs text-muted-foreground">À prendre en charge</p>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Patients en attente"
+          value={waitingPatients.length}
+          icon={Clock}
+          iconColor="text-orange-600"
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">En cours</CardTitle>
-            <Users className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{inProgressPatients.length}</div>
-            <p className="text-xs text-muted-foreground">En traitement</p>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="En cours"
+          value={inProgressPatients.length}
+          icon={Users}
+          iconColor="text-blue-600"
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Terminés</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{completedPatients.length}</div>
-            <p className="text-xs text-muted-foreground">Aujourd'hui</p>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Terminés"
+          value={completedPatients.length}
+          icon={CheckCircle}
+          iconColor="text-green-600"
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Urgences</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {waitingPatients.filter(p => p.service === 'Ug').length}
-            </div>
-            <p className="text-xs text-muted-foreground">Priorité haute</p>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Urgences"
+          value={urgentPatients.length}
+          icon={AlertTriangle}
+          iconColor="text-red-600"
+        />
       </div>
 
       {/* Waiting Patients */}
@@ -125,17 +106,17 @@ const NurseDashboard = () => {
                         </Badge>
                         <span className="font-medium">{patient.name}</span>
                         <span className="text-sm text-muted-foreground">
-                          ({differenceInYears(new Date(), new Date(patient.birth_date))} ans, {patient.gender})
+                          ({differenceInYears(new Date(), new Date(patient.birthDate))} ans, {patient.gender})
                         </span>
                       </div>
                       <p className="text-sm">
-                        <strong>Société:</strong> {patient.companies?.name}
+                        <strong>Société:</strong> {patient.company}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Arrivé le: {new Date(patient.created_at).toLocaleString()}
+                        Arrivé le: {new Date(patient.registeredAt).toLocaleString()}
                       </p>
                     </div>
-                    <Button onClick={() => handleTakeCharge(patient.id)}>
+                    <Button>
                       Prendre en charge
                     </Button>
                   </div>
@@ -174,7 +155,7 @@ const NurseDashboard = () => {
                         </Badge>
                       </div>
                       <p className="text-sm">
-                        <strong>Société:</strong> {patient.companies?.name}
+                        <strong>Société:</strong> {patient.company}
                       </p>
                     </div>
                     <Button variant="outline">

@@ -3,18 +3,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Patient } from '@/types/patient';
+import { useUnifiedPatients } from '@/hooks/useUnifiedPatients';
 import { useLanguage } from '@/hooks/useLanguage';
 
-interface PatientsTableProps {
-  patients: Patient[];
-}
-
-const PatientsTable = ({
-  patients
-}: PatientsTableProps) => {
+const PatientsTable = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { patients } = useUnifiedPatients();
   
   // Sort patients by registration time (most recent first)
   const sortedPatients = [...patients].sort((a, b) => {
